@@ -1,0 +1,46 @@
+{
+  "name": "@parifi/sdk",
+  "version": "0.0.1",
+  "description": "Parifi SDK with common utility functions",
+  "files": [
+    "dist",
+    "package.json"
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup ./src",
+    "prepare": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Parifi/parifi-sdk.git"
+  },
+  "keywords": [
+    "perpetuals",
+    "defi",
+    "web3"
+  ],
+  "author": "Parifi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Parifi/parifi-sdk/issues"
+  },
+  "homepage": "https://github.com/Parifi/parifi-sdk#readme",
+  "devDependencies": {
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "graphql": "^16.8.1",
+    "graphql-request": "^6.1.0"
+  }
+}
