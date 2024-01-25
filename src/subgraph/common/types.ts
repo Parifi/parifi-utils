@@ -222,11 +222,17 @@ export interface Order {
     // " Timestamp after which order cannot be executed, 0 in case of no deadline "
     deadline?: string
 
+    // " Timestamp after which order cannot be executed in string "
+    deadlineISO?: string
+
     // " Delta Collateral amount to create/increase/decrease position "
     deltaCollateral?: string
 
     // " Delta position size to create/increase/decrease position "
     deltaSize?: string
+
+    // " Delta position size to create/increase/decrease position in USD "
+    deltaSizeUsd?: string
 
     // " Desired Value for order execution "
     expectedPrice?: string
@@ -254,6 +260,9 @@ export interface Order {
 
     // " Order settlement timestamp "
     settledTimestamp?: string
+
+    // " Order settlement timestamp in ISO string "
+    settledTimestampISO?: string
 
     //  " Order Execution Price during settlement "
     executionPrice?: string
