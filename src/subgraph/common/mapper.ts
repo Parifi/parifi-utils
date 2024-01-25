@@ -144,6 +144,7 @@ export const mapSinglePositionToInterface = (response: any): Position => {
         netRealizedPnl: response.netRealizedPnl,
         createdTimestamp: response.createdTimestamp,
         lastRefresh: response.lastRefresh,
+        lastRefreshISO: response.lastRefreshISO
     };
 }
 

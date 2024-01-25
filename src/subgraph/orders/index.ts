@@ -5,7 +5,7 @@ import { fetchOrdersByUserQuery, fetchPendingOrdersQuery } from "./subgraphQueri
 import { mapOrdersArrayToInterface } from "../common/mapper"
 
 // Get all order by a user address 
-export const getAllOrdersByUserAddressQuery = async (chainId: Chain, userAddress: string, count: number = 10) => {
+export const getAllOrdersByUserAddress = async (chainId: Chain, userAddress: string, count: number = 10) => {
     const subgraphEndpoint = getSubgraphEndpoint(chainId)
 
     const subgraphResponse = await request(subgraphEndpoint, fetchOrdersByUserQuery(userAddress, count));

@@ -350,6 +350,9 @@ export interface Position {
 
     // //" Last position updated timestamp "
     lastRefresh?: string
+
+    // " Last position updated timestamp in string "
+    lastRefreshISO?: string
 }
 
 ////////////////////////////////////////////////////////////////
