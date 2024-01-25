@@ -66,11 +66,11 @@ export const mapSingleMarketToInterface = (response: any): Market => {
         transactionHash: response.transactionHash,
         senderAddress: response.senderAddress,
         pyth: response.pyth
-    }   
+    }
 }
 
-export const mapMarketsArrayMarketInterface = (response: any): Market[] => {
-    return response.markets.map((market:Market) => {
+export const mapMarketsArrayToInterface = (response: any): Market[] => {
+    return response.markets.map((market: Market) => {
         return mapSingleMarketToInterface(market)
     })
 };
@@ -80,7 +80,7 @@ export const mapMarketsArrayMarketInterface = (response: any): Market[] => {
 //////////////////////    ORDERS    ////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSubgraphResponseToOrderInterface = (response: any): Order => {
+export const mapSingleOrderToInterface = (response: any): Order => {
     return {
         id: response.id,
         market: response.market ? mapSingleMarketToInterface(response.market) : undefined,
@@ -106,13 +106,19 @@ export const mapSubgraphResponseToOrderInterface = (response: any): Order => {
         cancellationTxHash: response.cancellationTxHash,
         positionId: response.positionId,
     };
+}
+
+export const mapOrdersArrayToInterface = (response: any): Order[] => {
+    return response.orders.map((order: Order) => {
+        return mapSingleOrderToInterface(order)
+    })
 };
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    POSITION    //////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSubgraphResponseToPositionInterface = (response: any): Position => {
+export const mapSinglePositionToInterface = (response: any): Position => {
     return {
         id: response.id,
         market: response.market ? mapSingleMarketToInterface(response.market) : undefined,
@@ -136,6 +142,12 @@ export const mapSubgraphResponseToPositionInterface = (response: any): Position 
         createdTimestamp: response.createdTimestamp,
         lastRefresh: response.lastRefresh,
     };
+}
+
+export const mapPositionsArrayToInterface = (response: any): Position[] => {
+    return response.positions.map((position: Position) => {
+        return mapSinglePositionToInterface(position)
+    })
 };
 
 
