@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 
 // Fetch all orders by `userAddress`
-export const fetchOrdersByUser = (userAddress: string, count: number = 10) =>
+export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10) =>
   gql`
     {
   orders(
@@ -33,12 +33,12 @@ export const fetchOrdersByUser = (userAddress: string, count: number = 10) =>
   }   
 }`
 
-export const fetchPendingOrdersQuery = (currentTimestamp: number = Date.now() / 1000) =>
+export const fetchPendingOrdersQuery = (currentTimestamp: number = Math.floor(Date.now() / 1000), count: number) =>
   gql`
   {
   orders(
     where: {status: PENDING, deadline_gte: "${currentTimestamp}"}
-    first: 100
+    first: ${count}
     orderBy: createdTimestamp
     orderDirection: desc
   ) {
@@ -51,12 +51,22 @@ export const fetchPendingOrdersQuery = (currentTimestamp: number = Date.now() / 
         lastUpdatedTimestamp
       }
     }
-    expectedPrice
     deadline
+    deadlineISO
+    orderType
+    deltaSize
+    deltaCollateral
+   	expectedPrice 
+    executionPrice
     isLong
+    status
+    createdTimestamp
+    txHash
     maxSlippage
-    isLimitOrder
-    triggerAbove
+    partnerAddress
+    executionFee
+    settledTxHash
+    cancellationTxHash
   }
 }
 `;
