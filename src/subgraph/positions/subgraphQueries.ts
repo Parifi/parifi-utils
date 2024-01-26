@@ -4,6 +4,7 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 1
     gql`
     {
         positions(
+            first: ${count}
             orderBy: createdTimestamp
             orderDirection: desc
             where: {user: "${userAddress}"}

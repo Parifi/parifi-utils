@@ -13,7 +13,7 @@ export const getAllOrdersByUserAddress = async (chainId: Chain, userAddress: str
 }
 
 // Get all pending orders that are not yet settled/cancelled or expired 
-export const getAllPendingOrders = async (chainId: Chain, timestamp: number = Date.now() / 1000, count: number = 10) => {
+export const getAllPendingOrders = async (chainId: Chain, timestamp: number = Math.floor(Date.now() / 1000), count: number = 10) => {
     const subgraphEndpoint = getSubgraphEndpoint(chainId)
 
     const subgraphResponse = await request(subgraphEndpoint, fetchPendingOrdersQuery(timestamp, count));
