@@ -1,4 +1,3 @@
-export * from "./common"
-export * from "./subgraph"
-
-export * from "./testSdk"
+export * from './common';
+export * from './subgraph';
+export * from './contract-logic';
