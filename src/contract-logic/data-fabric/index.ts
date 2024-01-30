@@ -1,4 +1,4 @@
-import { PRECISION_MULTIPLIER, SECONDS_IN_A_YEAR } from '../../common/constants';
+import { PRECISION_MULTIPLIER, SECONDS_IN_A_YEAR, WAD } from '../../common/constants';
 import { getDiff } from '../../common/helpers';
 import { Market, Position } from '../../subgraph/common/types';
 import { Decimal } from 'decimal.js';
@@ -27,19 +27,18 @@ export const getMarketSkew = (market: Market): Decimal => {
 export const getDynamicBorrowRatePerSecond = (market: Market): string => {
   const dynamicCoeff = market.dynamicCoeff ?? '0';
   const maxDynamicBorrowFee = market.maxDynamicBorrowFee ?? '0';
-  const wad = new Decimal(10).pow(18);
 
   const skew = getMarketSkew(market);
 
   // Computing e^-(dynamicCoeff * skew * wad /(PRECISION_MULTIPLIER * 100))
   const exponent = new Decimal(-1).times(dynamicCoeff).times(skew).dividedBy(PRECISION_MULTIPLIER.times(100));
 
-  const eToTheExponent = Decimal.exp(exponent).times(wad).floor();
+  const eToTheExponent = Decimal.exp(exponent).times(WAD).floor();
 
   let dynamicBorrowRate = new Decimal(maxDynamicBorrowFee)
-    .times(wad)
-    .times(wad.minus(eToTheExponent))
-    .dividedBy(wad.plus(eToTheExponent));
+    .times(WAD)
+    .times(WAD.minus(eToTheExponent))
+    .dividedBy(WAD.plus(eToTheExponent));
   dynamicBorrowRate = dynamicBorrowRate.dividedBy(SECONDS_IN_A_YEAR.times(100));
 
   return dynamicBorrowRate.floor().toString();
@@ -51,18 +50,18 @@ export const getBaseBorrowRatePerSecond = (
 ): { baseBorrowRatePerSecondLong: string; baseBorrowRatePerSecondShort: string } => {
   const baseCoeff = market.baseCoeff ?? '0';
   const baseConst = market.baseConst ?? '0';
-  const wad = new Decimal(10).pow(18);
+
 
   const utilizationBpsLong = getMarketUtilization(market, true).times(100);
   const utilizationBpsShort = getMarketUtilization(market, false).times(100);
 
   // process to calculate baseBorrowRate
-  let baseBorrowRateLong = wad.times(
+  let baseBorrowRateLong = WAD.times(
     new Decimal(baseCoeff).times(utilizationBpsLong).times(utilizationBpsLong).plus(baseConst),
   );
   baseBorrowRateLong = baseBorrowRateLong.dividedBy(new Decimal(10).pow(12).times(SECONDS_IN_A_YEAR));
 
-  let baseBorrowRateShort = wad.times(
+  let baseBorrowRateShort = WAD.times(
     new Decimal(baseCoeff).times(utilizationBpsShort).times(utilizationBpsShort).plus(baseConst),
   );
   baseBorrowRateShort = baseBorrowRateShort.dividedBy(new Decimal(10).pow(12).times(SECONDS_IN_A_YEAR));
