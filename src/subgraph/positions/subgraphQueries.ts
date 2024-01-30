@@ -1,7 +1,7 @@
-import { gql } from "graphql-request";
+import { gql } from 'graphql-request';
 
 export const fetchPositionsByUserQuery = (userAddress: string, count: number = 10) =>
-    gql`
+  gql`
     {
         positions(
             first: ${count}
@@ -37,4 +37,39 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 1
             lastRefreshISO
             
         }
-    }`
+    }`;
+
+export const fetchPositionByIdQuery = (positionId: string) =>
+  gql`
+    {
+        position(
+            id: "${positionId}"
+        ) {
+            id
+            market {
+                id
+            }
+            user {
+                id
+            }
+            isLong
+            positionCollateral
+            positionSize
+            avgPrice
+            avgPriceDec
+            avgPricePrev
+            lastCumulativeFee
+            status
+            txHash
+            liquidationTxHash
+            closingPrice
+            realizedPnl
+            realizedPnlCollateral
+            realizedFee
+            realizedFeeCollateral
+            netRealizedPnl
+            createdTimestamp
+            lastRefresh
+            lastRefreshISO            
+        }
+    }`;

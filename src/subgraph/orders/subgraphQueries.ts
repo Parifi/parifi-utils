@@ -1,4 +1,4 @@
-import { gql } from "graphql-request";
+import { gql } from 'graphql-request';
 
 // Fetch all orders by `userAddress`
 export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10) =>
@@ -31,7 +31,7 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10) 
     settledTxHash
     cancellationTxHash
   }   
-}`
+}`;
 
 export const fetchPendingOrdersQuery = (currentTimestamp: number = Math.floor(Date.now() / 1000), count: number) =>
   gql`
@@ -67,6 +67,44 @@ export const fetchPendingOrdersQuery = (currentTimestamp: number = Math.floor(Da
     executionFee
     settledTxHash
     cancellationTxHash
+  }
+}
+`;
+
+export const fetchOrdersByIdQuery = (orderId: string) =>
+  gql`
+  {
+    order(id: "${orderId}") {
+    id
+    user {
+      id
+    }
+    market {
+      id
+    }
+    orderType
+    isLong
+    isLimitOrder
+    triggerAbove
+    deadline
+    deadlineISO
+    deltaCollateral
+    deltaSize
+    deltaSizeUsd
+   	expectedPrice 
+    maxSlippage
+    partnerAddress
+    executionFee
+    txHash
+    createdTimestamp
+    status
+    settledTxHash
+    settledTimestamp
+    settledTimestampISO
+    executionPrice
+    settledBy { id }
+    cancellationTxHash
+    positionId
   }
 }
 `;

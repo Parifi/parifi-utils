@@ -268,7 +268,7 @@ export interface Order {
     executionPrice?: string
 
     // " Order settled by "
-    settledBy?: string
+    settledBy?: Account
 
     // " Order cancellation tx hash "
     cancellationTxHash?: string
