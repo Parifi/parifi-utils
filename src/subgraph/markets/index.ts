@@ -20,6 +20,5 @@ export const getMarketById = async (chainId: Chain, marketId: string) => {
   const formattedMarketId = marketId.toLowerCase();
 
   const subgraphResponse: any = await request(subgraphEndpoint, fetchMarketByIdQuery(formattedMarketId));
-  console.log(subgraphResponse);
   return mapSingleMarketToInterface(subgraphResponse.market);
 };
