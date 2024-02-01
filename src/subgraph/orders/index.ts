@@ -1,8 +1,14 @@
 import { request } from 'graphql-request';
 import { Chain } from '../../common/chain';
-import { getSubgraphEndpoint } from '../common';
-import { fetchOrdersByIdQuery, fetchOrdersByUserQuery, fetchPendingOrdersQuery } from './subgraphQueries';
+import { Order, getSubgraphEndpoint } from '../common';
+import {
+  fetchOrdersByIdQuery,
+  fetchOrdersByUserQuery,
+  fetchPendingOrdersQuery,
+  fetchPriceIdsFromOrderIdsQuery,
+} from './subgraphQueries';
 import { mapOrdersArrayToInterface, mapSingleOrderToInterface } from '../common/mapper';
+import { getUniqueValuesFromArray } from '../../common';
 
 // Get all order by a user address
 export const getAllOrdersByUserAddress = async (chainId: Chain, userAddress: string, count: number = 10) => {
@@ -32,4 +38,28 @@ export const getOrderById = async (chainId: Chain, orderId: string) => {
 
   const subgraphResponse: any = await request(subgraphEndpoint, fetchOrdersByIdQuery(formattedOrderId));
   return mapSingleOrderToInterface(subgraphResponse.order);
+};
+
+// Get all price IDs of tokens related to the orders ids
+export const getPythPriceIdsForOrderIds = async (chainId: Chain, orderIds: string[]) => {
+  const subgraphEndpoint = getSubgraphEndpoint(chainId);
+  const formattedOrderIds: string[] = orderIds.map((orderId) => orderId.toLowerCase());
+
+  const subgraphResponse: any = await request(subgraphEndpoint, fetchPriceIdsFromOrderIdsQuery(formattedOrderIds));
+  const priceIds: string[] = [];
+
+  try {
+    const orders: Order[] = mapOrdersArrayToInterface(subgraphResponse) || [];
+    if (orders.length != 0) {
+      orders.map((order) => {
+        if (order.market?.pyth?.id) {
+          priceIds.push(order.market?.pyth?.id);
+        }
+      });
+    }
+    return getUniqueValuesFromArray(priceIds);
+  } catch (error) {
+    console.log('Error mapping price ids');
+    throw error;
+  }
 };
