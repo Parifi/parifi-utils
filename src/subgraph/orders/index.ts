@@ -8,7 +8,7 @@ import {
   fetchPriceIdsFromOrderIdsQuery,
 } from './subgraphQueries';
 import { mapOrdersArrayToInterface, mapSingleOrderToInterface } from '../common/mapper';
-import { getUniqueValuesFromArray } from '../../common';
+import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
 
 // Get all order by a user address
 export const getAllOrdersByUserAddress = async (chainId: Chain, userAddress: string, count: number = 10) => {
@@ -57,7 +57,10 @@ export const getPythPriceIdsForOrderIds = async (chainId: Chain, orderIds: strin
         }
       });
     }
-    return getUniqueValuesFromArray(priceIds);
+    const uniquePriceIds = getUniqueValuesFromArray(priceIds);
+
+    // Remove empty (0x00) price ids for orders where the Pyth data is not set
+    return uniquePriceIds.filter((id) => id !== EMPTY_BYTES32);
   } catch (error) {
     console.log('Error mapping price ids');
     throw error;
