@@ -108,3 +108,21 @@ export const fetchOrdersByIdQuery = (orderId: string) =>
   }
 }
 `;
+
+export const fetchPriceIdsFromOrderIdsQuery = (orderIds: string[]) =>
+  gql`
+  {
+    orders(
+      where: {
+        id_in: [${orderIds.map(id => `"${id}"`).join(', ')}]
+      }
+    ) {
+      id
+      market {
+        pyth {
+          id
+        }
+      }
+    }
+  }
+`;

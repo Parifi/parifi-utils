@@ -15,7 +15,8 @@ export const mapSubgraphResponseToAccountInterface = (response: any): Account | 
       referralFeesInUsd: response.referralFeesInUsd,
     };
   } catch (error) {
-    console.log(error);
+    console.log('Error while mapping data', error);
+    throw error;
   }
 };
 
@@ -70,10 +71,11 @@ export const mapSingleMarketToInterface = (response: any): Market | undefined =>
       dynamicCoeff: response.dynamicCoeff,
       transactionHash: response.transactionHash,
       senderAddress: response.senderAddress,
-      pyth: response.pyth,
+      pyth: response.pyth ? mapSubgraphResponseToPythDataInterface(response.pyth) : undefined,
     };
   } catch (error) {
-    console.log(error);
+    console.log('Error while mapping data', error);
+    throw error;
   }
 };
 
@@ -83,7 +85,8 @@ export const mapMarketsArrayToInterface = (response: any): Market[] | undefined 
       return mapSingleMarketToInterface(market);
     });
   } catch (error) {
-    console.log(error);
+    console.log('Error while mapping data', error);
+    throw error;
   }
 };
 
@@ -122,7 +125,8 @@ export const mapSingleOrderToInterface = (response: any): Order | undefined => {
       positionId: response.positionId,
     };
   } catch (error) {
-    console.log(error);
+    console.log('Error while mapping data', error);
+    throw error;
   }
 };
 
@@ -132,7 +136,8 @@ export const mapOrdersArrayToInterface = (response: any): Order[] | undefined =>
       return mapSingleOrderToInterface(order);
     });
   } catch (error) {
-    console.log(error);
+    console.log('Error while mapping data', error);
+    throw error;
   }
 };
 
@@ -167,7 +172,8 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
       lastRefreshISO: response.lastRefreshISO,
     };
   } catch (error) {
-    console.log(error);
+    console.log('Error while mapping data', error);
+    throw error;
   }
 };
 
@@ -177,7 +183,8 @@ export const mapPositionsArrayToInterface = (response: any): Position[] | undefi
       return mapSinglePositionToInterface(position);
     });
   } catch (error) {
-    console.log(error);
+    console.log('Error while mapping data', error);
+    throw error;
   }
 };
 
@@ -197,7 +204,8 @@ export const mapSubgraphResponseToTokenInterface = (response: any): Token | unde
       lastPriceTimestamp: response.lastPriceTimestamp,
     };
   } catch (error) {
-    console.log(error);
+    console.log('Error while mapping data', error);
+    throw error;
   }
 };
 
@@ -215,7 +223,8 @@ export const mapSubgraphResponseToPriceFeedSnapshotInterface = (response: any): 
       confidence: response.confidence,
     };
   } catch (error) {
-    console.log(error);
+    console.log('Error while mapping data', error);
+    throw error;
   }
 };
 
@@ -229,6 +238,7 @@ export const mapSubgraphResponseToPythDataInterface = (response: any): PythData 
       lastUpdatedTimestamp: response.lastUpdatedTimestamp,
     };
   } catch (error) {
-    console.log(error);
+    console.log('Error while mapping data', error);
+    throw error;
   }
 };
