@@ -12,9 +12,8 @@ export const getAllMarketsFromSubgraph = async (chainId: Chain): Promise<Market[
     if (markets) {
       return markets;
     }
-    throw new Error('Markets not found');
+    throw new NotFoundError('Markets not found');
   } catch (error) {
-    console.log('Markets not found');
     throw error;
   }
 };
@@ -29,9 +28,8 @@ export const getMarketById = async (chainId: Chain, marketId: string): Promise<M
     if (market && market.id === marketId) {
       return market;
     }
-    throw new Error('Market does not exists');
+    throw new NotFoundError('Market does not exists');
   } catch (error) {
-    console.log('Market does not exists');
     throw error;
   }
 };

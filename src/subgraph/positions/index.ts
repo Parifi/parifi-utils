@@ -19,7 +19,7 @@ export const getAllPositionsByUserAddress = async (
     if (positions) {
       return positions;
     }
-    throw new Error('Positions not found');
+    throw new NotFoundError('Positions not found');
   } catch (error) {
     throw error;
   }
@@ -36,7 +36,7 @@ export const getPositionById = async (chainId: Chain, positionId: string): Promi
     if (position) {
       return position;
     }
-    throw new Error('Position not found');
+    throw new NotFoundError('Position not found');
   } catch (error) {
     throw error;
   }

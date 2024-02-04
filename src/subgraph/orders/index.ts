@@ -20,7 +20,7 @@ export const getAllOrdersByUserAddress = async (
     const subgraphEndpoint = getSubgraphEndpoint(chainId);
     const subgraphResponse = await request(subgraphEndpoint, fetchOrdersByUserQuery(userAddress, count));
     const orders = mapOrdersArrayToInterface(subgraphResponse);
-    if (!orders) throw new Error('Orders not found');
+    if (!orders) throw new NotFoundError('Orders not found');
     return orders;
   } catch (error) {
     throw error;
@@ -41,7 +41,7 @@ export const getAllPendingOrders = async (
     if (orders) {
       return orders;
     }
-    throw new Error('Orders not found');
+    throw new NotFoundError('Orders not found');
   } catch (error) {
     throw error;
   }
@@ -58,7 +58,7 @@ export const getOrderById = async (chainId: Chain, orderId: string): Promise<Ord
     if (order && order.id === orderId) {
       return order;
     }
-    throw new Error('Order does not exist');
+    throw new NotFoundError('Order does not exist');
   } catch (error) {
     throw error;
   }
