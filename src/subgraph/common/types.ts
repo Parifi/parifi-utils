@@ -129,7 +129,7 @@ export interface Market {
     totalOI?: string
 
     // " Total Open Interest (assets) "
-    totalOIAssets: string
+    totalOIAssets?: string
 
     // " If closeOnlyMode is true, no new positions can be opened. Only existing position can be closed "
     closeOnlyMode?: boolean
@@ -274,7 +274,7 @@ export interface Order {
     cancellationTxHash?: string
 
     // " Related Position ID "
-    positionId?: string
+    positionId?: Position
 }
 
 

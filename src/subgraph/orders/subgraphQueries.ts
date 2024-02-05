@@ -104,7 +104,7 @@ export const fetchOrdersByIdQuery = (orderId: string) =>
     executionPrice
     settledBy { id }
     cancellationTxHash
-    positionId
+    position { id }
   }
 }
 `;

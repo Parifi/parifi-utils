@@ -24,7 +24,7 @@ export const getMarketSkew = (market: Market): Decimal => {
 };
 
 // Returns the Dynamic Borrow rate per second for a market
-export const getDynamicBorrowRatePerSecond = (market: Market): string => {
+export const getDynamicBorrowRatePerSecond = (market: Market): Decimal => {
   const dynamicCoeff = market.dynamicCoeff ?? '0';
   const maxDynamicBorrowFee = market.maxDynamicBorrowFee ?? '0';
 
@@ -41,16 +41,15 @@ export const getDynamicBorrowRatePerSecond = (market: Market): string => {
     .dividedBy(WAD.plus(eToTheExponent));
   dynamicBorrowRate = dynamicBorrowRate.dividedBy(SECONDS_IN_A_YEAR.times(100));
 
-  return dynamicBorrowRate.floor().toString();
+  return dynamicBorrowRate.floor();
 };
 
 // Returns the calculated base borrow rate per second for a market
 export const getBaseBorrowRatePerSecond = (
   market: Market,
-): { baseBorrowRatePerSecondLong: string; baseBorrowRatePerSecondShort: string } => {
+): { baseBorrowRatePerSecondLong: Decimal; baseBorrowRatePerSecondShort: Decimal } => {
   const baseCoeff = market.baseCoeff ?? '0';
   const baseConst = market.baseConst ?? '0';
-
 
   const utilizationBpsLong = getMarketUtilization(market, true).times(100);
   const utilizationBpsShort = getMarketUtilization(market, false).times(100);
@@ -67,8 +66,8 @@ export const getBaseBorrowRatePerSecond = (
   baseBorrowRateShort = baseBorrowRateShort.dividedBy(new Decimal(10).pow(12).times(SECONDS_IN_A_YEAR));
 
   return {
-    baseBorrowRatePerSecondLong: baseBorrowRateLong.floor().toString(),
-    baseBorrowRatePerSecondShort: baseBorrowRateShort.floor().toString(),
+    baseBorrowRatePerSecondLong: baseBorrowRateLong.floor(),
+    baseBorrowRatePerSecondShort: baseBorrowRateShort.floor(),
   };
 };
 
