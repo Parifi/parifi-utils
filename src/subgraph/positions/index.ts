@@ -9,10 +9,11 @@ export const getAllPositionsByUserAddress = async (
   chainId: Chain,
   userAddress: string,
   count: number = 10,
+  skip: number = 0
 ): Promise<Position[]> => {
   try {
     const subgraphEndpoint = getSubgraphEndpoint(chainId);
-    const query = fetchPositionsByUserQuery(userAddress, count);
+    const query = fetchPositionsByUserQuery(userAddress, count, skip);
 
     const subgraphResponse = await request(subgraphEndpoint, query);
     const positions = mapPositionsArrayToInterface(subgraphResponse);

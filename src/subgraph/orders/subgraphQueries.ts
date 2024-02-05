@@ -1,11 +1,12 @@
 import { gql } from 'graphql-request';
 
 // Fetch all orders by `userAddress`
-export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10) =>
+export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10, skip: number = 0) =>
   gql`
     {
   orders(
     first: ${count}
+    skip: ${skip}
     where: {user: "${userAddress}"}
     orderBy: createdTimestamp
     orderDirection: desc
@@ -33,12 +34,13 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10) 
   }   
 }`;
 
-export const fetchPendingOrdersQuery = (currentTimestamp: number = Math.floor(Date.now() / 1000), count: number) =>
+export const fetchPendingOrdersQuery = (currentTimestamp: number = Math.floor(Date.now() / 1000), count: number, skip: number = 0) =>
   gql`
   {
   orders(
     where: {status: PENDING, deadline_gte: "${currentTimestamp}"}
     first: ${count}
+    skip: ${skip}
     orderBy: createdTimestamp
     orderDirection: desc
   ) {
