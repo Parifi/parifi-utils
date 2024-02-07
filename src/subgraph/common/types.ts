@@ -418,3 +418,8 @@ export interface PythData {
     // " Last updated timestamp "
     lastUpdatedTimestamp?: string
 }
+
+export interface BatchExecute {
+    id: string;
+    priceUpdateData: string[];
+}

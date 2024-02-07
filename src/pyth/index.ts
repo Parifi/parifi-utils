@@ -77,3 +77,5 @@ export const normalizePythPriceForParifi = (pythPrice: number, pythExponent: num
     return new Decimal(pythPrice).div(adjustedFactor);
   }
 };
+
+export const 

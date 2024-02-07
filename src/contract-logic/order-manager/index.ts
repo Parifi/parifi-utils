@@ -3,6 +3,18 @@ import { Decimal } from 'decimal.js';
 import { DEVIATION_PRECISION_MULTIPLIER, MAX_FEE, PRECISION_MULTIPLIER } from '../../common/constants';
 import { getAccruedBorrowFeesInMarket, getMarketUtilization } from '../data-fabric';
 import { convertMarketAmountToCollateral } from '../price-feed';
+import { Chain } from '@parifi/references';
+import { contracts as parifiContracts } from '@parifi/references';
+import { Contract, ethers } from 'ethers';
+
+// Returns an Order Manager contract instance without signer
+export const getOrderManagerInstance = (chain: Chain): Contract => {
+  try {
+    return new ethers.Contract(parifiContracts[chain].OrderManager.address, parifiContracts[chain].OrderManager.abi);
+  } catch (error) {
+    throw error;
+  }
+};
 
 // Return the Profit or Loss for a position in USD
 // `normalizedMarketPrice` is the price of market with 8 decimals
