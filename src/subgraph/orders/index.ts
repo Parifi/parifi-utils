@@ -9,16 +9,18 @@ import {
 } from './subgraphQueries';
 import { mapOrdersArrayToInterface, mapSingleOrderToInterface } from '../common/mapper';
 import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
+import { NotFoundError } from '../../error/not-found.error';
 
 // Get all order by a user address
 export const getAllOrdersByUserAddress = async (
   chainId: Chain,
   userAddress: string,
   count: number = 10,
+  skip: number = 0
 ): Promise<Order[]> => {
   try {
     const subgraphEndpoint = getSubgraphEndpoint(chainId);
-    const subgraphResponse = await request(subgraphEndpoint, fetchOrdersByUserQuery(userAddress, count));
+    const subgraphResponse = await request(subgraphEndpoint, fetchOrdersByUserQuery(userAddress, count, skip));
     const orders = mapOrdersArrayToInterface(subgraphResponse);
     if (!orders) throw new NotFoundError('Orders not found');
     return orders;
@@ -32,10 +34,11 @@ export const getAllPendingOrders = async (
   chainId: Chain,
   timestamp: number = Math.floor(Date.now() / 1000),
   count: number = 10,
+  skip: number = 0
 ): Promise<Order[]> => {
   try {
     const subgraphEndpoint = getSubgraphEndpoint(chainId);
-    const subgraphResponse = await request(subgraphEndpoint, fetchPendingOrdersQuery(timestamp, count));
+    const subgraphResponse = await request(subgraphEndpoint, fetchPendingOrdersQuery(timestamp, count, skip));
 
     const orders = mapOrdersArrayToInterface(subgraphResponse);
     if (orders) {

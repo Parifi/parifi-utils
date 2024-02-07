@@ -3,6 +3,7 @@ import { Chain } from '../../common/chain';
 import { Market, getSubgraphEndpoint } from '../common';
 import { fetchAllMarketsDataQuery, fetchMarketByIdQuery } from './subgraphQueries';
 import { mapMarketsArrayToInterface, mapSingleMarketToInterface } from '../common/mapper';
+import { NotFoundError } from '../../error/not-found.error';
 
 export const getAllMarketsFromSubgraph = async (chainId: Chain): Promise<Market[]> => {
   try {
