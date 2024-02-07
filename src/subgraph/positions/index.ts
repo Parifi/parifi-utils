@@ -3,6 +3,7 @@ import { Chain } from '../../common/chain';
 import { Position, getSubgraphEndpoint } from '../common';
 import { fetchPositionByIdQuery, fetchPositionsByUserQuery } from './subgraphQueries';
 import { mapPositionsArrayToInterface, mapSinglePositionToInterface } from '../common/mapper';
+import { NotFoundError } from '../../error/not-found.error';
 
 // Get all positions by user address
 export const getAllPositionsByUserAddress = async (

@@ -9,6 +9,7 @@ import {
 } from './subgraphQueries';
 import { mapOrdersArrayToInterface, mapSingleOrderToInterface } from '../common/mapper';
 import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
+import { NotFoundError } from '../../error/not-found.error';
 
 // Get all order by a user address
 export const getAllOrdersByUserAddress = async (
