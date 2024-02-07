@@ -385,6 +385,29 @@ export interface Token {
 ////////////////////////////////////////////////////////////////
 ////////////////////////    PYTH    ////////////////////////////
 ////////////////////////////////////////////////////////////////
+
+
+// Pyth price data interface for prices received from Pyth
+export interface PythPrice {
+    price: string
+
+    conf: string
+
+    expo: number
+
+    publish_time: number
+}
+
+// Interface for response received for Pyth Price data
+export interface PythPriceResponse {
+    // Pyth Price ID
+    id? :string
+
+    price: PythPrice
+    
+    ema_price: PythPrice
+}
+
 export interface PriceFeedSnapshot {
     //" Price ID + Timestamp "
     id?: string
