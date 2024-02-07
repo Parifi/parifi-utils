@@ -4,9 +4,11 @@ import { Market, getSubgraphEndpoint } from '../common';
 import { fetchAllMarketsDataQuery, fetchMarketByIdQuery } from './subgraphQueries';
 import { mapMarketsArrayToInterface, mapSingleMarketToInterface } from '../common/mapper';
 
-export const getAllMarketsFromSubgraph = async (chainId: Chain): Promise<Market[]> => {
+export const getAllMarketsFromSubgraph = async (chainId: Chain, subgraphEndpoint: string|undefined): Promise<Market[]> => {
   try {
-    const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    if(!subgraphEndpoint){
+      const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    }
     const subgraphResponse = await request(subgraphEndpoint, fetchAllMarketsDataQuery);
     const markets = mapMarketsArrayToInterface(subgraphResponse);
     if (markets) {
@@ -19,9 +21,11 @@ export const getAllMarketsFromSubgraph = async (chainId: Chain): Promise<Market[
 };
 
 // Get all details of a market from subgraph by market ID
-export const getMarketById = async (chainId: Chain, marketId: string): Promise<Market> => {
+export const getMarketById = async (chainId: Chain, marketId: string,subgraphEndpoint: string|undefined): Promise<Market> => {
   try {
-    const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    if(!subgraphEndpoint){
+      const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    }
     const formattedMarketId = marketId.toLowerCase();
     const subgraphResponse: any = await request(subgraphEndpoint, fetchMarketByIdQuery(formattedMarketId));
     const market = mapSingleMarketToInterface(subgraphResponse.market);

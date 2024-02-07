@@ -14,10 +14,13 @@ import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
 export const getAllOrdersByUserAddress = async (
   chainId: Chain,
   userAddress: string,
+  subgraphEndpoint: string | undefined,
   count: number = 10,
 ): Promise<Order[]> => {
   try {
-    const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    if(!subgraphEndpoint){
+      const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    }
     const subgraphResponse = await request(subgraphEndpoint, fetchOrdersByUserQuery(userAddress, count));
     const orders = mapOrdersArrayToInterface(subgraphResponse);
     if (!orders) throw new NotFoundError('Orders not found');
@@ -30,11 +33,14 @@ export const getAllOrdersByUserAddress = async (
 // Get all pending orders that are not yet settled/cancelled or expired
 export const getAllPendingOrders = async (
   chainId: Chain,
+  subgraphEndpoint: string | undefined,
   timestamp: number = Math.floor(Date.now() / 1000),
   count: number = 10,
 ): Promise<Order[]> => {
   try {
-    const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    if(!subgraphEndpoint){
+      const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    }
     const subgraphResponse = await request(subgraphEndpoint, fetchPendingOrdersQuery(timestamp, count));
 
     const orders = mapOrdersArrayToInterface(subgraphResponse);
@@ -48,9 +54,11 @@ export const getAllPendingOrders = async (
 };
 
 // Get order from subgraph by order ID
-export const getOrderById = async (chainId: Chain, orderId: string): Promise<Order> => {
+export const getOrderById = async (chainId: Chain, orderId: string,subgraphEndpoint: string | undefined): Promise<Order> => {
   try {
-    const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    if(!subgraphEndpoint){
+      const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    }
     const formattedOrderId = orderId.toLowerCase();
 
     const subgraphResponse: any = await request(subgraphEndpoint, fetchOrdersByIdQuery(formattedOrderId));
@@ -65,9 +73,11 @@ export const getOrderById = async (chainId: Chain, orderId: string): Promise<Ord
 };
 
 // Get all price IDs of tokens related to the orders ids
-export const getPythPriceIdsForOrderIds = async (chainId: Chain, orderIds: string[]): Promise<string[]> => {
+export const getPythPriceIdsForOrderIds = async (chainId: Chain, orderIds: string[],subgraphEndpoint: string | undefined): Promise<string[]> => {
   try {
-  const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    if(!subgraphEndpoint){
+      const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    }
   const formattedOrderIds: string[] = orderIds.map((orderId) => orderId.toLowerCase());
 
   const subgraphResponse: any = await request(subgraphEndpoint, fetchPriceIdsFromOrderIdsQuery(formattedOrderIds));

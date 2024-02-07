@@ -8,10 +8,13 @@ import { mapPositionsArrayToInterface, mapSinglePositionToInterface } from '../c
 export const getAllPositionsByUserAddress = async (
   chainId: Chain,
   userAddress: string,
+  subgraphEndpoint: string | undefined,
   count: number = 10,
 ): Promise<Position[]> => {
   try {
-    const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    if(!subgraphEndpoint){
+      const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    }
     const query = fetchPositionsByUserQuery(userAddress, count);
 
     const subgraphResponse = await request(subgraphEndpoint, query);
@@ -26,11 +29,12 @@ export const getAllPositionsByUserAddress = async (
 };
 
 // Get position from subgraph by position ID
-export const getPositionById = async (chainId: Chain, positionId: string): Promise<Position> => {
+export const getPositionById = async (chainId: Chain, positionId: string,subgraphEndpoint: string | undefined): Promise<Position> => {
   try {
-    const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    if(!subgraphEndpoint){
+      const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    }
     const formattedPositionId = positionId.toLowerCase();
-
     const subgraphResponse: any = await request(subgraphEndpoint, fetchPositionByIdQuery(formattedPositionId));
     const position = mapSinglePositionToInterface(subgraphResponse.position);
     if (position) {

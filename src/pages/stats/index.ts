@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 import { Chain, DECIMAL_10, PRICE_FEED_DECIMALS } from '../../common';
-import { getBaseBorrowRatePerSecond, getDynamicBorrowRatePerSecond, getMarketSkew } from '../../contract-logic';
+import { getBaseBorrowRatePerSecond, getDynamicBorrowRatePerSecond, getMarketSkew } from '../../core';
 import { Market } from '../../subgraph';
 
 // Returns the total borrowing rate for a market per hour in percentage
