@@ -15,7 +15,7 @@ import { NotFoundError } from '../../error/not-found.error';
 export const getAllOrdersByUserAddress = async (
   chainId: Chain,
   userAddress: string,
-  subgraphEndpoint: string | undefined,
+  subgraphEndpoint?: string,
   count: number = 10,
   skip: number = 0,
 ): Promise<Order[]> => {
@@ -38,7 +38,7 @@ export const getAllOrdersByUserAddress = async (
 // Get all pending orders that are not yet settled/cancelled or expired
 export const getAllPendingOrders = async (
   chainId: Chain,
-  subgraphEndpoint: string | undefined,
+  subgraphEndpoint?: string,
   timestamp: number = Math.floor(Date.now() / 1000),
   count: number = 10,
   skip: number = 0,
@@ -63,11 +63,7 @@ export const getAllPendingOrders = async (
 };
 
 // Get order from subgraph by order ID
-export const getOrderById = async (
-  chainId: Chain,
-  orderId: string,
-  subgraphEndpoint: string | undefined,
-): Promise<Order> => {
+export const getOrderById = async (chainId: Chain, orderId: string, subgraphEndpoint?: string): Promise<Order> => {
   try {
     let subgraphResponse: any;
     const formattedOrderId = orderId.toLowerCase();
@@ -91,7 +87,7 @@ export const getOrderById = async (
 export const getPythPriceIdsForOrderIds = async (
   chainId: Chain,
   orderIds: string[],
-  subgraphEndpoint: string | undefined,
+  subgraphEndpoint?: string,
 ): Promise<string[]> => {
   try {
     const formattedOrderIds: string[] = orderIds.map((orderId) => orderId.toLowerCase());

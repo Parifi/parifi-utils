@@ -9,7 +9,7 @@ import { NotFoundError } from '../../error/not-found.error';
 export const getAllPositionsByUserAddress = async (
   chainId: Chain,
   userAddress: string,
-  subgraphEndpoint: string | undefined,
+  subgraphEndpoint?: string,
   count: number = 10,
   skip: number = 0,
 ): Promise<Position[]> => {
@@ -37,7 +37,7 @@ export const getAllPositionsByUserAddress = async (
 export const getPositionById = async (
   chainId: Chain,
   positionId: string,
-  subgraphEndpoint: string | undefined,
+  subgraphEndpoint?: string,
 ): Promise<Position> => {
   try {
     let subgraphResponse: any;

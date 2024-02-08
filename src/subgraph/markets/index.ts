@@ -5,10 +5,7 @@ import { fetchAllMarketsDataQuery, fetchMarketByIdQuery } from './subgraphQuerie
 import { mapMarketsArrayToInterface, mapSingleMarketToInterface } from '../common/mapper';
 import { NotFoundError } from '../../error/not-found.error';
 
-export const getAllMarketsFromSubgraph = async (
-  chainId: Chain,
-  subgraphEndpoint: string | undefined,
-): Promise<Market[]> => {
+export const getAllMarketsFromSubgraph = async (chainId: Chain, subgraphEndpoint?: string): Promise<Market[]> => {
   try {
     let subgraphResponse;
     if (subgraphEndpoint) {
@@ -28,11 +25,7 @@ export const getAllMarketsFromSubgraph = async (
 };
 
 // Get all details of a market from subgraph by market ID
-export const getMarketById = async (
-  chainId: Chain,
-  marketId: string,
-  subgraphEndpoint: string | undefined,
-): Promise<Market> => {
+export const getMarketById = async (chainId: Chain, marketId: string, subgraphEndpoint?: string): Promise<Market> => {
   try {
     let subgraphResponse: any;
     const formattedMarketId = marketId.toLowerCase();
