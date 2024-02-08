@@ -5,14 +5,14 @@ import { getVaaPriceUpdateData, normalizePythPriceForParifi } from '.';
 export class Pyth {
   constructor(private pythConfig: PythConfig) {}
 
-  private getPythClient = async (
+  private getPythClient = (
     pythServiceEndpoint = this.pythConfig.pythEndpoint,
     pythServiceUsername = this.pythConfig.username,
     pythServicePassword = this.pythConfig.password,
     isStable = this.pythConfig.isStable,
-  ): Promise<AxiosInstance | undefined> => {
+  ): AxiosInstance | undefined => {
     try {
-      if (isStable) {
+      if (isStable === undefined) {
         isStable = true;
       }
       if (pythServiceEndpoint) {
