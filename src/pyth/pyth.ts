@@ -44,7 +44,6 @@ export class Pyth {
         }
       }
     } catch (error) {
-      console.log('Error when creating Pyth instance:', error);
       throw error;
     }
   };
