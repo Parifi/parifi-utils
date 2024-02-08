@@ -3,11 +3,7 @@ import { PythConfig } from '../types';
 import { getVaaPriceUpdateData, normalizePythPriceForParifi } from '.';
 
 export class Pyth {
-  private pythConfig: PythConfig;
-
-  constructor(pythConfig: PythConfig) {
-    this.pythConfig = pythConfig;
-  }
+  constructor(private pythConfig: PythConfig) {}
 
   private getPythClient = async (
     pythServiceEndpoint = this.pythConfig.pythEndpoint,
@@ -16,7 +12,7 @@ export class Pyth {
     isStable = this.pythConfig.isStable,
   ): Promise<AxiosInstance | undefined> => {
     try {
-      if (!isStable) {
+      if (isStable) {
         isStable = true;
       }
       if (pythServiceEndpoint) {

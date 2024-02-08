@@ -10,13 +10,10 @@ export * from './orders';
 export * from './positions';
 
 export class SubGraph {
-  private rpcConfig: RpcConfig;
-  private subGraphConfig: SubgraphConfig;
-
-  constructor(rpcConfig: RpcConfig, subGraphConfig: SubgraphConfig) {
-    this.rpcConfig = rpcConfig;
-    this.subGraphConfig = subGraphConfig;
-  }
+  constructor(
+    private rpcConfig: RpcConfig,
+    private subGraphConfig: SubgraphConfig,
+  ) {}
 
   // orders
   public async getAllOrdersByUserAddress(userAddress: string, count: number, skip: number): Promise<Order[]> {

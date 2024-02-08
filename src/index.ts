@@ -1,4 +1,4 @@
-import { Pyth } from './pyth/Pyth';
+import { Pyth } from './pyth/pyth';
 import { SubGraph } from './subgraph';
 import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from './types';
 
