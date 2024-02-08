@@ -9,6 +9,7 @@ import {
 } from './subgraphQueries';
 import { mapOrdersArrayToInterface, mapSingleOrderToInterface } from '../common/mapper';
 import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
+import { NotFoundError } from '../../error/not-found.error';
 
 // Get all order by a user address
 export const getAllOrdersByUserAddress = async (
@@ -16,12 +17,16 @@ export const getAllOrdersByUserAddress = async (
   userAddress: string,
   subgraphEndpoint: string | undefined,
   count: number = 10,
+  skip: number = 0,
 ): Promise<Order[]> => {
   try {
-    if(!subgraphEndpoint){
+    let subgraphResponse;
+    if (subgraphEndpoint) {
+      subgraphResponse = await request(subgraphEndpoint, fetchOrdersByUserQuery(userAddress, count, skip));
+    } else {
       const subgraphEndpoint = getSubgraphEndpoint(chainId);
+      subgraphResponse = await request(subgraphEndpoint, fetchOrdersByUserQuery(userAddress, count, skip));
     }
-    const subgraphResponse = await request(subgraphEndpoint, fetchOrdersByUserQuery(userAddress, count));
     const orders = mapOrdersArrayToInterface(subgraphResponse);
     if (!orders) throw new NotFoundError('Orders not found');
     return orders;
@@ -36,12 +41,16 @@ export const getAllPendingOrders = async (
   subgraphEndpoint: string | undefined,
   timestamp: number = Math.floor(Date.now() / 1000),
   count: number = 10,
+  skip: number = 0,
 ): Promise<Order[]> => {
   try {
-    if(!subgraphEndpoint){
+    let subgraphResponse;
+    if (subgraphEndpoint) {
+      subgraphResponse = await request(subgraphEndpoint, fetchPendingOrdersQuery(timestamp, count, skip));
+    } else {
       const subgraphEndpoint = getSubgraphEndpoint(chainId);
+      subgraphResponse = await request(subgraphEndpoint, fetchPendingOrdersQuery(timestamp, count, skip));
     }
-    const subgraphResponse = await request(subgraphEndpoint, fetchPendingOrdersQuery(timestamp, count));
 
     const orders = mapOrdersArrayToInterface(subgraphResponse);
     if (orders) {
@@ -54,14 +63,20 @@ export const getAllPendingOrders = async (
 };
 
 // Get order from subgraph by order ID
-export const getOrderById = async (chainId: Chain, orderId: string,subgraphEndpoint: string | undefined): Promise<Order> => {
+export const getOrderById = async (
+  chainId: Chain,
+  orderId: string,
+  subgraphEndpoint: string | undefined,
+): Promise<Order> => {
   try {
-    if(!subgraphEndpoint){
-      const subgraphEndpoint = getSubgraphEndpoint(chainId);
-    }
+    let subgraphResponse: any;
     const formattedOrderId = orderId.toLowerCase();
-
-    const subgraphResponse: any = await request(subgraphEndpoint, fetchOrdersByIdQuery(formattedOrderId));
+    if (subgraphEndpoint) {
+      subgraphResponse = await request(subgraphEndpoint, fetchOrdersByIdQuery(formattedOrderId));
+    } else {
+      const subgraphEndpoint = getSubgraphEndpoint(chainId);
+      subgraphResponse = await request(subgraphEndpoint, fetchOrdersByIdQuery(formattedOrderId));
+    }
     const order = mapSingleOrderToInterface(subgraphResponse.order);
     if (order && order.id === orderId) {
       return order;
@@ -73,15 +88,22 @@ export const getOrderById = async (chainId: Chain, orderId: string,subgraphEndpo
 };
 
 // Get all price IDs of tokens related to the orders ids
-export const getPythPriceIdsForOrderIds = async (chainId: Chain, orderIds: string[],subgraphEndpoint: string | undefined): Promise<string[]> => {
+export const getPythPriceIdsForOrderIds = async (
+  chainId: Chain,
+  orderIds: string[],
+  subgraphEndpoint: string | undefined,
+): Promise<string[]> => {
   try {
-    if(!subgraphEndpoint){
+    const formattedOrderIds: string[] = orderIds.map((orderId) => orderId.toLowerCase());
+    let subgraphResponse: any;
+    if (subgraphEndpoint) {
+      subgraphResponse = await request(subgraphEndpoint, fetchPriceIdsFromOrderIdsQuery(formattedOrderIds));
+    } else {
       const subgraphEndpoint = getSubgraphEndpoint(chainId);
+      subgraphResponse = await request(subgraphEndpoint, fetchPriceIdsFromOrderIdsQuery(formattedOrderIds));
     }
-  const formattedOrderIds: string[] = orderIds.map((orderId) => orderId.toLowerCase());
 
-  const subgraphResponse: any = await request(subgraphEndpoint, fetchPriceIdsFromOrderIdsQuery(formattedOrderIds));
-  const priceIds: string[] = [];
+    const priceIds: string[] = [];
 
     const orders: Order[] = mapOrdersArrayToInterface(subgraphResponse) || [];
     if (orders.length != 0) {

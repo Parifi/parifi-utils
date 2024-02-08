@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { PythConfig, RpcConfig } from '../types';
+import { PythConfig } from '../types';
 import { getVaaPriceUpdateData, normalizePythPriceForParifi } from '.';
 
 export class Pyth {
@@ -55,8 +55,9 @@ export class Pyth {
 
   public async getVaaPriceUpdateData(priceIds: string[]) {
     const pythClient = await this.getPythClient();
+
     if (pythClient) {
-      await getVaaPriceUpdateData(priceIds, pythClient);
+      return await getVaaPriceUpdateData(priceIds, pythClient);
     }
   }
 
