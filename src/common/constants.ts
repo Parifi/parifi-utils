@@ -8,3 +8,6 @@ export const WAD = new Decimal(10).pow(18); // 10^18
 export const EMPTY_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 export const PRICE_FEED_DECIMALS = 8;
 export const DECIMAL_10 = new Decimal(10);
+export const DECIMAL_ZERO = new Decimal(0);
+export const DEFAULT_BATCH_COUNT = 10;
+
