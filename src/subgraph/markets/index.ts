@@ -5,10 +5,15 @@ import { fetchAllMarketsDataQuery, fetchMarketByIdQuery } from './subgraphQuerie
 import { mapMarketsArrayToInterface, mapSingleMarketToInterface } from '../common/mapper';
 import { NotFoundError } from '../../error/not-found.error';
 
-export const getAllMarketsFromSubgraph = async (chainId: Chain): Promise<Market[]> => {
+export const getAllMarketsFromSubgraph = async (chainId: Chain, subgraphEndpoint?: string): Promise<Market[]> => {
   try {
-    const subgraphEndpoint = getSubgraphEndpoint(chainId);
-    const subgraphResponse = await request(subgraphEndpoint, fetchAllMarketsDataQuery);
+    let subgraphResponse;
+    if (subgraphEndpoint) {
+      subgraphResponse = await request(subgraphEndpoint, fetchAllMarketsDataQuery);
+    } else {
+      const subgraphEndpoint = getSubgraphEndpoint(chainId);
+      subgraphResponse = await request(subgraphEndpoint, fetchAllMarketsDataQuery);
+    }
     const markets = mapMarketsArrayToInterface(subgraphResponse);
     if (markets) {
       return markets;
@@ -20,11 +25,16 @@ export const getAllMarketsFromSubgraph = async (chainId: Chain): Promise<Market[
 };
 
 // Get all details of a market from subgraph by market ID
-export const getMarketById = async (chainId: Chain, marketId: string): Promise<Market> => {
+export const getMarketById = async (chainId: Chain, marketId: string, subgraphEndpoint?: string): Promise<Market> => {
   try {
-    const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    let subgraphResponse: any;
     const formattedMarketId = marketId.toLowerCase();
-    const subgraphResponse: any = await request(subgraphEndpoint, fetchMarketByIdQuery(formattedMarketId));
+    if (subgraphEndpoint) {
+      subgraphResponse = await request(subgraphEndpoint, fetchMarketByIdQuery(formattedMarketId));
+    } else {
+      const subgraphEndpoint = getSubgraphEndpoint(chainId);
+      subgraphResponse = await request(subgraphEndpoint, fetchMarketByIdQuery(formattedMarketId));
+    }
     const market = mapSingleMarketToInterface(subgraphResponse.market);
     if (market && market.id === marketId) {
       return market;

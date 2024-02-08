@@ -1,6 +1,6 @@
 import { request } from 'graphql-request';
 import { Chain } from '../../common/chain';
-import { Position, getSubgraphEndpoint } from '../common';
+import { Position, getSubgraphEndpoint, subgraphEndpoints } from '../common';
 import { fetchPositionByIdQuery, fetchPositionsByUserQuery } from './subgraphQueries';
 import { mapPositionsArrayToInterface, mapSinglePositionToInterface } from '../common/mapper';
 import { NotFoundError } from '../../error/not-found.error';
@@ -9,14 +9,20 @@ import { NotFoundError } from '../../error/not-found.error';
 export const getAllPositionsByUserAddress = async (
   chainId: Chain,
   userAddress: string,
+  subgraphEndpoint?: string,
   count: number = 10,
-  skip: number = 0
+  skip: number = 0,
 ): Promise<Position[]> => {
   try {
-    const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    let subgraphResponse;
     const query = fetchPositionsByUserQuery(userAddress, count, skip);
+    if (subgraphEndpoint) {
+      subgraphResponse = await request(subgraphEndpoint, query);
+    } else {
+      const subgraphEndpoint = getSubgraphEndpoint(chainId);
+      subgraphResponse = await request(subgraphEndpoint, query);
+    }
 
-    const subgraphResponse = await request(subgraphEndpoint, query);
     const positions = mapPositionsArrayToInterface(subgraphResponse);
     if (positions) {
       return positions;
@@ -28,12 +34,20 @@ export const getAllPositionsByUserAddress = async (
 };
 
 // Get position from subgraph by position ID
-export const getPositionById = async (chainId: Chain, positionId: string): Promise<Position> => {
+export const getPositionById = async (
+  chainId: Chain,
+  positionId: string,
+  subgraphEndpoint?: string,
+): Promise<Position> => {
   try {
-    const subgraphEndpoint = getSubgraphEndpoint(chainId);
+    let subgraphResponse: any;
     const formattedPositionId = positionId.toLowerCase();
-
-    const subgraphResponse: any = await request(subgraphEndpoint, fetchPositionByIdQuery(formattedPositionId));
+    if (subgraphEndpoint) {
+      subgraphResponse = await request(subgraphEndpoint, fetchPositionByIdQuery(formattedPositionId));
+    } else {
+      const subgraphEndpoint = getSubgraphEndpoint(chainId);
+      subgraphResponse = await request(subgraphEndpoint, fetchPositionByIdQuery(formattedPositionId));
+    }
     const position = mapSinglePositionToInterface(subgraphResponse.position);
     if (position) {
       return position;

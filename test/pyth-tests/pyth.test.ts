@@ -42,7 +42,7 @@ describe('Pyth tests', () => {
       '0xbd8bdf1ed20ac4a074c0c6ccc49e1716b80cb734ed75b53668c15956c2bba494',
     ];
 
-    const priceIds: string[] = await getPythPriceIdsForOrderIds(chain, orderIds);
+    const priceIds: string[] = await getPythPriceIdsForOrderIds(chain, orderIds, '');
     console.log('priceIds from fn: ', priceIds);
 
     expect(priceIds.length).toBeGreaterThan(0);
