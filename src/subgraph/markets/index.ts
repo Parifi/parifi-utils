@@ -1,19 +1,13 @@
 import { request } from 'graphql-request';
-import { Chain } from '../../common/chain';
-import { Market, getSubgraphEndpoint } from '../common';
+import { Chain } from '@parifi/references';
+import { Market, getPublicSubgraphEndpoint } from '../common';
 import { fetchAllMarketsDataQuery, fetchMarketByIdQuery } from './subgraphQueries';
-import { mapMarketsArrayToInterface, mapSingleMarketToInterface } from '../common/mapper';
+import { mapMarketsArrayToInterface, mapSingleMarketToInterface } from '../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 
-export const getAllMarketsFromSubgraph = async (chainId: Chain, subgraphEndpoint?: string): Promise<Market[]> => {
+export const getAllMarketsFromSubgraph = async (subgraphEndpoint: string): Promise<Market[]> => {
   try {
-    let subgraphResponse;
-    if (subgraphEndpoint) {
-      subgraphResponse = await request(subgraphEndpoint, fetchAllMarketsDataQuery);
-    } else {
-      const subgraphEndpoint = getSubgraphEndpoint(chainId);
-      subgraphResponse = await request(subgraphEndpoint, fetchAllMarketsDataQuery);
-    }
+    const subgraphResponse: any = await request(subgraphEndpoint, fetchAllMarketsDataQuery);
     const markets = mapMarketsArrayToInterface(subgraphResponse);
     if (markets) {
       return markets;
@@ -25,16 +19,11 @@ export const getAllMarketsFromSubgraph = async (chainId: Chain, subgraphEndpoint
 };
 
 // Get all details of a market from subgraph by market ID
-export const getMarketById = async (chainId: Chain, marketId: string, subgraphEndpoint?: string): Promise<Market> => {
+export const getMarketById = async (subgraphEndpoint: string, marketId: string): Promise<Market> => {
   try {
-    let subgraphResponse: any;
     const formattedMarketId = marketId.toLowerCase();
-    if (subgraphEndpoint) {
-      subgraphResponse = await request(subgraphEndpoint, fetchMarketByIdQuery(formattedMarketId));
-    } else {
-      const subgraphEndpoint = getSubgraphEndpoint(chainId);
-      subgraphResponse = await request(subgraphEndpoint, fetchMarketByIdQuery(formattedMarketId));
-    }
+    const subgraphResponse: any = await request(subgraphEndpoint, fetchMarketByIdQuery(formattedMarketId));
+
     const market = mapSingleMarketToInterface(subgraphResponse.market);
     if (market && market.id === marketId) {
       return market;

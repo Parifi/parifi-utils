@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import { Chain } from '../../src';
+import { Chain } from '@parifi/references';
 import { getPythClient } from '../../src/pyth';
-import { batchSettlePendingOrdersUsingGelato } from '../../src/contract-logic/order-manager/settlement';
+import { batchSettlePendingOrdersUsingGelato } from '../../src/core/order-manager/settlement';
 
 const chainId = Chain.ARBITRUM_SEPOLIA;
 

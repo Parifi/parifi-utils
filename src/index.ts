@@ -1,22 +1,22 @@
 import { Pyth } from './pyth/pyth';
-import { SubGraph } from './subgraph';
+import { Subgraph } from './subgraph';
 import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from './types';
 
 export * from './common';
 export * from './subgraph';
 export * from './core';
 
-export class SDK {
-  subgraph: SubGraph;
+export class ParifiSdk {
+  subgraph: Subgraph;
   pyth: Pyth;
 
   constructor(
     rpcConfig: RpcConfig,
-    subGraphConfig: SubgraphConfig,
-    relayrConfig: RelayerConfig,
+    subgraphConfig: SubgraphConfig,
+    relayerConfig: RelayerConfig,
     pythConfig: PythConfig,
   ) {
-    this.subgraph = new SubGraph(rpcConfig, subGraphConfig);
+    this.subgraph = new Subgraph(rpcConfig, subgraphConfig);
     this.pyth = new Pyth(pythConfig);
   }
 }
