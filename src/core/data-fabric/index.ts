@@ -1,6 +1,6 @@
 import { PRECISION_MULTIPLIER, SECONDS_IN_A_YEAR, WAD } from '../../common/constants';
 import { getDiff } from '../../common/helpers';
-import { Market, Position } from '../../subgraph/common/types';
+import { Market, Position } from '../../subgraph/common/subgraphTypes';
 import { Decimal } from 'decimal.js';
 
 // Returns Market Utilization for a Market

@@ -1,4 +1,4 @@
-import { Market, Position } from '../../subgraph/common/types';
+import { Market, Position } from '../../subgraph/common/subgraphTypes';
 import { Decimal } from 'decimal.js';
 import { DEVIATION_PRECISION_MULTIPLIER, MAX_FEE, PRECISION_MULTIPLIER } from '../../common/constants';
 import { getAccruedBorrowFeesInMarket, getMarketUtilization } from '../data-fabric';

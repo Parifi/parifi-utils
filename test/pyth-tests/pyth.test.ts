@@ -1,8 +1,14 @@
 import 'dotenv/config';
-import { Chain, getPythPriceIdsForOrderIds } from '../../src';
+import { Chain } from '@parifi/references';
 import { getPythClient, getVaaPriceUpdateData } from '../../src/pyth';
+import { ParifiSdk } from '../../src';
+import { RpcConfig } from '../../src/types';
 
-const chain = Chain.ARBITRUM_SEPOLIA;
+const rpcConfig: RpcConfig = {
+  chainId: Chain.ARBITRUM_SEPOLIA,
+};
+
+const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {});
 
 describe('Pyth tests', () => {
   it('should return price update data from public endpoint', async () => {
@@ -42,7 +48,7 @@ describe('Pyth tests', () => {
       '0xbd8bdf1ed20ac4a074c0c6ccc49e1716b80cb734ed75b53668c15956c2bba494',
     ];
 
-    const priceIds: string[] = await getPythPriceIdsForOrderIds(chain, orderIds, '');
+    const priceIds: string[] = await parifiSdk.subgraph.getPythPriceIdsForOrderIds(orderIds);
     console.log('priceIds from fn: ', priceIds);
 
     expect(priceIds.length).toBeGreaterThan(0);

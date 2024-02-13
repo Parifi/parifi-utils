@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js';
-import { BatchExecute, Order, getAllPendingOrders } from '../../subgraph';
-import { Chain, DECIMAL_ZERO, DEFAULT_BATCH_COUNT, PRECISION_MULTIPLIER } from '../../common';
+import { Chain } from '@parifi/references';
+import { BatchExecute, Order, getAllPendingOrders, getPublicSubgraphEndpoint } from '../../subgraph';
+import { DECIMAL_ZERO, DEFAULT_BATCH_COUNT, PRECISION_MULTIPLIER } from '../../common';
 import { getLatestPricesFromPyth, getVaaPriceUpdateData, normalizePythPriceForParifi } from '../../pyth';
 import { AxiosInstance } from 'axios';
 import { getParifiUtilsInstance } from '../parifi-utils';
@@ -55,7 +56,8 @@ export const batchSettlePendingOrdersUsingGelato = async (
   pythClient: AxiosInstance,
 ): Promise<{ ordersCount: number }> => {
   const currentTimestamp = Math.floor(Date.now() / 1000);
-  const pendingOrders = await getAllPendingOrders(chainId, currentTimestamp, DEFAULT_BATCH_COUNT);
+  const subgraphEndpoint = getPublicSubgraphEndpoint(chainId);
+  const pendingOrders = await getAllPendingOrders(subgraphEndpoint, currentTimestamp, DEFAULT_BATCH_COUNT);
   if (pendingOrders.length == 0) return { ordersCount: 0 };
 
   const priceIds: string[] = [];
