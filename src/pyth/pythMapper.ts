@@ -1,4 +1,4 @@
-import { PythPriceResponse } from '../subgraph';
+import { PythPriceResponse } from '../interfaces/subgraphTypes';
 
 // Function to map the pyth latest price response to interface
 export const mapPythPriceResponseToInterface = (response: any[]): PythPriceResponse[] => {

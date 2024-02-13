@@ -1,8 +1,7 @@
 import { request } from 'graphql-request';
-import { Chain } from '@parifi/references';
-import { Market, getPublicSubgraphEndpoint } from '../common';
+import { Market } from '../../interfaces/subgraphTypes';
 import { fetchAllMarketsDataQuery, fetchMarketByIdQuery } from './subgraphQueries';
-import { mapMarketsArrayToInterface, mapSingleMarketToInterface } from '../common/subgraphMapper';
+import { mapMarketsArrayToInterface, mapSingleMarketToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 
 export const getAllMarketsFromSubgraph = async (subgraphEndpoint: string): Promise<Market[]> => {

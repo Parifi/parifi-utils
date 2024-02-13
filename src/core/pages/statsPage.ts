@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js';
-import { DECIMAL_10, PRICE_FEED_DECIMALS } from '../common';
-import { getBaseBorrowRatePerSecond, getDynamicBorrowRatePerSecond } from '.';
-import { Market } from '../subgraph';
+import { DECIMAL_10, PRICE_FEED_DECIMALS } from '../../common';
+import { getBaseBorrowRatePerSecond, getDynamicBorrowRatePerSecond } from '../data-fabric';
+import { Market } from '../../interfaces/subgraphTypes';
 
 // Returns the total borrowing rate for a market per hour in percentage
 export const getMarketBorrowingRatePerHour = (

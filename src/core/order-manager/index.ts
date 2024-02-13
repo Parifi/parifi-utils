@@ -1,6 +1,6 @@
-import { Market, Position } from '../../subgraph/common/subgraphTypes';
+import { Market, Order, Position } from '../../interfaces/subgraphTypes';
 import { Decimal } from 'decimal.js';
-import { DEVIATION_PRECISION_MULTIPLIER, MAX_FEE, PRECISION_MULTIPLIER } from '../../common/constants';
+import { DECIMAL_ZERO, DEVIATION_PRECISION_MULTIPLIER, MAX_FEE, PRECISION_MULTIPLIER } from '../../common/constants';
 import { getAccruedBorrowFeesInMarket, getMarketUtilization } from '../data-fabric';
 import { convertMarketAmountToCollateral } from '../price-feed';
 import { Chain } from '@parifi/references';
@@ -259,4 +259,46 @@ export const getNetProfitOrLossInCollateral = (
   }
 
   return { netPnlInCollateral, isNetProfit };
+};
+
+// Returns true if the price of market is within the range configured in order struct
+// The function can be used to check if a pending order can be settled or not
+export const checkIfOrderCanBeSettled = (order: Order, normalizedMarketPrice: Decimal): boolean => {
+  const isLimitOrder = order.isLimitOrder;
+  const triggerAbove = order.triggerAbove;
+  const isLong = order.isLong;
+  // Return false if any of the fields is undefined
+  if (isLimitOrder === undefined || triggerAbove === undefined || isLong === undefined) {
+    return false;
+  }
+
+  // Return false if any of the fields is undefined
+  if (order.expectedPrice === undefined || order.maxSlippage === undefined) {
+    return false;
+  }
+  const expectedPrice = new Decimal(order.expectedPrice);
+  const maxSlippage = new Decimal(order.maxSlippage);
+
+  if (isLimitOrder) {
+    // If its a limit order, check if the limit price is reached, either above or below
+    // depending on the triggerAbove flag
+    if (
+      (triggerAbove && normalizedMarketPrice < expectedPrice) ||
+      (!triggerAbove && normalizedMarketPrice > expectedPrice)
+    ) {
+      return false;
+    }
+  } else {
+    // Market Orders
+    // Check if current market price is within slippage range
+    if (expectedPrice != DECIMAL_ZERO) {
+      const upperLimit = expectedPrice.mul(PRECISION_MULTIPLIER.add(maxSlippage)).div(PRECISION_MULTIPLIER);
+      const lowerLimit = expectedPrice.mul(PRECISION_MULTIPLIER.sub(maxSlippage)).div(PRECISION_MULTIPLIER);
+
+      if ((isLong && normalizedMarketPrice > upperLimit) || (!isLong && normalizedMarketPrice < lowerLimit)) {
+        return false;
+      }
+    }
+  }
+  return true;
 };

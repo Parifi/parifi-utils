@@ -1,4 +1,4 @@
-import { Account, Market, Order, Position, PriceFeedSnapshot, PythData, Token } from './subgraphTypes';
+import { Account, Market, Order, Position, PriceFeedSnapshot, PythData, Token } from '../interfaces/subgraphTypes';
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    ACCOUNT   ////////////////////////////

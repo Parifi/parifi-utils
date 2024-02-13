@@ -1,14 +1,12 @@
 import { request } from 'graphql-request';
-// import { Chain } from '../../common/chain';
-import { Chain } from '@parifi/references';
-import { Order, getPublicSubgraphEndpoint } from '../common';
+import { Order } from '../../interfaces/subgraphTypes';
 import {
   fetchOrdersByIdQuery,
   fetchOrdersByUserQuery,
   fetchPendingOrdersQuery,
   fetchPriceIdsFromOrderIdsQuery,
 } from './subgraphQueries';
-import { mapOrdersArrayToInterface, mapSingleOrderToInterface } from '../common/subgraphMapper';
+import { mapOrdersArrayToInterface, mapSingleOrderToInterface } from '../../common/subgraphMapper';
 import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
 import { NotFoundError } from '../../error/not-found.error';
 
