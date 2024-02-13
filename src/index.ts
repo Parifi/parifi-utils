@@ -22,4 +22,8 @@ export class ParifiSdk {
     this.pyth = new Pyth(pythConfig);
     this.core = new Core(rpcConfig, subgraphConfig, relayerConfig, pythConfig);
   }
+
+  async init() {
+    await this.pyth.initPyth();
+  }
 }

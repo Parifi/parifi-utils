@@ -306,9 +306,6 @@ export interface Position {
     // " Average price of the position in decimals "
     avgPriceDec?: string
 
-    // " Previous Average price of the position "
-    avgPricePrev?: string
-
     // " Last cumulative fee that was charged "
     lastCumulativeFee?: string
 
