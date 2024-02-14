@@ -11,6 +11,3 @@ export const publicSubgraphEndpoints: { [key in Chain]: string } = {
 export const getPublicSubgraphEndpoint = (chainId: Chain) => {
   return publicSubgraphEndpoints[chainId];
 };
-
-export * from './subgraphMapper';
-export * from './subgraphTypes';

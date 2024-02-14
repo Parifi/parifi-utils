@@ -2,8 +2,8 @@ import 'dotenv/config';
 import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
 import Decimal from 'decimal.js';
-import { RpcConfig } from '../../src/types';
-import { getMarketBorrowingRatePerHour, getMarketOpenInterestInUsd } from '../../src/core/statsPage';
+import { RpcConfig } from '../../src/interfaces/classConfigs';
+import { getMarketBorrowingRatePerHour, getMarketOpenInterestInUsd } from '../../src/core/pages/statsPage';
 
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
@@ -13,13 +13,15 @@ const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {});
 
 describe('Stats tests', () => {
   it('should return correct borrowing fees for market', async () => {
+    await parifiSdk.init();
     const marketId = '0x122d17f9d86438d3f9d12c1366a56e45c03ae191f705a5d850617739f76605d5';
     const market = await parifiSdk.subgraph.getMarketById(marketId);
 
     const totalLongs = new Decimal(market.totalLongs ?? '0');
     const totalShorts = new Decimal(market.totalShorts ?? '0');
 
-    const { borrowingRatePerHourLong, borrowingRatePerHourShorts } = getMarketBorrowingRatePerHour(market);
+    const { borrowingRatePerHourLong, borrowingRatePerHourShorts } =
+      parifiSdk.core.getMarketBorrowingRatePerHour(market);
     console.log(borrowingRatePerHourLong, borrowingRatePerHourShorts);
     if (totalLongs.greaterThan(totalShorts)) {
       expect(borrowingRatePerHourLong.toNumber()).toBeGreaterThan(borrowingRatePerHourShorts.toNumber());
@@ -29,6 +31,7 @@ describe('Stats tests', () => {
   });
 
   it('should return correct Open Interest market', async () => {
+    await parifiSdk.init();
     const marketId = '0x122d17f9d86438d3f9d12c1366a56e45c03ae191f705a5d850617739f76605d5';
 
     const market = await parifiSdk.subgraph.getMarketById(marketId);
@@ -36,7 +39,7 @@ describe('Stats tests', () => {
 
     const totalOIInUsd = new Decimal(market.totalOI ?? '0');
 
-    const { openInterestInUsdLongs, openInterestInUsdShorts } = getMarketOpenInterestInUsd(
+    const { openInterestInUsdLongs, openInterestInUsdShorts } = parifiSdk.core.getMarketOpenInterestInUsd(
       market,
       normalizedMarketPrice,
     );

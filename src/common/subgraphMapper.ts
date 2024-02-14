@@ -1,4 +1,4 @@
-import { Account, Market, Order, Position, PriceFeedSnapshot, PythData, Token } from './subgraphTypes';
+import { Account, Market, Order, Position, PriceFeedSnapshot, PythData, Token } from '../interfaces/subgraphTypes';
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    ACCOUNT   ////////////////////////////
@@ -155,7 +155,6 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
       positionSize: response.positionSize,
       avgPrice: response.avgPrice,
       avgPriceDec: response.avgPriceDec,
-      avgPricePrev: response.avgPricePrev,
       lastCumulativeFee: response.lastCumulativeFee,
       status: response.status,
       txHash: response.txHash,

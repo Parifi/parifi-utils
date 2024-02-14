@@ -58,7 +58,6 @@ export const fetchPositionByIdQuery = (positionId: string) =>
             positionSize
             avgPrice
             avgPriceDec
-            avgPricePrev
             lastCumulativeFee
             status
             txHash

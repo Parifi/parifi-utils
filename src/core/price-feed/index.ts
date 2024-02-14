@@ -1,5 +1,4 @@
 import { Decimal } from 'decimal.js';
-import { Market } from '../../subgraph';
 
 // Converts the amount of market tokens to collateral tokens considering the decimal
 // values of both market and collateral tokens

@@ -1,6 +1,6 @@
 import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
-import { RpcConfig } from '../../src/types';
+import { RpcConfig } from '../../src/interfaces/classConfigs';
 
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
@@ -10,7 +10,7 @@ const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {});
 
 describe('Market fetching logic from subgraph', () => {
   it('should return correct market details', async () => {
-    console.log('Test running successfully');
+    await parifiSdk.init();
     const marketId = '0x122d17f9d86438d3f9d12c1366a56e45c03ae191f705a5d850617739f76605d5';
 
     const market = await parifiSdk.subgraph.getMarketById(marketId)

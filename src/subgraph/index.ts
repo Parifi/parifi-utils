@@ -1,10 +1,11 @@
 import { getAllOrdersByUserAddress, getAllPendingOrders, getOrderById, getPythPriceIdsForOrderIds } from './orders';
-import { RpcConfig, SubgraphConfig } from '../types';
+import { RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
 import { getAllPositionsByUserAddress, getPositionById } from './positions';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
-import { Market, Order, Position, getPublicSubgraphEndpoint } from './common';
+import { Market, Order, Position } from '../interfaces/subgraphTypes';
 import { Chain } from '@parifi/references';
 import { GraphQLClient } from 'graphql-request';
+import { getPublicSubgraphEndpoint } from './common';
 
 export * from './common';
 export * from './markets';

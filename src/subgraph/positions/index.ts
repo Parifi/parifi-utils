@@ -1,8 +1,7 @@
 import { request } from 'graphql-request';
-import { Chain } from '@parifi/references';
-import { Position, getPublicSubgraphEndpoint } from '../common';
+import { Position } from '../../interfaces/subgraphTypes';
 import { fetchPositionByIdQuery, fetchPositionsByUserQuery } from './subgraphQueries';
-import { mapPositionsArrayToInterface, mapSinglePositionToInterface } from '../common/subgraphMapper';
+import { mapPositionsArrayToInterface, mapSinglePositionToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 
 // Get all positions by user address
