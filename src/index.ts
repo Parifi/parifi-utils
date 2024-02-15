@@ -4,8 +4,11 @@ import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from './interfac
 import { Core } from './core';
 
 export * from './common';
-export * from './subgraph';
 export * from './core';
+export * from './gelato';
+export * from './interfaces';
+export * from './pyth';
+export * from './subgraph';
 
 export class ParifiSdk {
   subgraph: Subgraph;
