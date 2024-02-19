@@ -2,10 +2,11 @@ import { getAllOrdersByUserAddress, getAllPendingOrders, getOrderById, getPythPr
 import { RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
 import { getAllPositionsByUserAddress, getPositionById } from './positions';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
-import { Market, Order, Position } from '../interfaces/subgraphTypes';
+import { Market, Order, Position, Vault } from '../interfaces/subgraphTypes';
 import { Chain } from '@parifi/references';
 import { GraphQLClient } from 'graphql-request';
 import { getPublicSubgraphEndpoint } from './common';
+import { getAllVaults } from './vaults';
 
 export * from './common';
 export * from './markets';
@@ -87,5 +88,14 @@ export class Subgraph {
   public async getMarketById(marketId: string): Promise<Market> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return getMarketById(subgraphEndpoint, marketId);
+  }
+
+  ////////////////////////////////////////////////////////////////
+  //////////////////////    VAULTS    ////////////////////////////
+  ////////////////////////////////////////////////////////////////
+
+  public async getAllVaults(): Promise<Vault[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return getAllVaults(subgraphEndpoint);
   }
 }
