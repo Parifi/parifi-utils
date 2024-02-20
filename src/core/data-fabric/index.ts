@@ -1,4 +1,4 @@
-import { PRECISION_MULTIPLIER, SECONDS_IN_A_YEAR, WAD } from '../../common/constants';
+import { DECIMAL_ZERO, PRECISION_MULTIPLIER, SECONDS_IN_A_YEAR, WAD } from '../../common/constants';
 import { getDiff } from '../../common/helpers';
 import { Market, Position } from '../../interfaces/subgraphTypes';
 import { Decimal } from 'decimal.js';
@@ -14,13 +14,12 @@ export const getMarketUtilization = (market: Market, isLong: boolean): Decimal =
 
 // Returns the market skew based on the total long and total short positions
 export const getMarketSkew = (market: Market): Decimal => {
-  const totalLongs = market.totalLongs ?? '0';
-  const totalShorts = market.totalShorts ?? '0';
+  const totalLongs = new Decimal(market.totalLongs ?? '0');
+  const totalShorts = new Decimal(market.totalShorts ?? '0');
 
-  if (new Decimal(totalLongs).add(totalShorts).eq(0)) return new Decimal(0);
-  return getDiff(new Decimal(totalLongs), new Decimal(totalShorts))
-    .times(PRECISION_MULTIPLIER)
-    .dividedBy(new Decimal(totalLongs).add(totalShorts));
+  const diff = getDiff(totalLongs, totalShorts);
+  if (diff == DECIMAL_ZERO) return DECIMAL_ZERO;
+  return diff.times(PRECISION_MULTIPLIER).dividedBy(new Decimal(totalLongs).add(totalShorts));
 };
 
 // Returns the Dynamic Borrow rate per second for a market
