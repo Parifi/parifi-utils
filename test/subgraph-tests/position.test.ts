@@ -21,4 +21,37 @@ describe('Order fetching logic from subgraph', () => {
       fail;
     }
   });
+
+  it('should return position details by status: OPEN', async () => {
+    await parifiSdk.init();
+
+    const userAddress = '0x552AF4aF77b514E0DD1FB5B40A868e7dcE3fD794';
+    const positions = await parifiSdk.subgraph.getOpenPositionsByUserAddress(userAddress);
+    console.log(positions.length);
+    if (positions.length > 0) {
+      expect(positions[0].status).toBe('OPEN');
+    }
+  });
+
+  it('should return position details by status: CLOSED', async () => {
+    await parifiSdk.init();
+
+    const userAddress = '0x552AF4aF77b514E0DD1FB5B40A868e7dcE3fD794';
+    const positions = await parifiSdk.subgraph.getClosedPositionsByUserAddress(userAddress);
+    console.log(positions.length);
+    if (positions.length > 0) {
+      expect(positions[0].status).toBe('CLOSED');
+    }
+  });
+
+  it('should return position details by status: LIQUIDATED', async () => {
+    await parifiSdk.init();
+
+    const userAddress = '0x552AF4aF77b514E0DD1FB5B40A868e7dcE3fD794';
+    const positions = await parifiSdk.subgraph.getLiquidatedPositionsByUserAddress(userAddress);
+    console.log(positions.length);
+    if (positions.length > 0) {
+      expect(positions[0].status).toBe('LIQUIDATED');
+    }
+  });
 });

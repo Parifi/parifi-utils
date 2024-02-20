@@ -1,6 +1,7 @@
 import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
 import { RpcConfig } from '../../src/interfaces/classConfigs';
+import { assert } from 'ethers';
 
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
@@ -14,5 +15,7 @@ describe('Vault fetching logic from subgraph', () => {
 
     const vaults = await parifiSdk.subgraph.getAllVaults();
     console.log('vaults', vaults);
+
+    expect(vaults.length).not.toBe(0);
   });
 });
