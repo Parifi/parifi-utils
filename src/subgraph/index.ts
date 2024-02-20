@@ -1,6 +1,12 @@
 import { getAllOrdersByUserAddress, getAllPendingOrders, getOrderById, getPythPriceIdsForOrderIds } from './orders';
 import { RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
-import { getAllPositionsByUserAddress, getPositionById } from './positions';
+import {
+  getAllPositionsByUserAddress,
+  getClosedPositionsByUserAddress,
+  getLiquidatedPositionsByUserAddress,
+  getOpenPositionsByUserAddress,
+  getPositionById,
+} from './positions';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
 import { Market, Order, Position, Vault } from '../interfaces/subgraphTypes';
 import { Chain } from '@parifi/references';
@@ -66,7 +72,11 @@ export class Subgraph {
   ////////////////////////////////////////////////////////////////
   //////////////////////    POSITION    //////////////////////////
   ////////////////////////////////////////////////////////////////
-  public async getAllPositionsByUserAddress(userAddress: string, count: number, skip: number): Promise<Position[]> {
+  public async getAllPositionsByUserAddress(
+    userAddress: string,
+    count: number = 20,
+    skip?: number,
+  ): Promise<Position[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getAllPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
   }
@@ -76,6 +86,32 @@ export class Subgraph {
     return getPositionById(subgraphEndpoint, positionId);
   }
 
+  public async getOpenPositionsByUserAddress(
+    userAddress: string,
+    count: number = 20,
+    skip?: number,
+  ): Promise<Position[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getOpenPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
+  }
+
+  public async getClosedPositionsByUserAddress(
+    userAddress: string,
+    count: number = 20,
+    skip?: number,
+  ): Promise<Position[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getClosedPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
+  }
+
+  public async getLiquidatedPositionsByUserAddress(
+    userAddress: string,
+    count: number = 20,
+    skip?: number,
+  ): Promise<Position[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getLiquidatedPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
+  }
   ////////////////////////////////////////////////////////////////
   //////////////////////    MARKET    ////////////////////////////
   ////////////////////////////////////////////////////////////////
