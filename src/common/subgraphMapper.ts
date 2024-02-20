@@ -1,4 +1,13 @@
-import { Account, Market, Order, Position, PriceFeedSnapshot, PythData, Token } from '../interfaces/subgraphTypes';
+import {
+  Account,
+  Market,
+  Order,
+  Position,
+  PriceFeedSnapshot,
+  PythData,
+  Token,
+  Vault,
+} from '../interfaces/subgraphTypes';
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    ACCOUNT   ////////////////////////////
@@ -235,6 +244,48 @@ export const mapSubgraphResponseToPythDataInterface = (response: any): PythData 
       price: response.price,
       lastUpdatedTimestamp: response.lastUpdatedTimestamp,
     };
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
+
+////////////////////////////////////////////////////////////////
+//////////////////////    VAULTS    ////////////////////////////
+////////////////////////////////////////////////////////////////
+
+export const mapSingleVaultToInterface = (response: any): Vault | undefined => {
+  try {
+    return {
+      id: response.id,
+      vaultName: response.vaultName,
+      vaultSymbol: response.vaultSymbol,
+      vaultDecimals: response.vaultDecimals,
+      depositToken: response.depositToken ? mapSubgraphResponseToTokenInterface(response.depositToken) : undefined,
+      isPaused: response.isPaused,
+      feeManagerAddress: response.feeManagerAddress,
+      totalAssets: response.totalAssets,
+      totalShares: response.totalShares,
+      assetsPerShare: response.assetsPerShare,
+      assetsPerShareDec: response.assetsPerShareDec,
+      sharesPerAsset: response.sharesPerAsset,
+      withdrawalFee: response.withdrawalFee,
+      profitFromTraderLosses: response.profitFromTraderLosses,
+      lossFromTraderProfits: response.lossFromTraderProfits,
+      cooldownPeriod: response.cooldownPeriod,
+      withdrawalWindow: response.withdrawalWindow,
+    };
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
+
+export const mapVaultsArrayToInterface = (response: any): Vault[] | undefined => {
+  try {
+    return response.vaults.map((vault: Vault) => {
+      return mapSingleVaultToInterface(vault);
+    });
   } catch (error) {
     console.log('Error while mapping data', error);
     throw error;
