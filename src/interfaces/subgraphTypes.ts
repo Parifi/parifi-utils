@@ -273,7 +273,7 @@ export interface Order {
   cancellationTxHash?: string;
 
   // " Related Position ID "
-  positionId?: Position;
+  position?: Position;
 }
 
 ////////////////////////////////////////////////////////////////
