@@ -10,7 +10,7 @@ import {
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
 import { Market, Order, Position, Vault } from '../interfaces/subgraphTypes';
 import { Chain } from '@parifi/references';
-import { GraphQLClient } from 'graphql-request';
+import request, { GraphQLClient } from 'graphql-request';
 import { getPublicSubgraphEndpoint } from './common';
 import { getAllVaults } from './vaults';
 
@@ -44,6 +44,17 @@ export class Subgraph {
       return this.subgraphConfig.subgraphEndpoint;
     }
     return getPublicSubgraphEndpoint(chainId);
+  }
+
+  // Execute the provided subgraph query using the configured subgraph endpoint and configuration values
+  public async executeSubgraphQuery(query: string): Promise<any> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    try {
+      const subgraphResponse = await request(subgraphEndpoint, query);
+      return subgraphResponse;
+    } catch (error) {
+      throw error;
+    }
   }
 
   ////////////////////////////////////////////////////////////////
