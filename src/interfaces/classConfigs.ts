@@ -15,6 +15,10 @@ export interface SubgraphConfig {
   apiKey?: string;
 }
 
+export interface GelatoConfig {
+  apiKey: string;
+}
+
 export interface RelayerConfig {
   relayerEndpoint?: string;
   username?: string;

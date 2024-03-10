@@ -1,11 +1,11 @@
 import { Pyth } from './pyth';
 import { Subgraph } from './subgraph';
-import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from './interfaces/classConfigs';
+import { GelatoConfig, PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from './interfaces/classConfigs';
 import { Core } from './core';
 
 export * from './common';
 export * from './core';
-export * from './gelato';
+export * from './gelato/gelato-function';
 export * from './interfaces';
 export * from './pyth';
 export * from './subgraph';
@@ -20,6 +20,7 @@ export class ParifiSdk {
     subgraphConfig: SubgraphConfig,
     relayerConfig: RelayerConfig,
     pythConfig: PythConfig,
+    GelatoConfig: GelatoConfig,
   ) {
     this.subgraph = new Subgraph(rpcConfig, subgraphConfig);
     this.pyth = new Pyth(pythConfig);
