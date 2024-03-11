@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { Chain } from '@parifi/references';
 // import { getPythClient, getVaaPriceUpdateData } from '../../src/pyth';
 import { ParifiSdk } from '../../src';
-import { PythConfig, RpcConfig } from '../../src/interfaces/classConfigs';
+import { GelatoConfig, PythConfig, RpcConfig } from '../../src/interfaces/classConfigs';
 
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
@@ -15,7 +15,11 @@ const pythConfig: PythConfig = {
   isStable: true,
 };
 
-const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, pythConfig);
+const gelatoConfig: GelatoConfig = {
+  apiKey: process.env.GELO_API_KEY || '',
+};
+
+const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, pythConfig, gelatoConfig);
 
 describe('Pyth tests', () => {
   it('should return price update data from public endpoint', async () => {
@@ -23,7 +27,7 @@ describe('Pyth tests', () => {
     const ethPriceIdStable = '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace';
 
     // SDK is initialized without any fields for Pyth config, so public endpoints are used
-    const sdkWithPublicPyth = new ParifiSdk(rpcConfig, {}, {}, {});
+    const sdkWithPublicPyth = new ParifiSdk(rpcConfig, {}, {}, {}, gelatoConfig);
     await sdkWithPublicPyth.init();
 
     const priceUpdateData = await sdkWithPublicPyth.pyth.getVaaPriceUpdateData([ethPriceIdStable]);

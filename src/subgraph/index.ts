@@ -1,5 +1,5 @@
 import { getAllOrdersByUserAddress, getAllPendingOrders, getOrderById, getPythPriceIdsForOrderIds } from './orders';
-import { RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
+import { PythConfig, RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
 import {
   getAllPositionsByUserAddress,
   getClosedPositionsByUserAddress,
@@ -12,7 +12,10 @@ import { Market, Order, Position, Vault } from '../interfaces/subgraphTypes';
 import { Chain } from '@parifi/references';
 import { GraphQLClient } from 'graphql-request';
 import { getPublicSubgraphEndpoint } from './common';
-import { getAllVaults } from './vaults';
+import { getAllVaults, getChainVaultData } from './vaults';
+import { Pyth } from '../pyth';
+import Decimal from 'decimal.js';
+import { PRICE_FEED_DECIMALS } from '../common';
 
 export * from './common';
 export * from './markets';
@@ -25,17 +28,23 @@ export class Subgraph {
   // @todo Add authentication to Graph QL Client in a separate PR
   // Use the below graphQLClient for all requests to the subgraph
   public graphQLClient: GraphQLClient;
+  public pyth: Pyth;
 
   constructor(
     private rpcConfig: RpcConfig,
     private subgraphConfig: SubgraphConfig,
+    pythConfig: PythConfig,
   ) {
+    this.pyth = new Pyth(pythConfig);
     // Initialize the Graph QL Client using the config received
     if (subgraphConfig.subgraphEndpoint) {
       this.graphQLClient = new GraphQLClient(subgraphConfig.subgraphEndpoint);
     } else {
       this.graphQLClient = new GraphQLClient(getPublicSubgraphEndpoint(rpcConfig.chainId));
     }
+  }
+  async init() {
+    await this.pyth.initPyth();
   }
 
   // Returns the configured subgraph endpoint if set, otherwise returns public subgraph endpoint
@@ -133,5 +142,60 @@ export class Subgraph {
   public async getAllVaults(): Promise<Vault[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return getAllVaults(subgraphEndpoint);
+  }
+
+  public async getChainVaultData(): Promise<Vault[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return getChainVaultData(this.rpcConfig.chainId, subgraphEndpoint);
+  }
+
+  public async getTotalPoolValue() {
+    await this.init();
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    const vaults = await getChainVaultData(this.rpcConfig.chainId, subgraphEndpoint);
+    const priceIds = vaults.map((v) => v.depositToken?.pyth?.id);
+    const res = await this.pyth.getLatestPricesFromPyth(priceIds as string[]);
+    const price = res.map((pythPrice) => {
+      const normalizedPrice = this.pyth.normalizePythPriceForParifi(
+        Number(pythPrice.price.price),
+        pythPrice.price.expo,
+      );
+      const colletralPrice = new Decimal(normalizedPrice).div(10 ** PRICE_FEED_DECIMALS);
+      const returnObj = { priceId: `0x${pythPrice.id}`, normalizedPrice: colletralPrice };
+      return returnObj;
+    });
+
+    function getNormalizedPriceById(
+      priceId: string,
+      prices: { priceId: string | undefined; normalizedPrice: Decimal }[],
+    ) {
+      // Loop through the prices array
+      for (const price of prices) {
+        // Check if the priceId matches
+        if (price.priceId == priceId) {
+          // Return the normalizedPrice if matched
+          return price.normalizedPrice;
+        }
+      }
+      // Return null if no matching priceId found
+      return null;
+    }
+
+    const data = vaults.map((vault) => {
+      const normalizedPrice = getNormalizedPriceById(vault.depositToken?.pyth?.id as string, price);
+      const totatVaultValue =
+        (Number(vault.totalAssets) / 10 ** (vault.vaultDecimals || 0)) * Number(normalizedPrice || 0);
+      const returnObj = {
+        totalAssets: vault.totalAssets,
+        decimal: vault.vaultDecimals,
+        normalizedPrice: normalizedPrice,
+        Symbol: vault.depositToken?.symbol,
+        priceId: vault.depositToken?.pyth?.id,
+        totatVaultValue: totatVaultValue,
+      };
+      return returnObj;
+    });
+    const totalLiquidity = data.reduce((a, b) => a + b.totatVaultValue, 0);
+    return { data, totalLiquidity };
   }
 }

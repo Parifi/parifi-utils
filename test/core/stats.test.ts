@@ -2,14 +2,18 @@ import 'dotenv/config';
 import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
 import Decimal from 'decimal.js';
-import { RpcConfig } from '../../src/interfaces/classConfigs';
+import { GelatoConfig, RpcConfig } from '../../src/interfaces/classConfigs';
 import { getMarketBorrowingRatePerHour, getMarketOpenInterestInUsd } from '../../src/core/pages/statsPage';
 
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
 };
 
-const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {});
+const gelatoConfig: GelatoConfig = {
+  apiKey: process.env.GELO_API_KEY || '',
+};
+
+const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {}, gelatoConfig);
 
 describe('Stats tests', () => {
   it('should return correct borrowing fees for market', async () => {

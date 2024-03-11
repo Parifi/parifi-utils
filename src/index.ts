@@ -24,7 +24,7 @@ export class ParifiSdk {
     pythConfig: PythConfig,
     gelatoConfig: GelatoConfig,
   ) {
-    this.subgraph = new Subgraph(rpcConfig, subgraphConfig);
+    this.subgraph = new Subgraph(rpcConfig, subgraphConfig, pythConfig);
     this.pyth = new Pyth(pythConfig);
     this.core = new Core(rpcConfig, subgraphConfig, relayerConfig, pythConfig);
     this.gelato = new Gelato(gelatoConfig, rpcConfig);

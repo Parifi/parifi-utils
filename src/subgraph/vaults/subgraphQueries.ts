@@ -17,6 +17,9 @@ export const fetchAllVaultsQuery = () => gql`
         decimals
         lastPriceUSD
         lastPriceTimestamp
+        pyth {
+          id
+        }
       }
       isPaused
       feeManagerAddress

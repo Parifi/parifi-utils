@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { Chain } from '@parifi/references';
-import { PythConfig, RpcConfig } from '../../src/interfaces/classConfigs';
+import { GelatoConfig, PythConfig, RpcConfig } from '../../src/interfaces/classConfigs';
 import { ParifiSdk } from '../../src';
 
 const chain = Chain.ARBITRUM_SEPOLIA;
@@ -15,7 +15,11 @@ const pythConfig: PythConfig = {
   isStable: true,
 };
 
-const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, pythConfig);
+const gelatoConfig: GelatoConfig = {
+  apiKey: process.env.GELO_API_KEY || '',
+};
+
+const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, pythConfig, gelatoConfig);
 
 describe('Parifi Utils tests', () => {
   it('should settle orders in batch using Parifi Utils', async () => {
