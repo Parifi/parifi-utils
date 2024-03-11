@@ -17,7 +17,11 @@ import {
   isPositionLiquidatable,
 } from './order-manager';
 import { checkIfOrderCanBeSettled } from './order-manager/';
-import { batchSettlePendingOrdersUsingGelato, getParifiUtilsInstance } from './parifi-utils';
+import {
+  batchLiquidatePostionsUsingGelato,
+  batchSettlePendingOrdersUsingGelato,
+  getParifiUtilsInstance,
+} from './parifi-utils';
 import { AxiosInstance } from 'axios';
 import { convertCollateralAmountToUsd, convertMarketAmountToCollateral, convertMarketAmountToUsd } from './price-feed';
 import { getMarketBorrowingRatePerHour, getMarketOpenInterestInUsd } from './pages/statsPage';
@@ -147,6 +151,27 @@ export class Core {
       this.pythConfig.isStable,
     );
     return batchSettlePendingOrdersUsingGelato(this.rpcConfig.chainId, gelatoKey, subgraphEndpoint, pythClient);
+  };
+
+  batchLiquidatePositionsUsingGelato = async (
+    positionIds: string[],
+    gelatoKey: string,
+  ): Promise<{ positionsCount: number }> => {
+    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+    const pythClient = await getPythClient(
+      this.pythConfig.pythEndpoint,
+      this.pythConfig.username,
+      this.pythConfig.password,
+      this.pythConfig.isStable,
+    );
+
+    return batchLiquidatePostionsUsingGelato(
+      this.rpcConfig.chainId,
+      positionIds,
+      gelatoKey,
+      subgraphEndpoint,
+      pythClient,
+    );
   };
 
   ////////////////////////////////////////////////////////////////

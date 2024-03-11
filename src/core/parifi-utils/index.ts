@@ -4,7 +4,7 @@ import { contracts as parifiContracts } from '@parifi/references';
 import { getLatestPricesFromPyth, getVaaPriceUpdateData, normalizePythPriceForParifi } from '../../pyth/pyth';
 import { AxiosInstance } from 'axios';
 import { executeTxUsingGelato } from '../../gelato';
-import { getAllPendingOrders } from '../../subgraph';
+import { getAllPendingOrders, getPythPriceIdsForPositionIds } from '../../subgraph';
 import { BatchExecute } from '../../interfaces/subgraphTypes';
 import { DEFAULT_BATCH_COUNT } from '../../common';
 import { checkIfOrderCanBeSettled } from '../order-manager';
@@ -85,4 +85,43 @@ export const batchSettlePendingOrdersUsingGelato = async (
     console.log('Task ID:', taskId);
   }
   return { ordersCount: batchedOrders.length };
+};
+
+export const batchLiquidatePostionsUsingGelato = async (
+  chainId: Chain,
+  positionIds: string[],
+  gelatoKey: string,
+  subgraphEndpoint: string,
+  pythClient: AxiosInstance,
+): Promise<{ positionsCount: number }> => {
+  // Get unique price ids for all the positions
+  const priceIds = await getPythPriceIdsForPositionIds(subgraphEndpoint, positionIds);
+
+  // Get Price update data and latest prices from Pyth
+  const priceUpdateData = await getVaaPriceUpdateData(priceIds, pythClient);
+
+  // Populate batched positions for positions that can be liquidated
+  const batchedPositions: BatchExecute[] = [];
+  positionIds.forEach((positionId) => {
+    batchedPositions.push({
+      id: positionId,
+      priceUpdateData: priceUpdateData,
+    });
+  });
+
+  // Encode transaction data
+  if (batchedPositions.length != 0) {
+    const parifiUtils = getParifiUtilsInstance(chainId);
+    const { data: encodedTxData } = await parifiUtils.batchLiquidatePositions.populateTransaction(batchedPositions);
+
+    const taskId = await executeTxUsingGelato(
+      parifiContracts[chainId].ParifiUtils.address,
+      chainId,
+      gelatoKey,
+      encodedTxData,
+    );
+    // We need these console logs for feedback to Tenderly actions and other scripts
+    console.log('Task ID:', taskId);
+  }
+  return { positionsCount: batchedPositions.length };
 };
