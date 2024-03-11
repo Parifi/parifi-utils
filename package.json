@@ -1,6 +1,6 @@
 {
   "name": "@parifi/sdk",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Parifi SDK with common utility functions",
   "files": [
     "dist",
@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "@gelatonetwork/relay-sdk": "^5.5.5",
-    "@parifi/references": "^0.2.4",
+    "@parifi/references": "^1.0.0",
     "axios": "^1.6.7",
     "decimal.js": "^10.4.3",
     "dotenv": "^16.4.1",
