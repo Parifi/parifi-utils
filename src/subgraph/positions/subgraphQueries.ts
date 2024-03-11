@@ -123,3 +123,21 @@ export const fetchPositionByIdQuery = (positionId: string) =>
             lastRefreshISO            
         }
     }`;
+
+export const fetchPriceIdsFromPositionIdsQuery = (positionIds: string[]) =>
+  gql`
+  {
+    positions (
+      where: {
+        id_in: [${positionIds.map((id) => `"${id}"`).join(', ')}]
+      }
+    ) {
+      id
+      market {
+        pyth {
+          id
+        }
+      }
+    }
+  }
+`;

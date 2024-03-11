@@ -6,6 +6,7 @@ import {
   getLiquidatedPositionsByUserAddress,
   getOpenPositionsByUserAddress,
   getPositionById,
+  getPythPriceIdsForPositionIds,
 } from './positions';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
 import { Market, Order, Position, Vault } from '../interfaces/subgraphTypes';
@@ -122,6 +123,11 @@ export class Subgraph {
   ): Promise<Position[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getLiquidatedPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
+  }
+
+  public async getPythPriceIdsForPositionIds(positionIds: string[]): Promise<string[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getPythPriceIdsForPositionIds(subgraphEndpoint, positionIds);
   }
   ////////////////////////////////////////////////////////////////
   //////////////////////    MARKET    ////////////////////////////

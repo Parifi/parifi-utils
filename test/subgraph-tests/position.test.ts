@@ -54,4 +54,17 @@ describe('Order fetching logic from subgraph', () => {
       expect(positions[0].status).toBe('LIQUIDATED');
     }
   });
+
+  it('should return price ids for position ids', async () => {
+    await parifiSdk.init();
+
+    const positionIds = [
+      '0x00119fbaf9bcb7af16173ca7db01c90d53bd96c4eb2810f2b982bd3e1a36fab0',
+      '0x00450423fe9218d87b44919528e7cd75fb86c31af0ba0e7e7d3547e019d4adb4',
+      '0x00841110ab1304773ceb680ae39dcd0a50d3326a50de33aab6792d17a4483b04',
+    ];
+
+    const priceIds = await parifiSdk.subgraph.getPythPriceIdsForPositionIds(positionIds);
+    expect(priceIds.length).toBeGreaterThan(0);
+  });
 });
