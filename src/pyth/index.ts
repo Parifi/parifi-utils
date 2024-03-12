@@ -3,7 +3,7 @@ import { PythConfig } from '../interfaces/classConfigs';
 import { getLatestPricesFromPyth, getPythClient, getVaaPriceUpdateData, normalizePythPriceForParifi } from './pyth';
 
 export class Pyth {
-  private pythClient: AxiosInstance;
+  public pythClient: AxiosInstance;
 
   constructor(private pythConfig: PythConfig) {
     this.pythClient = {} as AxiosInstance;

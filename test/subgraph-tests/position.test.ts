@@ -1,15 +1,12 @@
 import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
-import { GelatoConfig, RpcConfig } from '../../src/interfaces/classConfigs';
+import { RpcConfig } from '../../src/interfaces/classConfigs';
 
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
 };
-const gelatoConfig: GelatoConfig = {
-  apiKey: process.env.GELO_API_KEY || '',
-};
 
-const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {}, gelatoConfig);
+const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {});
 
 describe('Order fetching logic from subgraph', () => {
   it('should return correct position details', async () => {

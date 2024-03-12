@@ -15,15 +15,17 @@ export interface SubgraphConfig {
   apiKey?: string;
 }
 
-export interface GelatoConfig {
-  apiKey: string;
+export interface RelayerConfig {
+  gelatoConfig?: RelayerI;
+  parifiRealyerConfig?: RelayerI;
 }
 
-export interface RelayerConfig {
+export interface RelayerI {
   relayerEndpoint?: string;
   username?: string;
   password?: string;
   apiKey?: string;
+  jwtToken?: string;
 }
 
 export interface PythConfig {

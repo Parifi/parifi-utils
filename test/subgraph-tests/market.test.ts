@@ -1,15 +1,19 @@
 import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
-import { GelatoConfig, RpcConfig } from '../../src/interfaces/classConfigs';
+import { RelayerConfig, RelayerI, RpcConfig } from '../../src/interfaces/classConfigs';
 
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
 };
-const gelatoConfig: GelatoConfig = {
+const gelatoConfig: RelayerI = {
   apiKey: process.env.GELO_API_KEY || '',
 };
 
-const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {}, gelatoConfig);
+const relayerConfig: RelayerConfig = {
+  gelatoConfig: gelatoConfig,
+};
+
+const parifiSdk = new ParifiSdk(rpcConfig, {}, relayerConfig, {});
 
 describe('Market fetching logic from subgraph', () => {
   it('should return correct market details', async () => {

@@ -12,10 +12,14 @@ import { Market, Order, Position, Vault } from '../interfaces/subgraphTypes';
 import { Chain } from '@parifi/references';
 import { GraphQLClient } from 'graphql-request';
 import { getPublicSubgraphEndpoint } from './common';
-import { getAllVaults, getChainVaultData, getUserVaultDataByChain } from './vaults';
+import {
+  getAllVaults,
+  getTotalPoolsValue,
+  getUserTotalPoolsValue,
+  getUserVaultDataByChain,
+  getVaultDataByChain,
+} from './vaults';
 import { Pyth } from '../pyth';
-import Decimal from 'decimal.js';
-import { PRICE_FEED_DECIMALS } from '../common';
 
 export * from './common';
 export * from './markets';
@@ -144,9 +148,9 @@ export class Subgraph {
     return getAllVaults(subgraphEndpoint);
   }
 
-  public async getChainVaultData(): Promise<Vault[]> {
+  public async getVaultDataByChain(): Promise<Vault[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return getChainVaultData(this.rpcConfig.chainId, subgraphEndpoint);
+    return getVaultDataByChain(this.rpcConfig.chainId, subgraphEndpoint);
   }
 
   public async getUserVaultDataByChain(userAddress: string): Promise<Vault[]> {
@@ -157,107 +161,12 @@ export class Subgraph {
   public async getTotalPoolsValue() {
     await this.init();
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    const vaults = await getChainVaultData(this.rpcConfig.chainId, subgraphEndpoint);
-    const priceIds = vaults.map((v) => v.depositToken?.pyth?.id);
-    const res = await this.pyth.getLatestPricesFromPyth(priceIds as string[]);
-    const priceInfos = res.map((pythPrice) => {
-      const normalizedPrice = this.pyth.normalizePythPriceForParifi(
-        Number(pythPrice.price.price),
-        pythPrice.price.expo,
-      );
-      const colletralPrice = new Decimal(normalizedPrice).div(10 ** PRICE_FEED_DECIMALS);
-      const returnObj = { priceId: `0x${pythPrice.id}`, normalizedPrice: colletralPrice };
-      return returnObj;
-    });
-
-    function getNormalizedPriceById(
-      priceId: string,
-      prices: { priceId: string | undefined; normalizedPrice: Decimal }[],
-    ) {
-      // Loop through the prices array
-      for (const price of prices) {
-        // Check if the priceId matches
-        if (price.priceId == priceId) {
-          // Return the normalizedPrice if matched
-          return price.normalizedPrice;
-        }
-      }
-      // Return 0 if no matching priceId found
-      return 0;
-    }
-
-    const data = vaults.map((vault) => {
-      const normalizedPrice = getNormalizedPriceById(vault.depositToken?.pyth?.id as string, priceInfos);
-      const totatVaultValue = (Number(vault.totalAssets) / 10 ** (vault.vaultDecimals || 18)) * Number(normalizedPrice);
-      const returnObj = {
-        totalAssets: vault.totalAssets,
-        decimal: vault.vaultDecimals,
-        normalizedPrice: normalizedPrice,
-        Symbol: vault.depositToken?.symbol,
-        priceId: vault.depositToken?.pyth?.id,
-        totatVaultValue: totatVaultValue,
-      };
-      return returnObj;
-    });
-    const totalPoolValue = data.reduce((a, b) => a + b.totatVaultValue, 0);
-    return { data, totalPoolValue };
+    return await getTotalPoolsValue(this.rpcConfig.chainId, subgraphEndpoint, this.pyth.pythClient);
   }
 
-  public async getMyTotalPoolsValue(userAddress: string) {
+  public async getUserTotalPoolsValue(userAddress: string) {
     await this.init();
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    const vaults = await getUserVaultDataByChain(this.rpcConfig.chainId, subgraphEndpoint, userAddress);
-    if (vaults.length === 0) {
-      return { data: 0, myTotalPoolValue: 0 };
-    }
-    const priceIds = vaults.map((v) => v.vault.depositToken?.pyth?.id);
-    const res = await this.pyth.getLatestPricesFromPyth(priceIds as string[]);
-    const priceInfos = res.map((pythPrice) => {
-      const normalizedPrice = this.pyth.normalizePythPriceForParifi(
-        Number(pythPrice.price.price),
-        pythPrice.price.expo,
-      );
-      const colletralPrice = new Decimal(normalizedPrice).div(10 ** PRICE_FEED_DECIMALS);
-      const returnObj = { priceId: `0x${pythPrice.id}`, normalizedPrice: colletralPrice };
-      return returnObj;
-    });
-
-    function getNormalizedPriceById(
-      priceId: string,
-      prices: { priceId: string | undefined; normalizedPrice: Decimal }[],
-    ) {
-      // Loop through the prices array
-      for (const price of prices) {
-        // Check if the priceId matches
-        if (price.priceId == priceId) {
-          // Return the normalizedPrice if matched
-          return price.normalizedPrice;
-        }
-      }
-      // Return 0 if no matching priceId found
-      return 0;
-    }
-
-    const data = vaults.map((vault) => {
-      const normalizedPrice = getNormalizedPriceById(vault.vault.depositToken?.pyth?.id as string, priceInfos);
-      const vaultPerShare = vault.vault.assetsPerShare;
-      const userShare = vault.sharesBalance;
-      const myBalance =
-        (Number(userShare || 0) * Number(vaultPerShare || 0)) /
-        Number(10 ** (vault.vault?.vaultDecimals || 18)) /
-        Number(10 ** parseInt(vault.vault.depositToken?.decimals || ''));
-
-      const totatVaultValue = myBalance * Number(normalizedPrice);
-      const returnObj = {
-        myBalance: myBalance,
-        normalizedPrice: normalizedPrice,
-        Symbol: vault.vault.depositToken?.symbol,
-        priceId: vault.vault.depositToken?.pyth?.id,
-        totatVaultValue: totatVaultValue,
-      };
-      return returnObj;
-    });
-    const myTotalPoolValue = data.reduce((a, b) => a + b.totatVaultValue, 0);
-    return { data, myTotalPoolValue };
+    return await getUserTotalPoolsValue(userAddress, this.rpcConfig.chainId, subgraphEndpoint, this.pyth.pythClient);
   }
 }

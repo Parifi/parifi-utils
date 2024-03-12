@@ -4,7 +4,7 @@ import { Chain } from '@parifi/references';
 export const executeTxUsingGelato = async (
   targetContractAddress: string,
   chainId: Chain,
-  gelatoKey: string,
+  gelatoKey: string | undefined,
   encodedTxData: string,
 ): Promise<string> => {
   const request: SponsoredCallRequest = {
@@ -14,7 +14,7 @@ export const executeTxUsingGelato = async (
   };
 
   const relay = new GelatoRelay();
-  const { taskId } = await relay.sponsoredCall(request, gelatoKey);
+  const { taskId } = await relay.sponsoredCall(request, gelatoKey || '');
   return taskId;
 };
 

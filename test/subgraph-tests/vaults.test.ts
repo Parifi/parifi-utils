@@ -1,6 +1,6 @@
 import { Chain } from '@parifi/references';
 import { PRICE_FEED_DECIMALS, ParifiSdk } from '../../src';
-import { GelatoConfig, RpcConfig } from '../../src/interfaces/classConfigs';
+import { RpcConfig } from '../../src/interfaces/classConfigs';
 import { assert } from 'ethers';
 import Decimal from 'decimal.js';
 
@@ -8,11 +8,7 @@ const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
 };
 
-const gelatoConfig: GelatoConfig = {
-  apiKey: process.env.GELO_API_KEY || '',
-};
-
-const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {}, gelatoConfig);
+const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {});
 
 describe('Vault fetching logic from subgraph', () => {
   it('should return correct vault details', async () => {
@@ -47,7 +43,7 @@ describe('Vault fetching logic from subgraph', () => {
 describe('Vault fetching logic from subgraph', () => {
   it('should return correct vault details', async () => {
     await parifiSdk.init();
-    const data = await parifiSdk.subgraph.getMyTotalPoolsValue('0x30f06f86F107f9523f5b91A8E8AEB602b7b260BD');
+    const data = await parifiSdk.subgraph.getUserTotalPoolsValue('0x30f06f86F107f9523f5b91A8E8AEB602b7b260BD');
     console.log(data);
 
     expect(data.myTotalPoolValue).not.toBe(0);

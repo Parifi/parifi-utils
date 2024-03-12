@@ -19,3 +19,19 @@ export const getUniqueValuesFromArray = (originalArray: string[]): string[] => {
   });
   return uniqueArray;
 };
+
+export function getNormalizedPriceByIdFromPriceIdArray(
+  priceId: string,
+  prices: { priceId: string | undefined; normalizedPrice: Decimal }[],
+) {
+  // Loop through the prices array
+  for (const price of prices) {
+    // Check if the priceId matches
+    if (price.priceId == priceId) {
+      // Return the normalizedPrice if matched
+      return price.normalizedPrice;
+    }
+  }
+  // Return 0 if no matching priceId found
+  return 0;
+}

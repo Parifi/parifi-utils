@@ -1,10 +1,10 @@
 import { TransactionStatusResponse } from '@gelatonetwork/relay-sdk';
-import { GelatoConfig, PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from '../interfaces';
+import { RelayerConfig, RpcConfig } from '../interfaces';
 import { checkGelatoTaskStatus, executeTxUsingGelato } from './gelato-function';
 
 export class Gelato {
   constructor(
-    private gelatoConfig: GelatoConfig,
+    private gelatoConfig: RelayerConfig['gelatoConfig'],
     private rpcConfig: RpcConfig,
   ) {}
 
@@ -12,7 +12,7 @@ export class Gelato {
     return await executeTxUsingGelato(
       targetContractAddress,
       this.rpcConfig.chainId,
-      this.gelatoConfig.apiKey,
+      this.gelatoConfig?.apiKey,
       encodedTxData,
     );
   }
