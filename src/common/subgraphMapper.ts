@@ -130,7 +130,7 @@ export const mapSingleOrderToInterface = (response: any): Order | undefined => {
       executionPrice: response.executionPrice,
       settledBy: response.settledBy ? mapSubgraphResponseToAccountInterface(response.settledBy) : undefined,
       cancellationTxHash: response.cancellationTxHash,
-      position: response.position ? mapSinglePositionToInterface(response.position) : undefined,
+      positionId: response.position.id ? response.position.id : undefined,
     };
   } catch (error) {
     console.log('Error while mapping data', error);
