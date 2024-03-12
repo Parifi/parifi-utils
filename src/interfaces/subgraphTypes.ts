@@ -272,8 +272,8 @@ export interface Order {
   // " Order cancellation tx hash "
   cancellationTxHash?: string;
 
-  // " Related Position ID "
-  position?: Position;
+  // " Related Position ID - In the sdk, only position id is stored as a string instead of the entire positions object "
+  positionId?: string;
 }
 
 ////////////////////////////////////////////////////////////////

@@ -4,7 +4,7 @@ import { contracts as parifiContracts } from '@parifi/references';
 import { getLatestPricesFromPyth, getVaaPriceUpdateData, normalizePythPriceForParifi } from '../../pyth/pyth';
 import { AxiosInstance } from 'axios';
 import { executeTxUsingGelato } from '../../gelato';
-import { getAllPendingOrders } from '../../subgraph';
+import { getAllPendingOrders, getPythPriceIdsForPositionIds } from '../../subgraph';
 import { BatchExecute } from '../../interfaces/subgraphTypes';
 import { DEFAULT_BATCH_COUNT } from '../../common';
 import { checkIfOrderCanBeSettled } from '../order-manager';
@@ -23,10 +23,10 @@ export const batchSettlePendingOrdersUsingGelato = async (
   gelatoKey: string,
   subgraphEndpoint: string, // @todo Replace the endpoint string with graphQL instance
   pythClient: AxiosInstance,
-): Promise<{ ordersCount: number }> => {
+): Promise<{ ordersCount: number; gelatoTaskId: string }> => {
   const currentTimestamp = Math.floor(Date.now() / 1000);
   const pendingOrders = await getAllPendingOrders(subgraphEndpoint, currentTimestamp, DEFAULT_BATCH_COUNT);
-  if (pendingOrders.length == 0) return { ordersCount: 0 };
+  if (pendingOrders.length == 0) return { ordersCount: 0, gelatoTaskId: '0x' };
 
   const priceIds: string[] = [];
 
@@ -71,11 +71,12 @@ export const batchSettlePendingOrdersUsingGelato = async (
   });
 
   // Encode transaction data
+  let taskId: string = '';
   if (batchedOrders.length != 0) {
     const parifiUtils = getParifiUtilsInstance(chainId);
     const { data: encodedTxData } = await parifiUtils.batchSettleOrders.populateTransaction(batchedOrders);
 
-    const taskId = await executeTxUsingGelato(
+    taskId = await executeTxUsingGelato(
       parifiContracts[chainId].ParifiUtils.address,
       chainId,
       gelatoKey,
@@ -84,5 +85,47 @@ export const batchSettlePendingOrdersUsingGelato = async (
     // We need these console logs for feedback to Tenderly actions and other scripts
     console.log('Task ID:', taskId);
   }
-  return { ordersCount: batchedOrders.length };
+  return { ordersCount: batchedOrders.length, gelatoTaskId: taskId };
+};
+
+export const batchLiquidatePostionsUsingGelato = async (
+  chainId: Chain,
+  positionIds: string[],
+  gelatoKey: string,
+  subgraphEndpoint: string,
+  pythClient: AxiosInstance,
+): Promise<{ positionsCount: number; gelatoTaskId: string }> => {
+  if (positionIds.length == 0) return { positionsCount: 0, gelatoTaskId: '0x' };
+
+  // Get unique price ids for all the positions
+  const priceIds = await getPythPriceIdsForPositionIds(subgraphEndpoint, positionIds);
+
+  // Get Price update data and latest prices from Pyth
+  const priceUpdateData = await getVaaPriceUpdateData(priceIds, pythClient);
+
+  // Populate batched positions for positions that can be liquidated
+  const batchedPositions: BatchExecute[] = [];
+  positionIds.forEach((positionId) => {
+    batchedPositions.push({
+      id: positionId,
+      priceUpdateData: priceUpdateData,
+    });
+  });
+
+  // Encode transaction data
+  let taskId: string = '';
+  if (batchedPositions.length != 0) {
+    const parifiUtils = getParifiUtilsInstance(chainId);
+    const { data: encodedTxData } = await parifiUtils.batchLiquidatePositions.populateTransaction(batchedPositions);
+
+    taskId = await executeTxUsingGelato(
+      parifiContracts[chainId].ParifiUtils.address,
+      chainId,
+      gelatoKey,
+      encodedTxData,
+    );
+    // We need these console logs for feedback to Tenderly actions and other scripts
+    console.log('Task ID:', taskId);
+  }
+  return { positionsCount: batchedPositions.length, gelatoTaskId: taskId };
 };

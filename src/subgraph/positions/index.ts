@@ -4,9 +4,20 @@ import {
   fetchPositionByIdQuery,
   fetchPositionsByUserQuery,
   fetchPositionsByUserQueryAndStatus,
+  fetchPositionsToLiquidateQuery,
+  fetchPositionsToRefreshQuery,
+  fetchPriceIdsFromPositionIdsQuery,
 } from './subgraphQueries';
 import { mapPositionsArrayToInterface, mapSinglePositionToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
+import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
+
+/// Position Ids interface to format subgraph response to string array
+interface PositionIdsSubgraphResponse {
+  positions: {
+    id: string;
+  }[];
+}
 
 // Get all positions by user address
 export const getAllPositionsByUserAddress = async (
@@ -99,6 +110,60 @@ export const getPositionById = async (subgraphEndpoint: string, positionId: stri
       return position;
     }
     throw new NotFoundError('Position not found');
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get all price IDs of tokens related to the position ids
+export const getPythPriceIdsForPositionIds = async (
+  subgraphEndpoint: string,
+  positionIds: string[],
+): Promise<string[]> => {
+  try {
+    const formattedPositionIds: string[] = positionIds.map((positionId) => positionId.toLowerCase());
+    let subgraphResponse: any = await request(
+      subgraphEndpoint,
+      fetchPriceIdsFromPositionIdsQuery(formattedPositionIds),
+    );
+
+    const priceIds: string[] = [];
+
+    const positions: Position[] = mapPositionsArrayToInterface(subgraphResponse) || [];
+    if (positions.length != 0) {
+      positions.map((position) => {
+        if (position.market?.pyth?.id) {
+          priceIds.push(position.market?.pyth?.id);
+        }
+      });
+    }
+    const uniquePriceIds = getUniqueValuesFromArray(priceIds);
+
+    // Remove empty (0x00) price ids for positions where the Pyth data is not set
+    return uniquePriceIds.filter((id) => id !== EMPTY_BYTES32);
+  } catch (error) {
+    console.log('Error mapping price ids');
+    throw error;
+  }
+};
+
+// Get `count` number of positions to refresh sorted by last refresh timestamp
+export const getPositionsToRefresh = async (subgraphEndpoint: string, count: number = 20): Promise<string[]> => {
+  try {
+    const query = fetchPositionsToRefreshQuery(count);
+    const subgraphResponse: PositionIdsSubgraphResponse = await request(subgraphEndpoint, query);
+    return subgraphResponse.positions.map((position) => position.id);
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get `count` number of positions that are available for liquidation sorted by position size
+export const getPositionsToLiquidate = async (subgraphEndpoint: string, count: number = 10): Promise<string[]> => {
+  try {
+    const query = fetchPositionsToLiquidateQuery(count);
+    const subgraphResponse: PositionIdsSubgraphResponse = await request(subgraphEndpoint, query);
+    return subgraphResponse.positions.map((position) => position.id);
   } catch (error) {
     throw error;
   }

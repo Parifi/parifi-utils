@@ -6,11 +6,14 @@ import {
   getLiquidatedPositionsByUserAddress,
   getOpenPositionsByUserAddress,
   getPositionById,
+  getPositionsToLiquidate,
+  getPositionsToRefresh,
+  getPythPriceIdsForPositionIds,
 } from './positions';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
 import { Market, Order, Position, Vault } from '../interfaces/subgraphTypes';
 import { Chain } from '@parifi/references';
-import { GraphQLClient } from 'graphql-request';
+import request, { GraphQLClient } from 'graphql-request';
 import { getPublicSubgraphEndpoint } from './common';
 import { getAllVaults } from './vaults';
 
@@ -44,6 +47,17 @@ export class Subgraph {
       return this.subgraphConfig.subgraphEndpoint;
     }
     return getPublicSubgraphEndpoint(chainId);
+  }
+
+  // Execute the provided subgraph query using the configured subgraph endpoint and configuration values
+  public async executeSubgraphQuery(query: string): Promise<any> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    try {
+      const subgraphResponse = await request(subgraphEndpoint, query);
+      return subgraphResponse;
+    } catch (error) {
+      throw error;
+    }
   }
 
   ////////////////////////////////////////////////////////////////
@@ -111,6 +125,21 @@ export class Subgraph {
   ): Promise<Position[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getLiquidatedPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
+  }
+
+  public async getPythPriceIdsForPositionIds(positionIds: string[]): Promise<string[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getPythPriceIdsForPositionIds(subgraphEndpoint, positionIds);
+  }
+
+  public async getPositionsToRefresh(count: number = 20): Promise<string[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getPositionsToRefresh(subgraphEndpoint, count);
+  }
+
+  public async getPositionsToLiquidate(count: number = 10): Promise<string[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getPositionsToLiquidate(subgraphEndpoint, count);
   }
   ////////////////////////////////////////////////////////////////
   //////////////////////    MARKET    ////////////////////////////

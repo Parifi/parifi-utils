@@ -13,13 +13,9 @@ describe('Market fetching logic from subgraph', () => {
     await parifiSdk.init();
     const marketId = '0x122d17f9d86438d3f9d12c1366a56e45c03ae191f705a5d850617739f76605d5';
 
-    const market = await parifiSdk.subgraph.getMarketById(marketId)
+    const market = await parifiSdk.subgraph.getMarketById(marketId);
 
     console.log(market);
-    if (market) {
-      expect(market.id).toBe(marketId);
-    } else {
-      fail;
-    }
+    expect(market.id).toBe(marketId);
   });
 });
