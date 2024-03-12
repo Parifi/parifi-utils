@@ -28,7 +28,7 @@ describe('Vault fetching logic from subgraph', () => {
 describe('Vault fetching logic from subgraph', () => {
   it('should return correct vault details', async () => {
     await parifiSdk.init();
-    const data = await parifiSdk.subgraph.getTotalPoolValue();
+    const data = await parifiSdk.subgraph.getTotalPoolsValue();
     console.log(data);
 
     expect(data.totalPoolValue).not.toBe(0);
@@ -38,7 +38,7 @@ describe('Vault fetching logic from subgraph', () => {
 describe('Vault fetching logic from subgraph', () => {
   it('should return correct vault details', async () => {
     await parifiSdk.init();
-    const data = await parifiSdk.subgraph.getUserVaultDataByChain('0x9DBaF66862C120148F398d4d525b50a0E3fE7069');
+    const data = await parifiSdk.subgraph.getUserVaultDataByChain('0x30f06f86F107f9523f5b91A8E8AEB602b7b260BD');
     console.log(data);
 
     expect(data.length).not.toBe(0);
@@ -47,7 +47,7 @@ describe('Vault fetching logic from subgraph', () => {
 describe('Vault fetching logic from subgraph', () => {
   it('should return correct vault details', async () => {
     await parifiSdk.init();
-    const data = await parifiSdk.subgraph.getMyTotalPoolValue('0x9DBaF66862C120148F398d4d525b50a0E3fE7069');
+    const data = await parifiSdk.subgraph.getMyTotalPoolsValue('0x30f06f86F107f9523f5b91A8E8AEB602b7b260BD');
     console.log(data);
 
     expect(data.myTotalPoolValue).not.toBe(0);

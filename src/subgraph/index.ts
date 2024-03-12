@@ -154,13 +154,13 @@ export class Subgraph {
     return getUserVaultDataByChain(this.rpcConfig.chainId, subgraphEndpoint, userAddress);
   }
 
-  public async getTotalPoolValue() {
+  public async getTotalPoolsValue() {
     await this.init();
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     const vaults = await getChainVaultData(this.rpcConfig.chainId, subgraphEndpoint);
     const priceIds = vaults.map((v) => v.depositToken?.pyth?.id);
     const res = await this.pyth.getLatestPricesFromPyth(priceIds as string[]);
-    const price = res.map((pythPrice) => {
+    const priceInfos = res.map((pythPrice) => {
       const normalizedPrice = this.pyth.normalizePythPriceForParifi(
         Number(pythPrice.price.price),
         pythPrice.price.expo,
@@ -182,14 +182,13 @@ export class Subgraph {
           return price.normalizedPrice;
         }
       }
-      // Return null if no matching priceId found
-      return null;
+      // Return 0 if no matching priceId found
+      return 0;
     }
 
     const data = vaults.map((vault) => {
-      const normalizedPrice = getNormalizedPriceById(vault.depositToken?.pyth?.id as string, price);
-      const totatVaultValue =
-        (Number(vault.totalAssets) / 10 ** (vault.vaultDecimals || 0)) * Number(normalizedPrice || 0);
+      const normalizedPrice = getNormalizedPriceById(vault.depositToken?.pyth?.id as string, priceInfos);
+      const totatVaultValue = (Number(vault.totalAssets) / 10 ** (vault.vaultDecimals || 18)) * Number(normalizedPrice);
       const returnObj = {
         totalAssets: vault.totalAssets,
         decimal: vault.vaultDecimals,
@@ -204,7 +203,7 @@ export class Subgraph {
     return { data, totalPoolValue };
   }
 
-  public async getMyTotalPoolValue(userAddress: string) {
+  public async getMyTotalPoolsValue(userAddress: string) {
     await this.init();
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     const vaults = await getUserVaultDataByChain(this.rpcConfig.chainId, subgraphEndpoint, userAddress);
@@ -213,7 +212,7 @@ export class Subgraph {
     }
     const priceIds = vaults.map((v) => v.vault.depositToken?.pyth?.id);
     const res = await this.pyth.getLatestPricesFromPyth(priceIds as string[]);
-    const price = res.map((pythPrice) => {
+    const priceInfos = res.map((pythPrice) => {
       const normalizedPrice = this.pyth.normalizePythPriceForParifi(
         Number(pythPrice.price.price),
         pythPrice.price.expo,
@@ -235,20 +234,20 @@ export class Subgraph {
           return price.normalizedPrice;
         }
       }
-      // Return null if no matching priceId found
-      return null;
+      // Return 0 if no matching priceId found
+      return 0;
     }
 
     const data = vaults.map((vault) => {
-      const normalizedPrice = getNormalizedPriceById(vault.vault.depositToken?.pyth?.id as string, price);
+      const normalizedPrice = getNormalizedPriceById(vault.vault.depositToken?.pyth?.id as string, priceInfos);
       const vaultPerShare = vault.vault.assetsPerShare;
       const userShare = vault.sharesBalance;
       const myBalance =
         (Number(userShare || 0) * Number(vaultPerShare || 0)) /
-        Number(10 ** (vault.vault?.vaultDecimals || 0)) /
+        Number(10 ** (vault.vault?.vaultDecimals || 18)) /
         Number(10 ** parseInt(vault.vault.depositToken?.decimals || ''));
 
-      const totatVaultValue = myBalance * Number(normalizedPrice || 0);
+      const totatVaultValue = myBalance * Number(normalizedPrice);
       const returnObj = {
         myBalance: myBalance,
         normalizedPrice: normalizedPrice,
