@@ -7,6 +7,7 @@ import {
   PythData,
   Token,
   Vault,
+  VaultPosition,
 } from '../interfaces/subgraphTypes';
 
 ////////////////////////////////////////////////////////////////

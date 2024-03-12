@@ -1,6 +1,6 @@
 import { request } from 'graphql-request';
-import { Vault } from '../../interfaces';
-import { fetchAllVaultsQuery } from './subgraphQueries';
+import { Vault, VaultPosition, VaultPositionsResponse } from '../../interfaces';
+import { fetchAllVaultsQuery, fetchUserAllVaultsQuery } from './subgraphQueries';
 import { mapVaultsArrayToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 import { Chain as SupportedChain, availableVaultsPerChain } from '@parifi/references';
@@ -40,6 +40,23 @@ export const getChainVaultData = async (chainId: SupportedChain, subgraphEndpoin
     return {
       ...vault,
       id: vaultAddress ?? vault.id,
+    };
+  });
+};
+
+export const getUserVaultDataByChain = async (chainId: SupportedChain, subgraphEndpoint: string, user: string) => {
+  let subgraphResponse: any = await request(subgraphEndpoint, fetchUserAllVaultsQuery(user));
+  const vaults: VaultPositionsResponse = subgraphResponse;
+  if (vaults.vaultPositions.length === 0) {
+    return [];
+  }
+  return vaults.vaultPositions.map((vault) => {
+    const vaultAddress = availableVaultsPerChain[chainId].find(
+      (vaultA) => vaultA.toLowerCase() === vault.vault?.id?.toLowerCase(),
+    );
+    return {
+      ...vault,
+      vault: { ...vault.vault, id: vaultAddress ?? vault.vault.id },
     };
   });
 };

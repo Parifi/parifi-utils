@@ -31,6 +31,25 @@ describe('Vault fetching logic from subgraph', () => {
     const data = await parifiSdk.subgraph.getTotalPoolValue();
     console.log(data);
 
-    expect(data.totalLiquidity).not.toBe(0);
+    expect(data.totalPoolValue).not.toBe(0);
+  });
+});
+
+describe('Vault fetching logic from subgraph', () => {
+  it('should return correct vault details', async () => {
+    await parifiSdk.init();
+    const data = await parifiSdk.subgraph.getUserVaultDataByChain('0x9DBaF66862C120148F398d4d525b50a0E3fE7069');
+    console.log(data);
+
+    expect(data.length).not.toBe(0);
+  });
+});
+describe('Vault fetching logic from subgraph', () => {
+  it('should return correct vault details', async () => {
+    await parifiSdk.init();
+    const data = await parifiSdk.subgraph.getMyTotalPoolValue('0x9DBaF66862C120148F398d4d525b50a0E3fE7069');
+    console.log(data);
+
+    expect(data.myTotalPoolValue).not.toBe(0);
   });
 });
