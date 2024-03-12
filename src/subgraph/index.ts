@@ -6,6 +6,8 @@ import {
   getLiquidatedPositionsByUserAddress,
   getOpenPositionsByUserAddress,
   getPositionById,
+  getPositionsToLiquidate,
+  getPositionsToRefresh,
   getPythPriceIdsForPositionIds,
 } from './positions';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
@@ -128,6 +130,16 @@ export class Subgraph {
   public async getPythPriceIdsForPositionIds(positionIds: string[]): Promise<string[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getPythPriceIdsForPositionIds(subgraphEndpoint, positionIds);
+  }
+
+  public async getPositionsToRefresh(count: number = 20): Promise<string[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getPositionsToRefresh(subgraphEndpoint, count);
+  }
+
+  public async getPositionsToLiquidate(count: number = 10): Promise<string[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getPositionsToLiquidate(subgraphEndpoint, count);
   }
   ////////////////////////////////////////////////////////////////
   //////////////////////    MARKET    ////////////////////////////

@@ -94,6 +94,8 @@ export const batchLiquidatePostionsUsingGelato = async (
   subgraphEndpoint: string,
   pythClient: AxiosInstance,
 ): Promise<{ positionsCount: number }> => {
+  if (positionIds.length == 0) return { positionsCount: 0 };
+
   // Get unique price ids for all the positions
   const priceIds = await getPythPriceIdsForPositionIds(subgraphEndpoint, positionIds);
 

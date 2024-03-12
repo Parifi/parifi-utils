@@ -4,11 +4,20 @@ import {
   fetchPositionByIdQuery,
   fetchPositionsByUserQuery,
   fetchPositionsByUserQueryAndStatus,
+  fetchPositionsToLiquidateQuery,
+  fetchPositionsToRefreshQuery,
   fetchPriceIdsFromPositionIdsQuery,
 } from './subgraphQueries';
 import { mapPositionsArrayToInterface, mapSinglePositionToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
+
+/// Position Ids interface to format subgraph response to string array
+interface PositionIdsSubgraphResponse {
+  positions: {
+    id: string;
+  }[];
+}
 
 // Get all positions by user address
 export const getAllPositionsByUserAddress = async (
@@ -134,6 +143,28 @@ export const getPythPriceIdsForPositionIds = async (
     return uniquePriceIds.filter((id) => id !== EMPTY_BYTES32);
   } catch (error) {
     console.log('Error mapping price ids');
+    throw error;
+  }
+};
+
+// Get `count` number of positions to refresh sorted by last refresh timestamp
+export const getPositionsToRefresh = async (subgraphEndpoint: string, count: number = 20): Promise<string[]> => {
+  try {
+    const query = fetchPositionsToRefreshQuery(count);
+    const subgraphResponse: PositionIdsSubgraphResponse = await request(subgraphEndpoint, query);
+    return subgraphResponse.positions.map((position) => position.id);
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get `count` number of positions that are available for liquidation sorted by position size
+export const getPositionsToLiquidate = async (subgraphEndpoint: string, count: number = 10): Promise<string[]> => {
+  try {
+    const query = fetchPositionsToLiquidateQuery(count);
+    const subgraphResponse: PositionIdsSubgraphResponse = await request(subgraphEndpoint, query);
+    return subgraphResponse.positions.map((position) => position.id);
+  } catch (error) {
     throw error;
   }
 };

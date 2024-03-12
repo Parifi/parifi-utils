@@ -157,6 +157,8 @@ export class Core {
     positionIds: string[],
     gelatoKey: string,
   ): Promise<{ positionsCount: number }> => {
+    if (positionIds.length == 0) return { positionsCount: 0 };
+
     const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
     const pythClient = await getPythClient(
       this.pythConfig.pythEndpoint,

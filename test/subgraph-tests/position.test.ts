@@ -1,12 +1,23 @@
 import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
-import { RpcConfig } from '../../src/interfaces/classConfigs';
+import { PythConfig, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
 };
 
-const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {});
+const subgraphConfig: SubgraphConfig = {
+  subgraphEndpoint: 'https://api.thegraph.com/subgraphs/name/sudeepb02/parifi-testnet',
+};
+
+const pythConfig: PythConfig = {
+  pythEndpoint: process.env.PYTH_SERVICE_ENDPOINT,
+  username: process.env.PYTH_SERVICE_USERNAME,
+  password: process.env.PYTH_SERVICE_PASSWORD,
+  isStable: true,
+};
+
+const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, {}, pythConfig);
 
 describe('Order fetching logic from subgraph', () => {
   it('should return correct position details', async () => {
@@ -15,11 +26,7 @@ describe('Order fetching logic from subgraph', () => {
 
     const position = await parifiSdk.subgraph.getPositionById(positionId);
     console.log(positionId);
-    if (position) {
-      expect(position.id).toBe(positionId);
-    } else {
-      fail;
-    }
+    expect(position.id).toBe(positionId);
   });
 
   it('should return position details by status: OPEN', async () => {
@@ -66,5 +73,21 @@ describe('Order fetching logic from subgraph', () => {
 
     const priceIds = await parifiSdk.subgraph.getPythPriceIdsForPositionIds(positionIds);
     expect(priceIds.length).toBeGreaterThan(0);
+  });
+
+  it('should return position ids available for liquidation', async () => {
+    await parifiSdk.init();
+
+    // Get upto 5 positions to liquidate
+    const positionIds = await parifiSdk.subgraph.getPositionsToLiquidate(5);
+    console.log('positionIds', positionIds);
+    if (positionIds.length == 0) return;
+
+    // Get unique price ids for the above positions
+    const priceIds = await parifiSdk.subgraph.getPythPriceIdsForPositionIds(positionIds);
+    console.log(priceIds);
+    expect(priceIds.length).toBeGreaterThan(0);
+
+    await parifiSdk.core.batchLiquidatePositionsUsingGelato(positionIds, process.env.GELATO_KEY ?? '');
   });
 });
