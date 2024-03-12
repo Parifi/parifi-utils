@@ -3,7 +3,6 @@ import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
 import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 
-
 const chain = Chain.ARBITRUM_SEPOLIA;
 const rpcConfig: RpcConfig = {
   chainId: chain,
@@ -19,7 +18,7 @@ const pythConfig: PythConfig = {
 const subgraphConfig: SubgraphConfig = {};
 
 const gelatoConfig: RelayerI = {
-  apiKey: process.env.GELO_API_KEY || '',
+  apiKey: process.env.GELATO_KEY || '',
 };
 
 const relayerConfig: RelayerConfig = {

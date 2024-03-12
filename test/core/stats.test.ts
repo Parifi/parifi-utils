@@ -10,7 +10,7 @@ const rpcConfig: RpcConfig = {
 };
 
 const gelatoConfig: RelayerI = {
-  apiKey: process.env.GELO_API_KEY || '',
+  apiKey: process.env.GELATO_KEY || '',
 };
 
 const relayerConfig: RelayerConfig = {

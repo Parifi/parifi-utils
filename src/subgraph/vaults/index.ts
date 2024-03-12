@@ -92,17 +92,17 @@ export const getUserTotalPoolsValue = async (
       Number(10 ** (vault.vault?.vaultDecimals || 18)) /
       Number(10 ** parseInt(vault.vault.depositToken?.decimals || ''));
 
-    const totatVaultValue = myBalance * Number(normalizedPrice);
+    const totalVaultValue = myBalance * Number(normalizedPrice);
     const returnObj = {
       myBalance: myBalance,
       normalizedPrice: normalizedPrice,
       Symbol: vault.vault.depositToken?.symbol,
       priceId: vault.vault.depositToken?.pyth?.id,
-      totatVaultValue: totatVaultValue,
+      totalVaultValue: totalVaultValue,
     };
     return returnObj;
   });
-  const myTotalPoolValue = data.reduce((a, b) => a + b.totatVaultValue, 0);
+  const myTotalPoolValue = data.reduce((a, b) => a + b.totalVaultValue, 0);
   return { data, myTotalPoolValue };
 };
 
