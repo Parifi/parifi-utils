@@ -13,11 +13,7 @@ import { getLatestPricesFromPyth, normalizePythPriceForParifi } from '../../pyth
 import { AxiosInstance } from 'axios';
 
 const matchChain: Record<SupportedChain, Chain> = {
-  [SupportedChain.ARBITRUM_GOERLI]: arbitrumGoerli,
   [SupportedChain.ARBITRUM_SEPOLIA]: arbitrumSepolia,
-  [SupportedChain.ARBITRUM]: arbitrum,
-  [SupportedChain.POLYGON]: polygon,
-  [SupportedChain.BASE]: base,
 };
 
 // Get all vaults from subgraph
