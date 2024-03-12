@@ -3,6 +3,7 @@ import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
 import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 
+
 const chain = Chain.ARBITRUM_SEPOLIA;
 const rpcConfig: RpcConfig = {
   chainId: chain,
@@ -33,13 +34,7 @@ describe('sdkTest', () => {
     const positionId = '0x5c46fe7154af223da5e2e6d284e367d4ef38bdfd5c6fd4ce56cc47d0d3cbd957';
 
     const position = await parifiSdk.subgraph.getPositionById(positionId);
-
-    console.log(positionId);
-    if (position) {
-      expect(position.id).toBe(positionId);
-    } else {
-      fail;
-    }
+    expect(position.id).toBe(positionId);
   });
 });
 
@@ -49,11 +44,7 @@ describe('Pyth tests', () => {
     const ethPriceIdStable = '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace';
 
     const priceUpdateData = await parifiSdk.pyth.getVaaPriceUpdateData([ethPriceIdStable]);
-    if (priceUpdateData) {
-      console.log(priceUpdateData);
-      expect(priceUpdateData).not.toBeNull();
-    } else {
-      fail;
-    }
+    console.log(priceUpdateData);
+    expect(priceUpdateData).not.toBeNull();
   });
 });

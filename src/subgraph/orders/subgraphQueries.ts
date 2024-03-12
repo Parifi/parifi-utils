@@ -15,6 +15,7 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10, 
 		market { 
     	id
     }
+    user { id }
     deadline
     deadlineISO
     orderType
@@ -23,6 +24,8 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10, 
    	expectedPrice 
     executionPrice
     isLong
+    isLimitOrder
+    triggerAbove
     status
     createdTimestamp
     txHash
@@ -30,11 +33,18 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10, 
     partnerAddress
     executionFee
     settledTxHash
+    settledTimestamp
     cancellationTxHash
+    settledBy { id }
+    position { id positionSize }
   }   
 }`;
 
-export const fetchPendingOrdersQuery = (currentTimestamp: number = Math.floor(Date.now() / 1000), count: number, skip: number = 0) =>
+export const fetchPendingOrdersQuery = (
+  currentTimestamp: number = Math.floor(Date.now() / 1000),
+  count: number,
+  skip: number = 0,
+) =>
   gql`
   {
   orders(
@@ -116,7 +126,7 @@ export const fetchPriceIdsFromOrderIdsQuery = (orderIds: string[]) =>
   {
     orders(
       where: {
-        id_in: [${orderIds.map(id => `"${id}"`).join(', ')}]
+        id_in: [${orderIds.map((id) => `"${id}"`).join(', ')}]
       }
     ) {
       id

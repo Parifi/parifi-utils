@@ -37,7 +37,6 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 1
             createdTimestamp
             lastRefresh
             lastRefreshISO
-            
         }
     }`;
 
@@ -86,7 +85,6 @@ export const fetchPositionsByUserQueryAndStatus = (
             createdTimestamp
             lastRefresh
             lastRefreshISO
-            
         }
     }`;
 
@@ -123,3 +121,37 @@ export const fetchPositionByIdQuery = (positionId: string) =>
             lastRefreshISO            
         }
     }`;
+
+export const fetchPriceIdsFromPositionIdsQuery = (positionIds: string[]) =>
+  gql`
+  {
+    positions (
+      where: {
+        id_in: [${positionIds.map((id) => `"${id}"`).join(', ')}]
+      }
+    ) {
+      id
+      market {
+        pyth {
+          id
+        }
+      }
+    }
+  }
+`;
+
+export const fetchPositionsToRefreshQuery = (count: number) => gql`
+  {
+    positions(where: { status: OPEN }, first: ${count}, orderBy: lastRefresh, orderDirection: asc) {
+      id
+    }
+  }
+`;
+
+export const fetchPositionsToLiquidateQuery = (count: number) => gql`
+  {
+    positions(where: { status: OPEN, canBeLiquidated: true }, first: ${count}, orderBy: positionSize, orderDirection: desc) {
+      id
+    }
+  }
+`;

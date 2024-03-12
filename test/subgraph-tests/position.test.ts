@@ -1,12 +1,23 @@
 import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
-import { RpcConfig } from '../../src/interfaces/classConfigs';
+import { PythConfig, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
 };
 
-const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {});
+const subgraphConfig: SubgraphConfig = {
+  subgraphEndpoint: 'https://api.thegraph.com/subgraphs/name/sudeepb02/parifi-testnet',
+};
+
+const pythConfig: PythConfig = {
+  pythEndpoint: process.env.PYTH_SERVICE_ENDPOINT,
+  username: process.env.PYTH_SERVICE_USERNAME,
+  password: process.env.PYTH_SERVICE_PASSWORD,
+  isStable: true,
+};
+
+const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, {}, pythConfig);
 
 describe('Order fetching logic from subgraph', () => {
   it('should return correct position details', async () => {
@@ -15,11 +26,7 @@ describe('Order fetching logic from subgraph', () => {
 
     const position = await parifiSdk.subgraph.getPositionById(positionId);
     console.log(positionId);
-    if (position) {
-      expect(position.id).toBe(positionId);
-    } else {
-      fail;
-    }
+    expect(position.id).toBe(positionId);
   });
 
   it('should return position details by status: OPEN', async () => {
@@ -53,5 +60,34 @@ describe('Order fetching logic from subgraph', () => {
     if (positions.length > 0) {
       expect(positions[0].status).toBe('LIQUIDATED');
     }
+  });
+
+  it('should return price ids for position ids', async () => {
+    await parifiSdk.init();
+
+    const positionIds = [
+      '0x00119fbaf9bcb7af16173ca7db01c90d53bd96c4eb2810f2b982bd3e1a36fab0',
+      '0x00450423fe9218d87b44919528e7cd75fb86c31af0ba0e7e7d3547e019d4adb4',
+      '0x00841110ab1304773ceb680ae39dcd0a50d3326a50de33aab6792d17a4483b04',
+    ];
+
+    const priceIds = await parifiSdk.subgraph.getPythPriceIdsForPositionIds(positionIds);
+    expect(priceIds.length).toBeGreaterThan(0);
+  });
+
+  it('should return position ids available for liquidation', async () => {
+    await parifiSdk.init();
+
+    // Get upto 5 positions to liquidate
+    const positionIds = await parifiSdk.subgraph.getPositionsToLiquidate(5);
+    console.log('positionIds', positionIds);
+    if (positionIds.length == 0) return;
+
+    // Get unique price ids for the above positions
+    const priceIds = await parifiSdk.subgraph.getPythPriceIdsForPositionIds(positionIds);
+    console.log(priceIds);
+    expect(priceIds.length).toBeGreaterThan(0);
+
+    await parifiSdk.core.batchLiquidatePositionsUsingGelato(positionIds, process.env.GELATO_KEY ?? '');
   });
 });

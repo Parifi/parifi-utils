@@ -23,10 +23,6 @@ describe('Market fetching logic from subgraph', () => {
     const market = await parifiSdk.subgraph.getMarketById(marketId);
 
     console.log(market);
-    if (market) {
-      expect(market.id).toBe(marketId);
-    } else {
-      fail;
-    }
+    expect(market.id).toBe(marketId);
   });
 });
