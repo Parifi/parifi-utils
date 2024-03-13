@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
-import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
+import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 
 const chain = Chain.ARBITRUM_SEPOLIA;
 const rpcConfig: RpcConfig = {
@@ -15,8 +15,15 @@ const pythConfig: PythConfig = {
   isStable: true,
 };
 
-const relayerConfig: RelayerConfig = {};
 const subgraphConfig: SubgraphConfig = {};
+
+const gelatoConfig: RelayerI = {
+  apiKey: process.env.GELATO_KEY || '',
+};
+
+const relayerConfig: RelayerConfig = {
+  gelatoConfig: gelatoConfig,
+};
 
 const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, relayerConfig, pythConfig);
 

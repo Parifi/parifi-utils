@@ -497,6 +497,25 @@ export interface Vault {
   withdrawalWindow?: string;
 
   // Vault PNL info can be fetched using a separate query
-  // to avoid nested data structure 
+  // to avoid nested data structure
   // vaultPnl?: [VaultPnl]
+}
+
+export interface VaultPosition {
+  vault: Vault;
+  sharesBalance: string;
+  totalMinted: string;
+  totalRedeemed: string;
+  totalDeposited: string;
+  totalWithdrawn: string;
+  avgMintPrice: string;
+  avgMintPriceDec: string;
+  unrealizedPNL: string;
+  realizedPNL: string;
+  realizedPNLInUsd: string;
+  id: string;
+}
+
+export interface VaultPositionsResponse {
+  vaultPositions: VaultPosition[];
 }

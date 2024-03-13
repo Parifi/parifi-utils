@@ -17,6 +17,9 @@ export const fetchAllVaultsQuery = () => gql`
         decimals
         lastPriceUSD
         lastPriceTimestamp
+        pyth {
+          id
+        }
       }
       isPaused
       feeManagerAddress
@@ -32,4 +35,44 @@ export const fetchAllVaultsQuery = () => gql`
       withdrawalWindow
     }
   }
+`;
+
+export const fetchUserAllVaultsQuery = (user: string) => gql`
+query vaultInfo {
+  vaultPositions(where: {user: "${user}"}) {
+    vault {
+      vaultSymbol
+      assetsPerShareDec
+      assetsPerShare
+      id
+      cooldownPeriod
+      withdrawalWindow
+      withdrawalFee
+      vaultDecimals
+      depositToken {
+        id
+        name
+        symbol
+        decimals
+        lastPriceUSD
+        lastPriceTimestamp
+        pyth {
+          id
+        }
+      }
+      totalAssets
+      totalShares
+  }
+  sharesBalance
+  totalMinted
+  totalRedeemed
+  totalDeposited
+  totalWithdrawn
+  avgMintPrice
+  avgMintPriceDec
+  unrealizedPNL
+  realizedPNL
+  realizedPNLInUsd
+  }
+}
 `;

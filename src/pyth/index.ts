@@ -1,9 +1,9 @@
 import { AxiosInstance } from 'axios';
 import { PythConfig } from '../interfaces/classConfigs';
-import { getPythClient, getVaaPriceUpdateData, normalizePythPriceForParifi } from './pyth';
+import { getLatestPricesFromPyth, getPythClient, getVaaPriceUpdateData, normalizePythPriceForParifi } from './pyth';
 
 export class Pyth {
-  private pythClient: AxiosInstance;
+  public pythClient: AxiosInstance;
 
   constructor(private pythConfig: PythConfig) {
     this.pythClient = {} as AxiosInstance;
@@ -22,7 +22,11 @@ export class Pyth {
     return await getVaaPriceUpdateData(priceIds, this.pythClient);
   }
 
-  public async normalizePythPriceForParifi(pythPrice: number, pythExponent: number) {
-    normalizePythPriceForParifi(pythPrice, pythExponent);
+  public normalizePythPriceForParifi(pythPrice: number, pythExponent: number) {
+    return normalizePythPriceForParifi(pythPrice, pythExponent);
+  }
+
+  public async getLatestPricesFromPyth(priceIds: string[]) {
+    return await getLatestPricesFromPyth(priceIds, this.pythClient);
   }
 }

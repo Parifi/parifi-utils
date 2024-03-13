@@ -1,5 +1,5 @@
 import { getAllOrdersByUserAddress, getAllPendingOrders, getOrderById, getPythPriceIdsForOrderIds } from './orders';
-import { RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
+import { PythConfig, RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
 import {
   getAllPositionsByUserAddress,
   getClosedPositionsByUserAddress,
@@ -15,7 +15,14 @@ import { Market, Order, Position, Vault } from '../interfaces/subgraphTypes';
 import { Chain } from '@parifi/references';
 import request, { GraphQLClient } from 'graphql-request';
 import { getPublicSubgraphEndpoint } from './common';
-import { getAllVaults } from './vaults';
+import {
+  getAllVaults,
+  getTotalPoolsValue,
+  getUserTotalPoolsValue,
+  getUserVaultDataByChain,
+  getVaultDataByChain,
+} from './vaults';
+import { Pyth } from '../pyth';
 
 export * from './common';
 export * from './markets';
@@ -28,17 +35,23 @@ export class Subgraph {
   // @todo Add authentication to Graph QL Client in a separate PR
   // Use the below graphQLClient for all requests to the subgraph
   public graphQLClient: GraphQLClient;
+  public pyth: Pyth;
 
   constructor(
     private rpcConfig: RpcConfig,
     private subgraphConfig: SubgraphConfig,
+    pythConfig: PythConfig,
   ) {
+    this.pyth = new Pyth(pythConfig);
     // Initialize the Graph QL Client using the config received
     if (subgraphConfig.subgraphEndpoint) {
       this.graphQLClient = new GraphQLClient(subgraphConfig.subgraphEndpoint);
     } else {
       this.graphQLClient = new GraphQLClient(getPublicSubgraphEndpoint(rpcConfig.chainId));
     }
+  }
+  async init() {
+    await this.pyth.initPyth();
   }
 
   // Returns the configured subgraph endpoint if set, otherwise returns public subgraph endpoint
@@ -162,5 +175,27 @@ export class Subgraph {
   public async getAllVaults(): Promise<Vault[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return getAllVaults(subgraphEndpoint);
+  }
+
+  public async getVaultDataByChain(): Promise<Vault[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return getVaultDataByChain(this.rpcConfig.chainId, subgraphEndpoint);
+  }
+
+  public async getUserVaultDataByChain(userAddress: string): Promise<Vault[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return getUserVaultDataByChain(this.rpcConfig.chainId, subgraphEndpoint, userAddress);
+  }
+
+  public async getTotalPoolsValue() {
+    await this.init();
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getTotalPoolsValue(this.rpcConfig.chainId, subgraphEndpoint, this.pyth.pythClient);
+  }
+
+  public async getUserTotalPoolsValue(userAddress: string) {
+    await this.init();
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getUserTotalPoolsValue(userAddress, this.rpcConfig.chainId, subgraphEndpoint, this.pyth.pythClient);
   }
 }

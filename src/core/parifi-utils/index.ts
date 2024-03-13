@@ -3,7 +3,7 @@ import { Chain } from '@parifi/references';
 import { contracts as parifiContracts } from '@parifi/references';
 import { getLatestPricesFromPyth, getVaaPriceUpdateData, normalizePythPriceForParifi } from '../../pyth/pyth';
 import { AxiosInstance } from 'axios';
-import { executeTxUsingGelato } from '../../gelato';
+import { executeTxUsingGelato } from '../../gelato/gelato-function';
 import { getAllPendingOrders, getPythPriceIdsForPositionIds } from '../../subgraph';
 import { BatchExecute } from '../../interfaces/subgraphTypes';
 import { DEFAULT_BATCH_COUNT } from '../../common';
