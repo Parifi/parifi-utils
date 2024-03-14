@@ -11,3 +11,9 @@ export const DECIMAL_10 = new Decimal(10);
 export const DECIMAL_ZERO = new Decimal(0);
 export const DEFAULT_BATCH_COUNT = 10;
 
+// Constants for Pyth price ids of collaterals
+export const PYTH_ETH_USD_PRICE_ID_BETA = '0xca80ba6dc32e08d06f1aa886011eed1d77c77be9eb761cc10d72b7d0a2fd57a6';
+export const PYTH_ETH_USD_PRICE_ID_STABLE = '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace';
+
+export const PYTH_USDC_USD_PRICE_ID_BETA = '0x41f3625971ca2ed2263e78573fe5ce23e13d2558ed3f2e47ab0f84fb9e7ae722';
+export const PYTH_USDC_USD_PRICE_ID_STABLE = '0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a';
