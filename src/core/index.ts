@@ -168,7 +168,14 @@ export class Core {
       this.pythConfig.password,
       this.pythConfig.isStable,
     );
-    return batchSettlePendingOrdersUsingGelato(this.rpcConfig.chainId, gelatoKey, subgraphEndpoint, pythClient);
+    const isStablePyth = this.pythConfig.isStable ?? true;
+    return batchSettlePendingOrdersUsingGelato(
+      this.rpcConfig.chainId,
+      gelatoKey,
+      subgraphEndpoint,
+      isStablePyth,
+      pythClient,
+    );
   };
 
   batchLiquidatePositionsUsingGelato = async (
@@ -185,11 +192,14 @@ export class Core {
       this.pythConfig.isStable,
     );
 
+    const isStablePyth = this.pythConfig.isStable ?? true;
+
     return batchLiquidatePostionsUsingGelato(
       this.rpcConfig.chainId,
       positionIds,
       gelatoKey,
       subgraphEndpoint,
+      isStablePyth,
       pythClient,
     );
   };
