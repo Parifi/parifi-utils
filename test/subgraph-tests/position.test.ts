@@ -1,6 +1,7 @@
+import 'dotenv/config';
 import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
-import { PythConfig, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
+import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
@@ -15,6 +16,12 @@ const pythConfig: PythConfig = {
   username: process.env.PYTH_SERVICE_USERNAME,
   password: process.env.PYTH_SERVICE_PASSWORD,
   isStable: true,
+};
+
+const relayerConfig: RelayerConfig = {
+  gelatoConfig: {
+    apiKey: process.env.GELATO_KEY,
+  },
 };
 
 const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, {}, pythConfig);
@@ -75,8 +82,11 @@ describe('Order fetching logic from subgraph', () => {
     expect(priceIds.length).toBeGreaterThan(0);
   });
 
-  it('should return position ids available for liquidation', async () => {
+  it.only('should return position ids available for liquidation', async () => {
     await parifiSdk.init();
+
+    const positionsToRefresh = await parifiSdk.subgraph.getPositionsToRefresh();
+    console.log('positionsToRefresh', positionsToRefresh);
 
     // Get upto 5 positions to liquidate
     const positionIds = await parifiSdk.subgraph.getPositionsToLiquidate(5);
@@ -85,9 +95,11 @@ describe('Order fetching logic from subgraph', () => {
 
     // Get unique price ids for the above positions
     const priceIds = await parifiSdk.subgraph.getPythPriceIdsForPositionIds(positionIds);
-    console.log(priceIds);
+    console.log('priceIds', priceIds);
     expect(priceIds.length).toBeGreaterThan(0);
 
-    await parifiSdk.core.batchLiquidatePositionsUsingGelato(positionIds, process.env.GELATO_KEY ?? '');
+    console.log('gelato', process.env.GELATO_KEY);
+    const taskId = await parifiSdk.core.batchLiquidatePositionsUsingGelato(positionIds, process.env.GELATO_KEY ?? '');
+    console.log('Task ID: ', taskId);
   });
 });

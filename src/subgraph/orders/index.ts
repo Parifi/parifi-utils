@@ -7,7 +7,7 @@ import {
   fetchPriceIdsFromOrderIdsQuery,
 } from './subgraphQueries';
 import { mapOrdersArrayToInterface, mapSingleOrderToInterface } from '../../common/subgraphMapper';
-import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
+import { EMPTY_BYTES32, getPriceIdsForCollaterals, getUniqueValuesFromArray } from '../../common';
 import { NotFoundError } from '../../error/not-found.error';
 
 // Get all order by a user address

@@ -6,6 +6,11 @@ import { convertMarketAmountToCollateral } from '../price-feed';
 import { Chain } from '@parifi/references';
 import { contracts as parifiContracts } from '@parifi/references';
 import { Contract, ethers } from 'ethers';
+import { AxiosInstance } from 'axios';
+import { getPythPriceIdsForPositionIds } from '../../subgraph';
+import { getVaaPriceUpdateData } from '../../pyth/pyth';
+import { getPriceIdsForCollaterals } from '../../common';
+import { executeTxUsingGelato } from '../../gelato/gelato-function';
 
 // Returns an Order Manager contract instance without signer
 export const getOrderManagerInstance = (chain: Chain): Contract => {
@@ -301,4 +306,32 @@ export const checkIfOrderCanBeSettled = (order: Order, normalizedMarketPrice: De
     }
   }
   return true;
+};
+
+// Liquidates a position using Gelato as the relayer
+export const liquidatePositionUsingGelato = async (
+  chainId: Chain,
+  positionId: string,
+  gelatoKey: string,
+  subgraphEndpoint: string,
+  isStablePyth: boolean,
+  pythClient: AxiosInstance,
+): Promise<{ gelatoTaskId: string }> => {
+  // Get unique price ids for the position
+  const priceIds = await getPythPriceIdsForPositionIds(subgraphEndpoint, [positionId]);
+  const collateralPriceIds = getPriceIdsForCollaterals(isStablePyth);
+
+  // Get Price update data and latest prices from Pyth
+  const priceUpdateData = await getVaaPriceUpdateData(priceIds.concat(collateralPriceIds), pythClient);
+
+  // Encode transaction data
+  let taskId: string = '';
+  const orderManager = getOrderManagerInstance(chainId);
+  const { data: encodedTxData } = await orderManager.liquidatePosition.populateTransaction(positionId, priceUpdateData);
+
+  taskId = await executeTxUsingGelato(parifiContracts[chainId].OrderManager.address, chainId, gelatoKey, encodedTxData);
+
+  // We need these console logs for feedback to Tenderly actions and other scripts
+  console.log('Task ID:', taskId);
+  return { gelatoTaskId: taskId };
 };

@@ -1,4 +1,10 @@
 import { Decimal } from 'decimal.js';
+import {
+  PYTH_ETH_USD_PRICE_ID_BETA,
+  PYTH_ETH_USD_PRICE_ID_STABLE,
+  PYTH_USDC_USD_PRICE_ID_BETA,
+  PYTH_USDC_USD_PRICE_ID_STABLE,
+} from './constants';
 
 export const getDiff = (a: Decimal, b: Decimal): Decimal => {
   return a.gt(b) ? a.minus(b) : b.minus(a);
@@ -35,3 +41,21 @@ export function getNormalizedPriceByIdFromPriceIdArray(
   // Return 0 if no matching priceId found
   return 0;
 }
+
+// Returns the Pyth price IDs of collateral tokens
+export const getPriceIdsForCollaterals = (isStable: boolean): string[] => {
+  if (isStable) {
+    // Return Pyth Stable price ids
+    return [PYTH_ETH_USD_PRICE_ID_STABLE, PYTH_USDC_USD_PRICE_ID_STABLE];
+  } else {
+    // Return Pyth Beta price ids
+    return [PYTH_ETH_USD_PRICE_ID_BETA, PYTH_USDC_USD_PRICE_ID_BETA];
+  }
+};
+
+// Return Pyth price ids with price ids of collateral tokens
+export const addPythPriceIdsForCollateralTokens = (isStable: boolean = true, priceIds: string[]): string[] => {
+  const collateralPriceIds = getPriceIdsForCollaterals(isStable);
+  priceIds.concat(collateralPriceIds);
+  return getUniqueValuesFromArray(priceIds);
+};

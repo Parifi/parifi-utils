@@ -15,6 +15,7 @@ import {
   getOrderManagerInstance,
   getProfitOrLossInUsd,
   isPositionLiquidatable,
+  liquidatePositionUsingGelato,
 } from './order-manager';
 import { checkIfOrderCanBeSettled } from './order-manager/';
 import {
@@ -22,16 +23,10 @@ import {
   batchSettlePendingOrdersUsingGelato,
   getParifiUtilsInstance,
 } from './parifi-utils';
-import { AxiosInstance } from 'axios';
 import { convertCollateralAmountToUsd, convertMarketAmountToCollateral, convertMarketAmountToUsd } from './price-feed';
 import { getMarketBorrowingRatePerHour, getMarketOpenInterestInUsd } from './pages/statsPage';
 import { getPublicSubgraphEndpoint } from '../subgraph';
 import { getPythClient } from '../pyth/pyth';
-
-// export * from './data-fabric';
-// export * from './order-manager';
-// export * from './price-feed';
-// export * from './parifi-utils';
 
 export class Core {
   constructor(
@@ -134,6 +129,29 @@ export class Core {
     return checkIfOrderCanBeSettled(order, normalizedMarketPrice);
   };
 
+  liquidatePositionUsingGelato = async (positionId: string): Promise<{ gelatoTaskId: string }> => {
+    // Get all the variables from SDK config
+    const gelatoApiKey = this.relayerConfig.gelatoConfig?.apiKey ?? '';
+    const isStablePyth = this.pythConfig.isStable ?? true;
+
+    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+    const pythClient = await getPythClient(
+      this.pythConfig.pythEndpoint,
+      this.pythConfig.username,
+      this.pythConfig.password,
+      this.pythConfig.isStable,
+    );
+
+    return liquidatePositionUsingGelato(
+      this.rpcConfig.chainId,
+      positionId,
+      gelatoApiKey,
+      subgraphEndpoint,
+      isStablePyth,
+      pythClient,
+    );
+  };
+
   ////////////////////////////////////////////////////////////////
   //////////////////////    PARIFI UTILS    //////////////////////
   ////////////////////////////////////////////////////////////////
@@ -150,7 +168,14 @@ export class Core {
       this.pythConfig.password,
       this.pythConfig.isStable,
     );
-    return batchSettlePendingOrdersUsingGelato(this.rpcConfig.chainId, gelatoKey, subgraphEndpoint, pythClient);
+    const isStablePyth = this.pythConfig.isStable ?? true;
+    return batchSettlePendingOrdersUsingGelato(
+      this.rpcConfig.chainId,
+      gelatoKey,
+      subgraphEndpoint,
+      isStablePyth,
+      pythClient,
+    );
   };
 
   batchLiquidatePositionsUsingGelato = async (
@@ -167,11 +192,14 @@ export class Core {
       this.pythConfig.isStable,
     );
 
+    const isStablePyth = this.pythConfig.isStable ?? true;
+
     return batchLiquidatePostionsUsingGelato(
       this.rpcConfig.chainId,
       positionIds,
       gelatoKey,
       subgraphEndpoint,
+      isStablePyth,
       pythClient,
     );
   };

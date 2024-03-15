@@ -6,7 +6,7 @@ import { AxiosInstance } from 'axios';
 import { executeTxUsingGelato } from '../../gelato/gelato-function';
 import { getAllPendingOrders, getPythPriceIdsForPositionIds } from '../../subgraph';
 import { BatchExecute } from '../../interfaces/subgraphTypes';
-import { DEFAULT_BATCH_COUNT } from '../../common';
+import { DEFAULT_BATCH_COUNT, getPriceIdsForCollaterals } from '../../common';
 import { checkIfOrderCanBeSettled } from '../order-manager';
 
 // Returns an Order Manager contract instance without signer
@@ -22,6 +22,7 @@ export const batchSettlePendingOrdersUsingGelato = async (
   chainId: Chain,
   gelatoKey: string,
   subgraphEndpoint: string, // @todo Replace the endpoint string with graphQL instance
+  isStablePyth: boolean,
   pythClient: AxiosInstance,
 ): Promise<{ ordersCount: number; gelatoTaskId: string }> => {
   const currentTimestamp = Math.floor(Date.now() / 1000);
@@ -37,8 +38,11 @@ export const batchSettlePendingOrdersUsingGelato = async (
     }
   });
 
+  // Get Price IDs of collateral tokens
+  const priceIdsForCollaterals = getPriceIdsForCollaterals(isStablePyth);
+
   // Get Price update data and latest prices from Pyth
-  const priceUpdateData = await getVaaPriceUpdateData(priceIds, pythClient);
+  const priceUpdateData = await getVaaPriceUpdateData(priceIds.concat(priceIdsForCollaterals), pythClient);
   const pythLatestPrices = await getLatestPricesFromPyth(priceIds, pythClient);
 
   // Populate batched orders for settlement for orders that can be settled
@@ -93,6 +97,7 @@ export const batchLiquidatePostionsUsingGelato = async (
   positionIds: string[],
   gelatoKey: string,
   subgraphEndpoint: string,
+  isStablePyth: boolean,
   pythClient: AxiosInstance,
 ): Promise<{ positionsCount: number; gelatoTaskId: string }> => {
   if (positionIds.length == 0) return { positionsCount: 0, gelatoTaskId: '0x' };
@@ -100,8 +105,11 @@ export const batchLiquidatePostionsUsingGelato = async (
   // Get unique price ids for all the positions
   const priceIds = await getPythPriceIdsForPositionIds(subgraphEndpoint, positionIds);
 
+  // Get Price IDs of collateral tokens
+  const priceIdsForCollaterals = getPriceIdsForCollaterals(isStablePyth);
+
   // Get Price update data and latest prices from Pyth
-  const priceUpdateData = await getVaaPriceUpdateData(priceIds, pythClient);
+  const priceUpdateData = await getVaaPriceUpdateData(priceIds.concat(priceIdsForCollaterals), pythClient);
 
   // Populate batched positions for positions that can be liquidated
   const batchedPositions: BatchExecute[] = [];
