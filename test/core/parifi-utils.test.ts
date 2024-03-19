@@ -29,7 +29,7 @@ describe('Parifi Utils tests', () => {
   it('should settle orders in batch using Parifi Utils', async () => {
     // To test the batch settle functionality, create some orders manually using the interface
     await parifiSdk.init();
-    const orderCount = await parifiSdk.core.batchSettlePendingOrdersUsingGelato(process.env.GELATO_KEY ?? '');
+    const orderCount = await parifiSdk.core.batchSettlePendingOrdersUsingGelato();
     console.log('Orders processed: ', orderCount);
   });
 
@@ -37,10 +37,7 @@ describe('Parifi Utils tests', () => {
     // To test the batch liquidate functionality, add correct position ids below
     await parifiSdk.init();
     const positionIds = ['0x00841110ab1304773ceb680ae39dcd0a50d3326a50de33aab6792d17a4483b04'];
-    const positionsCount = await parifiSdk.core.batchLiquidatePositionsUsingGelato(
-      positionIds,
-      process.env.GELATO_KEY ?? '',
-    );
+    const positionsCount = await parifiSdk.core.batchLiquidatePositionsUsingGelato(positionIds);
     console.log('Positions processed: ', positionsCount);
   });
 });

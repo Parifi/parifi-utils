@@ -7,7 +7,7 @@ import { Chain } from '@parifi/references';
 import { contracts as parifiContracts } from '@parifi/references';
 import { Contract, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
-import { getPythPriceIdsForPositionIds } from '../../subgraph';
+import { getPythPriceIdsForOrderIds, getPythPriceIdsForPositionIds } from '../../subgraph';
 import { getVaaPriceUpdateData } from '../../pyth/pyth';
 import { getPriceIdsForCollaterals } from '../../common';
 import { executeTxUsingGelato } from '../../gelato/gelato-function';
@@ -328,6 +328,35 @@ export const liquidatePositionUsingGelato = async (
   let taskId: string = '';
   const orderManager = getOrderManagerInstance(chainId);
   const { data: encodedTxData } = await orderManager.liquidatePosition.populateTransaction(positionId, priceUpdateData);
+
+  taskId = await executeTxUsingGelato(parifiContracts[chainId].OrderManager.address, chainId, gelatoKey, encodedTxData);
+
+  // We need these console logs for feedback to Tenderly actions and other scripts
+  console.log('Task ID:', taskId);
+  return { gelatoTaskId: taskId };
+};
+
+
+// Settles an order using Gelato as the relayer
+export const settleOrderUsingGelato = async (
+  chainId: Chain,
+  orderId: string,
+  gelatoKey: string,
+  subgraphEndpoint: string,
+  isStablePyth: boolean,
+  pythClient: AxiosInstance,
+): Promise<{ gelatoTaskId: string }> => {
+  // Get unique price ids for the order
+  const priceIds = await getPythPriceIdsForOrderIds(subgraphEndpoint, [orderId]);
+  const collateralPriceIds = getPriceIdsForCollaterals(isStablePyth);
+
+  // Get Price update data and latest prices from Pyth
+  const priceUpdateData = await getVaaPriceUpdateData(priceIds.concat(collateralPriceIds), pythClient);
+
+  // Encode transaction data
+  let taskId: string = '';
+  const orderManager = getOrderManagerInstance(chainId);
+  const { data: encodedTxData } = await orderManager.settleOrder.populateTransaction(orderId, priceUpdateData);
 
   taskId = await executeTxUsingGelato(parifiContracts[chainId].OrderManager.address, chainId, gelatoKey, encodedTxData);
 

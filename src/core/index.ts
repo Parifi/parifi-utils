@@ -152,6 +152,29 @@ export class Core {
     );
   };
 
+  settleOrderUsingGelato = async (orderId: string): Promise<{ gelatoTaskId: string }> => {
+    // Get all the variables from SDK config
+    const gelatoApiKey = this.relayerConfig.gelatoConfig?.apiKey ?? '';
+    const isStablePyth = this.pythConfig.isStable ?? true;
+
+    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+    const pythClient = await getPythClient(
+      this.pythConfig.pythEndpoint,
+      this.pythConfig.username,
+      this.pythConfig.password,
+      this.pythConfig.isStable,
+    );
+
+    return liquidatePositionUsingGelato(
+      this.rpcConfig.chainId,
+      orderId,
+      gelatoApiKey,
+      subgraphEndpoint,
+      isStablePyth,
+      pythClient,
+    );
+  };
+
   ////////////////////////////////////////////////////////////////
   //////////////////////    PARIFI UTILS    //////////////////////
   ////////////////////////////////////////////////////////////////
@@ -160,7 +183,7 @@ export class Core {
     return getParifiUtilsInstance(this.rpcConfig.chainId);
   };
 
-  batchSettlePendingOrdersUsingGelato = async (gelatoKey: string): Promise<{ ordersCount: number }> => {
+  batchSettlePendingOrdersUsingGelato = async (): Promise<{ ordersCount: number }> => {
     const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
     const pythClient = await getPythClient(
       this.pythConfig.pythEndpoint,
@@ -169,6 +192,8 @@ export class Core {
       this.pythConfig.isStable,
     );
     const isStablePyth = this.pythConfig.isStable ?? true;
+    const gelatoKey = this.relayerConfig.gelatoConfig?.apiKey ?? '';
+
     return batchSettlePendingOrdersUsingGelato(
       this.rpcConfig.chainId,
       gelatoKey,
@@ -178,10 +203,7 @@ export class Core {
     );
   };
 
-  batchLiquidatePositionsUsingGelato = async (
-    positionIds: string[],
-    gelatoKey: string,
-  ): Promise<{ positionsCount: number }> => {
+  batchLiquidatePositionsUsingGelato = async (positionIds: string[]): Promise<{ positionsCount: number }> => {
     if (positionIds.length == 0) return { positionsCount: 0 };
 
     const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
@@ -193,6 +215,7 @@ export class Core {
     );
 
     const isStablePyth = this.pythConfig.isStable ?? true;
+    const gelatoKey = this.relayerConfig.gelatoConfig?.apiKey ?? '';
 
     return batchLiquidatePostionsUsingGelato(
       this.rpcConfig.chainId,
