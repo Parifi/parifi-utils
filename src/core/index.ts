@@ -160,7 +160,7 @@ export class Core {
     return getParifiUtilsInstance(this.rpcConfig.chainId);
   };
 
-  batchSettlePendingOrdersUsingGelato = async (gelatoKey: string): Promise<{ ordersCount: number }> => {
+  batchSettlePendingOrdersUsingGelato = async (): Promise<{ ordersCount: number }> => {
     const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
     const pythClient = await getPythClient(
       this.pythConfig.pythEndpoint,
@@ -169,6 +169,8 @@ export class Core {
       this.pythConfig.isStable,
     );
     const isStablePyth = this.pythConfig.isStable ?? true;
+    const gelatoKey = this.relayerConfig.gelatoConfig?.apiKey ?? '';
+
     return batchSettlePendingOrdersUsingGelato(
       this.rpcConfig.chainId,
       gelatoKey,
@@ -179,8 +181,7 @@ export class Core {
   };
 
   batchLiquidatePositionsUsingGelato = async (
-    positionIds: string[],
-    gelatoKey: string,
+    positionIds: string[]
   ): Promise<{ positionsCount: number }> => {
     if (positionIds.length == 0) return { positionsCount: 0 };
 
@@ -193,6 +194,7 @@ export class Core {
     );
 
     const isStablePyth = this.pythConfig.isStable ?? true;
+    const gelatoKey = this.relayerConfig.gelatoConfig?.apiKey ?? '';
 
     return batchLiquidatePostionsUsingGelato(
       this.rpcConfig.chainId,
