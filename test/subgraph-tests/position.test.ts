@@ -82,7 +82,7 @@ describe('Order fetching logic from subgraph', () => {
     expect(priceIds.length).toBeGreaterThan(0);
   });
 
-  it.only('should return position ids available for liquidation', async () => {
+  it('should return position ids available for liquidation', async () => {
     await parifiSdk.init();
 
     const positionsToRefresh = await parifiSdk.subgraph.getPositionsToRefresh();
@@ -99,7 +99,7 @@ describe('Order fetching logic from subgraph', () => {
     expect(priceIds.length).toBeGreaterThan(0);
 
     console.log('gelato', process.env.GELATO_KEY);
-    const taskId = await parifiSdk.core.batchLiquidatePositionsUsingGelato(positionIds, process.env.GELATO_KEY ?? '');
+    const taskId = await parifiSdk.core.batchLiquidatePositionsUsingGelato(positionIds);
     console.log('Task ID: ', taskId);
   });
 });

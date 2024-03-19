@@ -152,6 +152,29 @@ export class Core {
     );
   };
 
+  settleOrderUsingGelato = async (orderId: string): Promise<{ gelatoTaskId: string }> => {
+    // Get all the variables from SDK config
+    const gelatoApiKey = this.relayerConfig.gelatoConfig?.apiKey ?? '';
+    const isStablePyth = this.pythConfig.isStable ?? true;
+
+    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+    const pythClient = await getPythClient(
+      this.pythConfig.pythEndpoint,
+      this.pythConfig.username,
+      this.pythConfig.password,
+      this.pythConfig.isStable,
+    );
+
+    return liquidatePositionUsingGelato(
+      this.rpcConfig.chainId,
+      orderId,
+      gelatoApiKey,
+      subgraphEndpoint,
+      isStablePyth,
+      pythClient,
+    );
+  };
+
   ////////////////////////////////////////////////////////////////
   //////////////////////    PARIFI UTILS    //////////////////////
   ////////////////////////////////////////////////////////////////
@@ -180,9 +203,7 @@ export class Core {
     );
   };
 
-  batchLiquidatePositionsUsingGelato = async (
-    positionIds: string[]
-  ): Promise<{ positionsCount: number }> => {
+  batchLiquidatePositionsUsingGelato = async (positionIds: string[]): Promise<{ positionsCount: number }> => {
     if (positionIds.length == 0) return { positionsCount: 0 };
 
     const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
