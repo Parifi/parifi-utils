@@ -2,23 +2,23 @@
 ////////////////////    ENUMS     //////////////////////////////
 ////////////////////////////////////////////////////////////////
 export enum OrderType {
-  OPEN_NEW_POSITION,
-  CLOSE_POSITION,
-  INCREASE_POSITION,
-  DECREASE_POSITION,
-  CANCEL_ORDER,
+  OPEN_NEW_POSITION = 'OPEN_NEW_POSITION',
+  CLOSE_POSITION = 'CLOSE_POSITION',
+  INCREASE_POSITION = 'INCREASE_POSITION',
+  DECREASE_POSITION = 'DECREASE_POSITION',
+  CANCEL_ORDER = 'CANCEL_ORDER',
 }
 
 export enum OrderStatus {
-  PENDING,
-  CANCELLED,
-  SETTLED,
+  PENDING = 'PENDING',
+  CANCELLED = 'CANCELLED',
+  SETTLED = 'SETTLED',
 }
 
 export enum PositionStatus {
-  OPEN,
-  CLOSED,
-  LIQUIDATED,
+  OPEN = 'OPEN',
+  CLOSED = 'CLOSED',
+  LIQUIDATED = 'LIQUIDATED',
 }
 
 ////////////////////////////////////////////////////////////////
@@ -206,7 +206,7 @@ export interface Order {
   // " Account/Address of the order "
   user?: Account;
 
-  // " 0 => OPEN, 1 => CLOSE, 2 => INCREASE, 3 => DECREASE "
+  // "OPEN, CLOSE, INCREASE, DECREASE "
   orderType?: OrderType;
 
   // " True if LONG order "
