@@ -155,3 +155,25 @@ export const fetchPositionsToLiquidateQuery = (count: number) => gql`
     }
   }
 `;
+
+export const fetchAllPositionsForCollateralData = (userAddress: string) => gql`
+  {
+    positions(
+      first: 1000
+      orderBy: positionCollateral
+      orderDirection: desc
+      where: { user: "${userAddress}", status: OPEN }
+    ) {
+      id
+      positionCollateral
+      market {
+        depositToken {
+          decimals
+          pyth {
+            price
+          }
+        }
+      }
+    }
+  }
+`;

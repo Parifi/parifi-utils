@@ -9,6 +9,7 @@ import {
   getPositionsToLiquidate,
   getPositionsToRefresh,
   getPythPriceIdsForPositionIds,
+  getTotalDepositedCollateralInUsd,
 } from './positions';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
 import { Market, Order, Position, Vault } from '../interfaces/subgraphTypes';
@@ -23,6 +24,7 @@ import {
   getVaultDataByChain,
 } from './vaults';
 import { Pyth } from '../pyth';
+import Decimal from 'decimal.js';
 
 export * from './common';
 export * from './markets';
@@ -153,6 +155,11 @@ export class Subgraph {
   public async getPositionsToLiquidate(count: number = 10): Promise<string[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getPositionsToLiquidate(subgraphEndpoint, count);
+  }
+
+  public async getTotalDepositedCollateralInUsd(userAddress: string): Promise<Decimal> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getTotalDepositedCollateralInUsd(subgraphEndpoint, userAddress);
   }
   ////////////////////////////////////////////////////////////////
   //////////////////////    MARKET    ////////////////////////////

@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { Chain } from '@parifi/references';
-import { ParifiSdk } from '../../src';
+import { DECIMAL_ZERO, ParifiSdk } from '../../src';
 import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 
 const rpcConfig: RpcConfig = {
@@ -101,5 +101,17 @@ describe('Order fetching logic from subgraph', () => {
     console.log('gelato', process.env.GELATO_KEY);
     const taskId = await parifiSdk.core.batchLiquidatePositionsUsingGelato(positionIds);
     console.log('Task ID: ', taskId);
+  });
+
+  it.only('should return price ids for position ids', async () => {
+    await parifiSdk.init();
+
+    /// Add an address that has active positions
+    const userAddress = '0xd60202464e7d923dea9c2b2f5435597e51de2683';
+    const userPositions = await parifiSdk.subgraph.getAllPositionsByUserAddress(userAddress);
+    if (userPositions.length > 0) {
+      const totalCollateralValueInUsd = await parifiSdk.subgraph.getTotalDepositedCollateralInUsd(userAddress);
+      expect(totalCollateralValueInUsd.toNumber()).toBeGreaterThan(0);
+    }
   });
 });
