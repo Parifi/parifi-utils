@@ -16,6 +16,7 @@ import {
   getProfitOrLossInUsd,
   isPositionLiquidatable,
   liquidatePositionUsingGelato,
+  settleOrderUsingGelato,
 } from './order-manager';
 import { checkIfOrderCanBeSettled } from './order-manager/';
 import {
@@ -165,7 +166,7 @@ export class Core {
       this.pythConfig.isStable,
     );
 
-    return liquidatePositionUsingGelato(
+    return settleOrderUsingGelato(
       this.rpcConfig.chainId,
       orderId,
       gelatoApiKey,
@@ -216,9 +217,6 @@ export class Core {
 
     const isStablePyth = this.pythConfig.isStable ?? true;
     const gelatoKey = this.relayerConfig.gelatoConfig?.apiKey ?? '';
-    console.log("gelatoKey", gelatoKey);
-    console.log("this.relayerConfig", this.relayerConfig);
-
 
     return batchLiquidatePostionsUsingGelato(
       this.rpcConfig.chainId,
