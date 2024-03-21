@@ -10,6 +10,7 @@ import {
   getPositionsToRefresh,
   getPythPriceIdsForPositionIds,
   getTotalDepositedCollateralInUsd,
+  getTotalUnrealizedPnlInUsd,
 } from './positions';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
 import { Market, Order, Position, Vault } from '../interfaces/subgraphTypes';
@@ -160,6 +161,11 @@ export class Subgraph {
   public async getTotalDepositedCollateralInUsd(userAddress: string): Promise<Decimal> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getTotalDepositedCollateralInUsd(subgraphEndpoint, userAddress);
+  }
+
+  public async getTotalUnrealizedPnlInUsd(userAddress: string): Promise<Decimal> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getTotalUnrealizedPnlInUsd(subgraphEndpoint, userAddress);
   }
   ////////////////////////////////////////////////////////////////
   //////////////////////    MARKET    ////////////////////////////

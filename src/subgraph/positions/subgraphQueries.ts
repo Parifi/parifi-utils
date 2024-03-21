@@ -156,6 +156,7 @@ export const fetchPositionsToLiquidateQuery = (count: number) => gql`
   }
 `;
 
+// Fetches the collateral related data for all positions of a `userAddress`
 export const fetchAllPositionsForCollateralData = (userAddress: string) => gql`
   {
     positions(
@@ -174,6 +175,21 @@ export const fetchAllPositionsForCollateralData = (userAddress: string) => gql`
           }
         }
       }
+    }
+  }
+`;
+
+// Fetches the unrealized PNL for all positions of a `userAddress`
+export const fetchAllPositionsUnrealizedPnl = (userAddress: string) => gql`
+  {
+    positions(
+      first: 1000
+      orderBy: positionCollateral
+      orderDirection: desc
+      where: { user: "${userAddress}", status: OPEN }
+    ) {
+      id
+      netUnrealizedPnlInUsd
     }
   }
 `;
