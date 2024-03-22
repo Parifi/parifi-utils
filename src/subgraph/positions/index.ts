@@ -1,6 +1,8 @@
 import { request } from 'graphql-request';
 import { Position } from '../../interfaces/subgraphTypes';
 import {
+  fetchAllPositionsForCollateralData,
+  fetchAllPositionsUnrealizedPnl,
   fetchPositionByIdQuery,
   fetchPositionsByUserQuery,
   fetchPositionsByUserQueryAndStatus,
@@ -10,7 +12,8 @@ import {
 } from './subgraphQueries';
 import { mapPositionsArrayToInterface, mapSinglePositionToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
-import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
+import { DECIMAL_ZERO, EMPTY_BYTES32, PRICE_FEED_PRECISION, getUniqueValuesFromArray } from '../../common';
+import Decimal from 'decimal.js';
 
 /// Position Ids interface to format subgraph response to string array
 interface PositionIdsSubgraphResponse {
@@ -164,6 +167,73 @@ export const getPositionsToLiquidate = async (subgraphEndpoint: string, count: n
     const query = fetchPositionsToLiquidateQuery(count);
     const subgraphResponse: PositionIdsSubgraphResponse = await request(subgraphEndpoint, query);
     return subgraphResponse.positions.map((position) => position.id);
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Returns the USD value of collateral deposited across all the positions for a user address
+export const getTotalDepositedCollateralInUsd = async (
+  subgraphEndpoint: string,
+  userAddress: string,
+): Promise<Decimal> => {
+  try {
+    /// PositionCollateralSubgraphResponse interface to format subgraph response to string array
+    interface PositionCollateralSubgraphResponse {
+      positions: {
+        id: string;
+        positionCollateral: string;
+        market: {
+          depositToken: {
+            decimals: string;
+            pyth: {
+              price: string;
+            };
+          };
+        };
+      }[];
+    }
+
+    let totalCollateralValueInUsd: Decimal = DECIMAL_ZERO;
+    const query = fetchAllPositionsForCollateralData(userAddress);
+    const subgraphResponse: PositionCollateralSubgraphResponse = await request(subgraphEndpoint, query);
+
+    // For each position, calculate the USD value of the deposited collateral
+    subgraphResponse.positions.forEach((position) => {
+      const positionCollateral = new Decimal(position.positionCollateral);
+      const pythPrice = position.market.depositToken.pyth.price;
+      const tokenDecimalsFactor = new Decimal(10).pow(position.market.depositToken.decimals);
+
+      let amountUsd: Decimal = positionCollateral.times(pythPrice).div(tokenDecimalsFactor).div(PRICE_FEED_PRECISION);
+      totalCollateralValueInUsd = totalCollateralValueInUsd.plus(amountUsd);
+    });
+    return totalCollateralValueInUsd;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Returns the USD value of unrealized P&L across all the positions for a user address
+export const getTotalUnrealizedPnlInUsd = async (subgraphEndpoint: string, userAddress: string): Promise<Decimal> => {
+  try {
+    /// PositionCollateralSubgraphResponse interface to format subgraph response to string array
+    interface PositionUnrealizedPnlSubgraphResponse {
+      positions: {
+        id: string;
+        netUnrealizedPnlInUsd: string;
+      }[];
+    }
+
+    let totalNetUnrealizedPnlInUsd: Decimal = DECIMAL_ZERO;
+    const query = fetchAllPositionsUnrealizedPnl(userAddress);
+    const subgraphResponse: PositionUnrealizedPnlSubgraphResponse = await request(subgraphEndpoint, query);
+
+    // For each position, calculate the USD value of the deposited collateral
+    subgraphResponse.positions.forEach((position) => {
+      const unrealizedPnlInUsd = new Decimal(position.netUnrealizedPnlInUsd);
+      totalNetUnrealizedPnlInUsd = totalNetUnrealizedPnlInUsd.add(unrealizedPnlInUsd);
+    });
+    return totalNetUnrealizedPnlInUsd;
   } catch (error) {
     throw error;
   }
