@@ -28,14 +28,15 @@ const relayerConfig: RelayerConfig = {
 };
 
 const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, relayerConfig, pythConfig);
-
-describe('Order Manager tests', () => {
+//
+// gelato say too many requests
+describe.skip('Order Manager tests', () => {
   it('should liquidate a single position', async () => {
     await parifiSdk.init();
 
     let positionId: string;
     const positionsToLiquidate = await parifiSdk.subgraph.getPositionsToLiquidate();
-    console.log("positionsToLiquidate", positionsToLiquidate)
+    console.log('positionsToLiquidate', positionsToLiquidate);
 
     // Get the first position id to liquidate
     if (positionsToLiquidate.length > 0) {
@@ -45,7 +46,7 @@ describe('Order Manager tests', () => {
       console.log('taskId', gelatoTaskId);
 
       const taskStatus = await parifiSdk.gelato.checkGelatoTaskStatus(gelatoTaskId);
-      console.log("taskStatus", taskStatus)
+      console.log('taskStatus', taskStatus);
     }
   });
 });

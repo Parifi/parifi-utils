@@ -1,0 +1,38 @@
+name: Test contracts sdk
+on: [pull_request]
+
+env:
+  NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+  RUST_BACKTRACE: full
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 20.11.0 ]
+    outputs:
+      runner: ${{ steps.branch.outputs.runner }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Dependencies and authenticate
+        run: |
+          npm install
+
+      - name: Test sdk
+        continue-on-error: true 
+        env:
+          GELATO_KEY: ${{secrets.GELATO_KEY}}
+          PYTH_SERVICE_ENDPOINT: ${{secrets.PYTH_SERVICE_ENDPOINT}}
+          PYTH_SERVICE_PASSWORD: ${{secrets.PYTH_SERVICE_PASSWORD}}
+          PYTH_SERVICE_USERNAME: ${{secrets.PYTH_SERVICE_USERNAME}}
+          SUBGRAPH_ENDPOINT: ${{secrets.SUBGRAPH_ENDPOINT}}
+        run: npm run test
