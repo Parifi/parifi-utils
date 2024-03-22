@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: "${{ secrets.NPM_TOKEN }}"
+          token: "${{ secrets.AUTH_TOKEN }}"
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
@@ -42,7 +42,7 @@ jobs:
         id: commitPush
         continue-on-error: false 
         env:
-          GITHUB_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.AUTH_TOKEN }}
           GIT_AUTHOR_NAME: ${{ steps.import-gpg.outputs.name }}
           GIT_AUTHOR_EMAIL: ${{ steps.import-gpg.outputs.email }}
           GIT_COMMITTER_NAME: ${{ steps.import-gpg.outputs.name }}

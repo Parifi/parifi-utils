@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.AUTH_TOKEN }}
 
       - uses: actions/setup-node@v3
         with:
