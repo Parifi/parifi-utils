@@ -1,14 +1,15 @@
 import 'dotenv/config';
 import { Chain } from '@parifi/references';
-import { ParifiSdk } from '../../src';
-import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
+import { DECIMAL_ZERO, ParifiSdk } from '../../src';
+import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
 };
 
 const subgraphConfig: SubgraphConfig = {
-  subgraphEndpoint: 'https://api.thegraph.com/subgraphs/name/sudeepb02/parifi-testnet',
+  subgraphEndpoint: 'https://api.studio.thegraph.com/query/68480/parifi-arb-sepolia-test-dev/v0.0.4',
+  // subgraphEndpoint: 'https://api.thegraph.com/subgraphs/name/sudeepb02/parifi-testnet',
 };
 
 const pythConfig: PythConfig = {
@@ -18,13 +19,15 @@ const pythConfig: PythConfig = {
   isStable: true,
 };
 
-const relayerConfig: RelayerConfig = {
-  gelatoConfig: {
-    apiKey: process.env.GELATO_KEY,
-  },
+const gelatoConfig: RelayerI = {
+  apiKey: process.env.GELATO_KEY,
 };
 
-const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, {}, pythConfig);
+const relayerConfig: RelayerConfig = {
+  gelatoConfig: gelatoConfig,
+};
+
+const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, relayerConfig, pythConfig);
 
 describe('Order fetching logic from subgraph', () => {
   it('should return correct position details', async () => {
@@ -98,8 +101,36 @@ describe('Order fetching logic from subgraph', () => {
     console.log('priceIds', priceIds);
     expect(priceIds.length).toBeGreaterThan(0);
 
-    console.log('gelato', process.env.GELATO_KEY);
     const taskId = await parifiSdk.core.batchLiquidatePositionsUsingGelato(positionIds);
     console.log('Task ID: ', taskId);
+  });
+
+  it('should return valid total collateral deposited value from all user positions', async () => {
+    await parifiSdk.init();
+
+    /// Add an address that has active positions
+    const userAddress = '0xd60202464e7d923dea9c2b2f5435597e51de2683';
+    const userPositions = await parifiSdk.subgraph.getAllPositionsByUserAddress(userAddress);
+    if (userPositions.length > 0) {
+      const totalCollateralValueInUsd = await parifiSdk.subgraph.getTotalDepositedCollateralInUsd(userAddress);
+      expect(totalCollateralValueInUsd.toNumber()).toBeGreaterThan(0);
+    }
+  });
+
+  it('should return valid total unrealized PNL from all user positions', async () => {
+    await parifiSdk.init();
+
+    /// Add an address that has active positions
+    const userAddress = '0xd60202464e7d923dea9c2b2f5435597e51de2683';
+    const userPositions = await parifiSdk.subgraph.getAllPositionsByUserAddress(userAddress);
+    if (userPositions.length > 0) {
+      const totalNetUnrealizedPnlInUsd = await parifiSdk.subgraph.getTotalUnrealizedPnlInUsd(userAddress);
+      console.log('totalNetUnrealizedPnlInUsd', totalNetUnrealizedPnlInUsd);
+      if (totalNetUnrealizedPnlInUsd.isPositive()) {
+        expect(totalNetUnrealizedPnlInUsd.toNumber()).toBeGreaterThan(0);
+      } else {
+        expect(totalNetUnrealizedPnlInUsd.toNumber()).toBeLessThan(0);
+      }
+    }
   });
 });
