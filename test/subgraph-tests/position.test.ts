@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { Chain } from '@parifi/references';
-import { DECIMAL_ZERO, ParifiSdk } from '../../src';
+import { ParifiSdk } from '../../src';
 import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 
 const rpcConfig: RpcConfig = {
