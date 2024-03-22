@@ -29,12 +29,10 @@ jobs:
 
       - name: Test sdk
         continue-on-error: false 
-        with:
+        env:
           GELATO_KEY: ${{secrets.GELATO_KEY}}
           PYTH_SERVICE_ENDPOINT: ${{secrets.PYTH_SERVICE_ENDPOINT}}
           PYTH_SERVICE_PASSWORD: ${{secrets.PYTH_SERVICE_PASSWORD}}
           PYTH_SERVICE_USERNAME: ${{secrets.PYTH_SERVICE_USERNAME}}
           SUBGRAPH_ENDPOINT: ${{secrets.SUBGRAPH_ENDPOINT}}
-        run: |
-           npm run build
-           npm run test
+        run: npm run test

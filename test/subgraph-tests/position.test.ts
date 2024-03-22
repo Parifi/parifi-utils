@@ -24,7 +24,7 @@ const relayerConfig: RelayerConfig = {
   },
 };
 
-const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, {}, pythConfig);
+const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, relayerConfig, pythConfig);
 
 describe('Order fetching logic from subgraph', () => {
   it('should return correct position details', async () => {
