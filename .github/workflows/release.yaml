@@ -40,7 +40,7 @@ jobs:
 
       - name: Commit update
         id: commitPush
-        continue-on-error: true
+        continue-on-error: false 
         env:
           GITHUB_TOKEN: ${{ secrets.NPM_TOKEN }}
           GIT_AUTHOR_NAME: ${{ steps.import-gpg.outputs.name }}
@@ -48,7 +48,6 @@ jobs:
           GIT_COMMITTER_NAME: ${{ steps.import-gpg.outputs.name }}
           GIT_COMMITTER_EMAIL: ${{ steps.import-gpg.outputs.email }}
         run: |
-          git restore .npmrc
           if [[ $(git status --porcelain | wc -l) -gt 0 ]]; then
               echo "New files detected, committing and pushing them"
               git add package.json
@@ -58,8 +57,7 @@ jobs:
               echo "No new files, exiting cleanly"
           fi
 
-      - name: Publish Image for development
-        if: github.ref == 'refs/heads/development'
+      - name: Publish Image
         run: |
           npm install
           npm run build
