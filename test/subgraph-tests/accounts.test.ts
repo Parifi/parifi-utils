@@ -8,7 +8,7 @@ const rpcConfig: RpcConfig = {
 };
 
 const subgraphConfig: SubgraphConfig = {
-  subgraphEndpoint: 'https://api.studio.thegraph.com/query/68480/parifi-arb-sepolia-test-dev/v0.0.6',
+  subgraphEndpoint: process.env.SUBGRAPH_ENDPOINT,
 };
 
 const pythConfig: PythConfig = {

@@ -240,8 +240,12 @@ export class Core {
     return batchSettleOrdersUsingGelato(this.rpcConfig.chainId, orderIds, priceUpdateData, gelatoKey);
   };
 
-  batchSettleOrdersUsingWallet = async (orderIds: string[], priceUpdateData: string[], wallet: Signer) => {
-    return batchSettleOrdersUsingWallet(this.rpcConfig.chainId, orderIds, priceUpdateData, wallet);
+  batchSettleOrdersUsingWallet = async (
+    orderIds: string[],
+    priceUpdateData: string[],
+    wallet: Signer,
+  ): Promise<{ txHash: string }> => {
+    return await batchSettleOrdersUsingWallet(this.rpcConfig.chainId, orderIds, priceUpdateData, wallet);
   };
 
   ////////////////////////////////////////////////////////////////

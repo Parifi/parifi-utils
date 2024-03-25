@@ -23,7 +23,6 @@ export const getRealizedPnlForUser = async (
 
     const query = fetchRealizedPnlData(userAddress);
     const subgraphResponse: RealizedPnlSubgraphResponse = await request(subgraphEndpoint, query);
-    console.log(subgraphResponse);
 
     const totalRealizedPnlPositions = new Decimal(subgraphResponse.account.totalRealizedPnlPositions);
     const totalRealizedPnlVaults = new Decimal(subgraphResponse.account.totalRealizedPnlVaults);

@@ -186,10 +186,10 @@ export const batchSettleOrdersUsingWallet = async (
   orderIds: string[],
   priceUpdateData: string[],
   wallet: Signer,
-) => {
+): Promise<{ txHash: string }> => {
   if (orderIds.length == 0) {
     console.log('Orders not available for settlement');
-    return;
+    return { txHash: '0x' };
   }
 
   // Populate batched orders for settlement for orders that can be settled
@@ -210,6 +210,8 @@ export const batchSettleOrdersUsingWallet = async (
     );
 
     const tx = await parifiUtilsContract.batchSettleOrders(batchedOrders);
-    console.log('Transaction:', tx);
+    await tx.wait();
+    return { txHash: tx.hash };
   }
+  return { txHash: '0x' };
 };

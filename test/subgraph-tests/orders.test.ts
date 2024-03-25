@@ -8,7 +8,7 @@ const rpcConfig: RpcConfig = {
 };
 
 const subgraphConfig: SubgraphConfig = {
-  subgraphEndpoint: 'https://api.studio.thegraph.com/query/68480/parifi-arb-sepolia-test-dev/v0.0.6',
+  subgraphEndpoint: process.env.SUBGRAPH_ENDPOINT,
 };
 
 const pythConfig: PythConfig = {
@@ -34,16 +34,7 @@ describe('Order fetching logic from subgraph', () => {
     const orderId = '0xdede011c078916f11a1c92808d527f06db18da40d61e0eb05dc13a8d4e65447f';
 
     const order = await parifiSdk.subgraph.getOrderById(orderId);
-    console.log(order);
     expect(order.id).toBe(orderId);
-
-    const priceIds = await parifiSdk.subgraph.getPythPriceIdsForOrderIds([orderId]);
-    const collateralPriceIds = await parifiSdk.pyth.getPriceIdsForCollaterals();
-
-    console.log('PRice ids : ', priceIds.concat(collateralPriceIds));
-
-    const priceUpdateData = await parifiSdk.pyth.getVaaPriceUpdateData(priceIds.concat(collateralPriceIds));
-    console.log('price update data', priceUpdateData);
   });
 
   it('should settle order using Gelato', async () => {
@@ -52,14 +43,6 @@ describe('Order fetching logic from subgraph', () => {
 
     const order = await parifiSdk.subgraph.getOrderById(orderId);
     expect(order.id).toBe(orderId);
-
-    const priceIds = await parifiSdk.subgraph.getPythPriceIdsForOrderIds([orderId]);
-    const collateralPriceIds = await parifiSdk.pyth.getPriceIdsForCollaterals();
-
-    console.log('Price ids : ', priceIds.concat(collateralPriceIds));
-
-    const priceUpdateData = await parifiSdk.pyth.getVaaPriceUpdateData(priceIds.concat(collateralPriceIds));
-    console.log('price update data', priceUpdateData);
 
     const { gelatoTaskId: taskId } = await parifiSdk.core.settleOrderUsingGelato(orderId);
     console.log('taskId', taskId);

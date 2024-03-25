@@ -25,6 +25,5 @@ describe('Query fetching logic from subgraph', () => {
     `;
 
     const response = await parifiSdk.subgraph.executeSubgraphQuery(query);
-    console.log(response);
   });
 });
