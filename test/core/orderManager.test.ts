@@ -30,7 +30,7 @@ const relayerConfig: RelayerConfig = {
 const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, relayerConfig, pythConfig);
 //
 // gelato say too many requests
-describe.skip('Order Manager tests', () => {
+describe('Order Manager tests', () => {
   it('should liquidate a single position', async () => {
     await parifiSdk.init();
 

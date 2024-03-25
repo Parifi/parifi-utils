@@ -26,6 +26,7 @@ import {
 } from './vaults';
 import { Pyth } from '../pyth';
 import Decimal from 'decimal.js';
+import { getRealizedPnlForUser } from './accounts';
 
 export * from './common';
 export * from './markets';
@@ -76,6 +77,16 @@ export class Subgraph {
     }
   }
 
+  ////////////////////////////////////////////////////////////////
+  //////////////////////    MARKET    ////////////////////////////
+  ////////////////////////////////////////////////////////////////
+  public async getRealizedPnlForUser(userAddress: string): Promise<{
+    totalRealizedPnlPositions: Decimal;
+    totalRealizedPnlVaults: Decimal;
+  }> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getRealizedPnlForUser(subgraphEndpoint, userAddress);
+  }
   ////////////////////////////////////////////////////////////////
   //////////////////////    ORDERS    ////////////////////////////
   ////////////////////////////////////////////////////////////////

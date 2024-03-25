@@ -8,7 +8,7 @@ import {
   getMarketSkew,
   getMarketUtilization,
 } from './data-fabric';
-import { Contract } from 'ethers';
+import { Contract, Signer } from 'ethers';
 import {
   calculatePositionLeverage,
   getNetProfitOrLossInCollateral,
@@ -21,6 +21,8 @@ import {
 import { checkIfOrderCanBeSettled } from './order-manager/';
 import {
   batchLiquidatePostionsUsingGelato,
+  batchSettleOrdersUsingGelato,
+  batchSettleOrdersUsingWallet,
   batchSettlePendingOrdersUsingGelato,
   getParifiUtilsInstance,
 } from './parifi-utils';
@@ -184,7 +186,7 @@ export class Core {
     return getParifiUtilsInstance(this.rpcConfig.chainId);
   };
 
-  batchSettlePendingOrdersUsingGelato = async (): Promise<{ ordersCount: number }> => {
+  batchSettlePendingOrdersUsingGelato = async (): Promise<{ ordersCount: number; gelatoTaskId: string }> => {
     const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
     const pythClient = await getPythClient(
       this.pythConfig.pythEndpoint,
@@ -204,8 +206,10 @@ export class Core {
     );
   };
 
-  batchLiquidatePositionsUsingGelato = async (positionIds: string[]): Promise<{ positionsCount: number }> => {
-    if (positionIds.length == 0) return { positionsCount: 0 };
+  batchLiquidatePositionsUsingGelato = async (
+    positionIds: string[],
+  ): Promise<{ positionsCount: number; gelatoTaskId: string }> => {
+    if (positionIds.length == 0) return { positionsCount: 0, gelatoTaskId: '' };
 
     const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
     const pythClient = await getPythClient(
@@ -226,6 +230,22 @@ export class Core {
       isStablePyth,
       pythClient,
     );
+  };
+
+  batchSettleOrdersUsingGelato = async (
+    orderIds: string[],
+    priceUpdateData: string[],
+  ): Promise<{ ordersCount: number; gelatoTaskId: string }> => {
+    const gelatoKey = this.relayerConfig.gelatoConfig?.apiKey ?? '';
+    return batchSettleOrdersUsingGelato(this.rpcConfig.chainId, orderIds, priceUpdateData, gelatoKey);
+  };
+
+  batchSettleOrdersUsingWallet = async (
+    orderIds: string[],
+    priceUpdateData: string[],
+    wallet: Signer,
+  ): Promise<{ txHash: string }> => {
+    return await batchSettleOrdersUsingWallet(this.rpcConfig.chainId, orderIds, priceUpdateData, wallet);
   };
 
   ////////////////////////////////////////////////////////////////

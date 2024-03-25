@@ -22,6 +22,8 @@ export const mapSubgraphResponseToAccountInterface = (response: any): Account | 
       openPositionsCount: response.openPositionsCount,
       totalPositionsCount: response.totalPositionsCount,
       referralFeesInUsd: response.referralFeesInUsd,
+      totalRealizedPnlPositions: response.totalRealizedPnlPositions,
+      totalRealizedPnlVaults: response.totalRealizedPnlVaults,
     };
   } catch (error) {
     console.log('Error while mapping data', error);

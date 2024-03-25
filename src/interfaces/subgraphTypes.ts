@@ -49,6 +49,12 @@ export interface Account {
 
   // " Referral Fees claimed by partner/referrer in USD "
   referralFeesInUsd?: string;
+
+  // " Total Realized P&L from Positions in USD "
+  totalRealizedPnlPositions: string
+
+  // " Total Realized P&L from Vaults in USD "
+  totalRealizedPnlVaults: string
 }
 
 ////////////////////////////////////////////////////////////////

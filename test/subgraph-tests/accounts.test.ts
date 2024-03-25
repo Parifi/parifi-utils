@@ -1,8 +1,8 @@
 import 'dotenv/config';
-
 import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
 import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
+
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
 };
@@ -29,22 +29,19 @@ const relayerConfig: RelayerConfig = {
 const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, relayerConfig, pythConfig);
 
 describe('Order fetching logic from subgraph', () => {
-  it('should return correct order details', async () => {
+  it('should return PNL details for a user', async () => {
     await parifiSdk.init();
-    const orderId = '0xdede011c078916f11a1c92808d527f06db18da40d61e0eb05dc13a8d4e65447f';
 
-    const order = await parifiSdk.subgraph.getOrderById(orderId);
-    expect(order.id).toBe(orderId);
-  });
+    // Use an address with a non-zero positions/deposits
+    const userAddress = '0xe4fDB1Fa65b29533D6d3D9Aa74e07E6e87405B32';
 
-  it('should settle order using Gelato', async () => {
-    await parifiSdk.init();
-    const orderId = '0x8e96c0d38e6d09593c0e96457d2681b62f208ca4a2c3f86fdbf47a6cff0c3dd1';
+    const { totalRealizedPnlPositions, totalRealizedPnlVaults } =
+      await parifiSdk.subgraph.getRealizedPnlForUser(userAddress);
 
-    const order = await parifiSdk.subgraph.getOrderById(orderId);
-    expect(order.id).toBe(orderId);
+    console.log('totalRealizedPnlPositions', totalRealizedPnlPositions);
+    console.log('totalRealizedPnlVaults', totalRealizedPnlVaults);
 
-    const { gelatoTaskId: taskId } = await parifiSdk.core.settleOrderUsingGelato(orderId);
-    console.log('taskId', taskId);
+    const unrealizedPNL = await parifiSdk.subgraph.getTotalUnrealizedPnlInUsd(userAddress);
+    console.log("unrealizedPNL", unrealizedPNL)
   });
 });
