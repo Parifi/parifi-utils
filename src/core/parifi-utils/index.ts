@@ -6,7 +6,12 @@ import { AxiosInstance } from 'axios';
 import { executeTxUsingGelato } from '../../gelato/gelato-function';
 import { getAllPendingOrders, getPythPriceIdsForPositionIds } from '../../subgraph';
 import { BatchExecute } from '../../interfaces/subgraphTypes';
-import { DEFAULT_BATCH_COUNT, getPriceIdsForCollaterals } from '../../common';
+import {
+  DEFAULT_BATCH_COUNT,
+  GAS_LIMIT_LIQUIDATION,
+  GAS_LIMIT_SETTLEMENT,
+  getPriceIdsForCollaterals,
+} from '../../common';
 import { checkIfOrderCanBeSettled } from '../order-manager';
 
 // Returns an Order Manager contract instance without signer
@@ -83,11 +88,14 @@ export const batchSettlePendingOrdersUsingGelato = async (
     const parifiUtils = getParifiUtilsInstance(chainId);
     const { data: encodedTxData } = await parifiUtils.batchSettleOrders.populateTransaction(batchedOrders);
 
+    const gelatoGasLimit = BigInt(batchedOrders.length * GAS_LIMIT_SETTLEMENT);
+
     taskId = await executeTxUsingGelato(
       parifiContracts[chainId].ParifiUtils.address,
       chainId,
       gelatoKey,
       encodedTxData,
+      gelatoGasLimit,
     );
     // We need these console logs for feedback to Tenderly actions and other scripts
     console.log('Task ID:', taskId);
@@ -129,11 +137,14 @@ export const batchLiquidatePostionsUsingGelato = async (
     const parifiUtils = getParifiUtilsInstance(chainId);
     const { data: encodedTxData } = await parifiUtils.batchLiquidatePositions.populateTransaction(batchedPositions);
 
+    const gelatoGasLimit = BigInt(batchedPositions.length * GAS_LIMIT_LIQUIDATION);
+
     taskId = await executeTxUsingGelato(
       parifiContracts[chainId].ParifiUtils.address,
       chainId,
       gelatoKey,
       encodedTxData,
+      gelatoGasLimit,
     );
     // We need these console logs for feedback to Tenderly actions and other scripts
     console.log('Task ID:', taskId);
@@ -168,11 +179,14 @@ export const batchSettleOrdersUsingGelato = async (
     const parifiUtils = getParifiUtilsInstance(chainId);
     const { data: encodedTxData } = await parifiUtils.batchSettleOrders.populateTransaction(batchedOrders);
 
+    const gelatoGasLimit = BigInt(batchedOrders.length * GAS_LIMIT_SETTLEMENT);
+
     taskId = await executeTxUsingGelato(
       parifiContracts[chainId].ParifiUtils.address,
       chainId,
       gelatoKey,
       encodedTxData,
+      gelatoGasLimit,
     );
     // We need these console logs for feedback to Tenderly actions and other scripts
     console.log('Task ID:', taskId);
@@ -209,7 +223,9 @@ export const batchSettleOrdersUsingWallet = async (
       wallet,
     );
 
-    const tx = await parifiUtilsContract.batchSettleOrders(batchedOrders);
+    const txGasLimit = BigInt(batchedOrders.length * GAS_LIMIT_SETTLEMENT);
+
+    const tx = await parifiUtilsContract.batchSettleOrders(batchedOrders, { gasLimit: txGasLimit });
     await tx.wait();
     return { txHash: tx.hash };
   }
