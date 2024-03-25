@@ -1,4 +1,4 @@
-import { Contract, ethers } from 'ethers';
+import { Contract, Signer, ethers } from 'ethers';
 import { Chain } from '@parifi/references';
 import { contracts as parifiContracts } from '@parifi/references';
 import { getLatestPricesFromPyth, getVaaPriceUpdateData, normalizePythPriceForParifi } from '../../pyth/pyth';
@@ -27,7 +27,10 @@ export const batchSettlePendingOrdersUsingGelato = async (
 ): Promise<{ ordersCount: number; gelatoTaskId: string }> => {
   const currentTimestamp = Math.floor(Date.now() / 1000);
   const pendingOrders = await getAllPendingOrders(subgraphEndpoint, currentTimestamp, DEFAULT_BATCH_COUNT);
-  if (pendingOrders.length == 0) return { ordersCount: 0, gelatoTaskId: '0x' };
+  if (pendingOrders.length == 0) {
+    console.log('Orders not available for settlement');
+    return { ordersCount: 0, gelatoTaskId: '0x' };
+  }
 
   const priceIds: string[] = [];
 
@@ -136,4 +139,77 @@ export const batchLiquidatePostionsUsingGelato = async (
     console.log('Task ID:', taskId);
   }
   return { positionsCount: batchedPositions.length, gelatoTaskId: taskId };
+};
+
+// Batch settle orders using Gelato for OrderIds
+export const batchSettleOrdersUsingGelato = async (
+  chainId: Chain,
+  orderIds: string[],
+  priceUpdateData: string[],
+  gelatoKey: string,
+): Promise<{ ordersCount: number; gelatoTaskId: string }> => {
+  if (orderIds.length == 0) {
+    console.log('Orders not available for settlement');
+    return { ordersCount: 0, gelatoTaskId: '0x' };
+  }
+  // Populate batched orders for settlement for orders that can be settled
+  const batchedOrders: BatchExecute[] = [];
+
+  orderIds.forEach((orderId) => {
+    batchedOrders.push({
+      id: orderId,
+      priceUpdateData: priceUpdateData,
+    });
+  });
+
+  // Encode transaction data
+  let taskId: string = '';
+  if (batchedOrders.length != 0) {
+    const parifiUtils = getParifiUtilsInstance(chainId);
+    const { data: encodedTxData } = await parifiUtils.batchSettleOrders.populateTransaction(batchedOrders);
+
+    taskId = await executeTxUsingGelato(
+      parifiContracts[chainId].ParifiUtils.address,
+      chainId,
+      gelatoKey,
+      encodedTxData,
+    );
+    // We need these console logs for feedback to Tenderly actions and other scripts
+    console.log('Task ID:', taskId);
+  }
+  return { ordersCount: batchedOrders.length, gelatoTaskId: taskId };
+};
+
+// Batch settle orders using Wallet for OrderIds
+export const batchSettleOrdersUsingWallet = async (
+  chainId: Chain,
+  orderIds: string[],
+  priceUpdateData: string[],
+  wallet: Signer,
+) => {
+  if (orderIds.length == 0) {
+    console.log('Orders not available for settlement');
+    return;
+  }
+
+  // Populate batched orders for settlement for orders that can be settled
+  const batchedOrders: BatchExecute[] = [];
+
+  orderIds.forEach((orderId) => {
+    batchedOrders.push({
+      id: orderId,
+      priceUpdateData: priceUpdateData,
+    });
+  });
+
+  if (batchedOrders.length != 0) {
+    const parifiUtilsContract = new ethers.Contract(
+      parifiContracts[chainId].ParifiUtils.address,
+      parifiContracts[chainId].ParifiUtils.abi,
+      wallet,
+    );
+
+    const tx = await parifiUtilsContract.batchSettleOrders(batchedOrders);
+    console.log('Transaction:', tx);
+  }
 };
