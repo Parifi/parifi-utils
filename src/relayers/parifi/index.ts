@@ -23,7 +23,7 @@ export class ParifiRelayer implements relayerRepository {
     });
     const data = await response.json();
 
-    return data.txId as string;
+    return (customTxId ?? data.txId) as string;
   }
 
   async checkStatus(_hash: string) {
