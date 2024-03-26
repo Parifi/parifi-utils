@@ -1,7 +1,11 @@
 import { Contract, Signer, ethers } from 'ethers';
 import { Chain } from '@parifi/references';
 import { contracts as parifiContracts } from '@parifi/references';
-import { getLatestPricesFromPyth, getVaaPriceUpdateData, normalizePythPriceForParifi } from '../../pyth/pyth';
+import {
+  getVaaPriceUpdateData,
+  // getLatestPricesFromPyth,
+  // normalizePythPriceForParifi
+} from '../../pyth/pyth';
 import { AxiosInstance } from 'axios';
 import { executeTxUsingGelato } from '../../gelato/gelato-function';
 import { getAllPendingOrders, getPythPriceIdsForPositionIds } from '../../subgraph';
@@ -12,7 +16,7 @@ import {
   GAS_LIMIT_SETTLEMENT,
   getPriceIdsForCollaterals,
 } from '../../common';
-import { checkIfOrderCanBeSettled } from '../order-manager';
+// import { checkIfOrderCanBeSettled } from '../order-manager';
 
 // Returns an Order Manager contract instance without signer
 export const getParifiUtilsInstance = (chain: Chain): Contract => {
@@ -223,11 +227,24 @@ export const batchSettleOrdersUsingWallet = async (
       wallet,
     );
 
-    const txGasLimit = BigInt(batchedOrders.length * GAS_LIMIT_SETTLEMENT);
-
-    const tx = await parifiUtilsContract.batchSettleOrders(batchedOrders, { gasLimit: txGasLimit });
-    await tx.wait();
-    return { txHash: tx.hash };
+    const provider = await wallet.provider;
+    if (provider) {
+      const estimatedGas = await parifiUtilsContract.batchSettleOrders.estimateGas(batchedOrders);
+      const estimatedGasPrice = await provider.getFeeData();
+      console.log(estimatedGas);
+      console.log(estimatedGasPrice);
+      const tx1 = await parifiUtilsContract.batchSettleOrders(batchedOrders, {
+        gasLimit: estimatedGas,
+        maxFeePerGas: estimatedGasPrice.maxFeePerGas,
+        maxPriorityFeePerGas: estimatedGasPrice.maxPriorityFeePerGas,
+      });
+      await tx1.wait();
+      return { txHash: tx1.hash };
+    } else {
+      const tx2 = await parifiUtilsContract.batchSettleOrders(batchedOrders);
+      await tx2.wait();
+      return { txHash: tx2.hash };
+    }
   }
   return { txHash: '0x' };
 };

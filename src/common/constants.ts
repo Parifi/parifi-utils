@@ -15,6 +15,9 @@ export const DEFAULT_BATCH_COUNT = 10;
 export const GAS_LIMIT_SETTLEMENT = 1000000   // 1M gas
 export const GAS_LIMIT_LIQUIDATION = 6000000   // 6M gas
 
+export const ONE_GWEI = 1000000000 // 10^9
+export const DEFAULT_GAS_PRICE = 2 * ONE_GWEI // 1 gwei
+
 
 // Constants for Pyth price ids of collaterals
 export const PYTH_ETH_USD_PRICE_ID_BETA = '0xca80ba6dc32e08d06f1aa886011eed1d77c77be9eb761cc10d72b7d0a2fd57a6';
