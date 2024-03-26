@@ -1,20 +1,14 @@
 import { request } from 'graphql-request';
-import { Vault, VaultPosition, VaultPositionsResponse } from '../../interfaces';
+import { Vault, VaultPositionsResponse } from '../../interfaces';
 import { fetchAllVaultsQuery, fetchUserAllVaultsQuery } from './subgraphQueries';
 import { mapVaultsArrayToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 import { Chain as SupportedChain, availableVaultsPerChain } from '@parifi/references';
 
-import { arbitrumGoerli, polygon, arbitrum, base, arbitrumSepolia } from 'viem/chains';
-import { Chain } from 'viem';
 import { PRICE_FEED_DECIMALS, getNormalizedPriceByIdFromPriceIdArray } from '../../common';
 import Decimal from 'decimal.js';
 import { getLatestPricesFromPyth, normalizePythPriceForParifi } from '../../pyth/pyth';
 import { AxiosInstance } from 'axios';
-
-const matchChain: Record<SupportedChain, Chain> = {
-  [SupportedChain.ARBITRUM_SEPOLIA]: arbitrumSepolia,
-};
 
 // Get all vaults from subgraph
 export const getAllVaults = async (subgraphEndpoint: string): Promise<Vault[]> => {

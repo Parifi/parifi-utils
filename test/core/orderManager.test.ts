@@ -2,14 +2,15 @@ import 'dotenv/config';
 import { Chain } from '@parifi/references';
 import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 import { ParifiSdk } from '../../src';
+import { ethers } from 'ethers';
 
-const chain = Chain.ARBITRUM_SEPOLIA;
+const chain = Chain.ARBITRUM_MAINNET;
 const rpcConfig: RpcConfig = {
   chainId: chain,
 };
 
 const subgraphConfig: SubgraphConfig = {
-  subgraphEndpoint: process.env.SUBGRAPH_ENDPOINT,
+  subgraphEndpoint: 'https://api.thegraph.com/subgraphs/name/parifi/parifi-arbitrum',
 };
 
 const pythConfig: PythConfig = {
@@ -48,5 +49,22 @@ describe('Order Manager tests', () => {
       const taskStatus = await parifiSdk.gelato.checkGelatoTaskStatus(gelatoTaskId);
       console.log('taskStatus', taskStatus);
     }
+  });
+
+  it('should settle single order using wallet', async () => {
+    await parifiSdk.init();
+
+    const orderIds = ['0x5f0aafacb19b261b533339322f45542f33e5e20ff71b0374320b69713f59695d'];
+
+    const priceIds = await parifiSdk.subgraph.getPythPriceIdsForOrderIds(orderIds);
+
+    const collateralPriceIds = parifiSdk.pyth.getPriceIdsForCollaterals();
+
+    const priceUpdateData = await parifiSdk.pyth.getVaaPriceUpdateData(priceIds.concat(collateralPriceIds));
+
+    const provider = new ethers.JsonRpcProvider(process.env.RPC_ARBITRUM);
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY ?? '', provider);
+    const tx = await parifiSdk.core.batchSettleOrdersUsingWallet(orderIds, priceUpdateData, wallet);
+    console.log(tx);
   });
 });
