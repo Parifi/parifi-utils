@@ -5,8 +5,6 @@ import { mapVaultsArrayToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 import { Chain as SupportedChain, availableVaultsPerChain } from '@parifi/references';
 
-// import { arbitrumGoerli, polygon, arbitrum, base, arbitrumSepolia } from 'viem/chains';
-// import { Chain } from 'viem';
 import { PRICE_FEED_DECIMALS, getNormalizedPriceByIdFromPriceIdArray } from '../../common';
 import Decimal from 'decimal.js';
 import { getLatestPricesFromPyth, normalizePythPriceForParifi } from '../../pyth/pyth';
