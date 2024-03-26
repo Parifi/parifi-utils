@@ -1,4 +1,9 @@
-import { GelatoRelay, SponsoredCallRequest, TransactionStatusResponse } from '@gelatonetwork/relay-sdk';
+import {
+  GelatoRelay,
+  RelayRequestOptions,
+  SponsoredCallRequest,
+  TransactionStatusResponse,
+} from '@gelatonetwork/relay-sdk';
 import { Chain } from '@parifi/references';
 
 export const executeTxUsingGelato = async (
@@ -6,6 +11,7 @@ export const executeTxUsingGelato = async (
   chainId: Chain,
   gelatoKey: string | undefined,
   encodedTxData: string,
+  gelatoGasLimit?: bigint,
 ): Promise<string> => {
   const request: SponsoredCallRequest = {
     chainId: BigInt(chainId.toString()),
@@ -14,7 +20,11 @@ export const executeTxUsingGelato = async (
   };
 
   const relay = new GelatoRelay();
-  const { taskId } = await relay.sponsoredCall(request, gelatoKey || '');
+  const relayOptions: RelayRequestOptions = {
+    gasLimit: gelatoGasLimit || BigInt(5000000),
+  };
+
+  const { taskId } = await relay.sponsoredCall(request, gelatoKey || '', relayOptions);
   return taskId;
 };
 

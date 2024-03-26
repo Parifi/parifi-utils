@@ -12,6 +12,10 @@ export const DECIMAL_10 = new Decimal(10);
 export const DECIMAL_ZERO = new Decimal(0);
 export const DEFAULT_BATCH_COUNT = 10;
 
+export const GAS_LIMIT_SETTLEMENT = 1000000   // 1M gas
+export const GAS_LIMIT_LIQUIDATION = 6000000   // 6M gas
+
+
 // Constants for Pyth price ids of collaterals
 export const PYTH_ETH_USD_PRICE_ID_BETA = '0xca80ba6dc32e08d06f1aa886011eed1d77c77be9eb761cc10d72b7d0a2fd57a6';
 export const PYTH_ETH_USD_PRICE_ID_STABLE = '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace';

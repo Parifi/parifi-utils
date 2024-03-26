@@ -8,12 +8,17 @@ export class Gelato {
     private rpcConfig: RpcConfig,
   ) {}
 
-  public async executeTxUsingGelato(targetContractAddress: string, encodedTxData: string): Promise<string> {
+  public async executeTxUsingGelato(
+    targetContractAddress: string,
+    encodedTxData: string,
+    gelatoGasLimit?: bigint,
+  ): Promise<string> {
     return await executeTxUsingGelato(
       targetContractAddress,
       this.rpcConfig.chainId,
       this.gelatoConfig?.apiKey,
       encodedTxData,
+      gelatoGasLimit,
     );
   }
 

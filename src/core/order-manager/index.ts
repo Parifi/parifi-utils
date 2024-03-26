@@ -1,6 +1,13 @@
 import { Market, Order, Position } from '../../interfaces/subgraphTypes';
 import { Decimal } from 'decimal.js';
-import { DECIMAL_ZERO, DEVIATION_PRECISION_MULTIPLIER, MAX_FEE, PRECISION_MULTIPLIER } from '../../common/constants';
+import {
+  DECIMAL_ZERO,
+  DEVIATION_PRECISION_MULTIPLIER,
+  GAS_LIMIT_LIQUIDATION,
+  GAS_LIMIT_SETTLEMENT,
+  MAX_FEE,
+  PRECISION_MULTIPLIER,
+} from '../../common/constants';
 import { getAccruedBorrowFeesInMarket, getMarketUtilization } from '../data-fabric';
 import { convertMarketAmountToCollateral } from '../price-feed';
 import { Chain } from '@parifi/references';
@@ -329,13 +336,19 @@ export const liquidatePositionUsingGelato = async (
   const orderManager = getOrderManagerInstance(chainId);
   const { data: encodedTxData } = await orderManager.liquidatePosition.populateTransaction(positionId, priceUpdateData);
 
-  taskId = await executeTxUsingGelato(parifiContracts[chainId].OrderManager.address, chainId, gelatoKey, encodedTxData);
+  const gelatoGasLimit = BigInt(GAS_LIMIT_LIQUIDATION);
+  taskId = await executeTxUsingGelato(
+    parifiContracts[chainId].OrderManager.address,
+    chainId,
+    gelatoKey,
+    encodedTxData,
+    gelatoGasLimit,
+  );
 
   // We need these console logs for feedback to Tenderly actions and other scripts
   console.log('Task ID:', taskId);
   return { gelatoTaskId: taskId };
 };
-
 
 // Settles an order using Gelato as the relayer
 export const settleOrderUsingGelato = async (
@@ -358,7 +371,15 @@ export const settleOrderUsingGelato = async (
   const orderManager = getOrderManagerInstance(chainId);
   const { data: encodedTxData } = await orderManager.settleOrder.populateTransaction(orderId, priceUpdateData);
 
-  taskId = await executeTxUsingGelato(parifiContracts[chainId].OrderManager.address, chainId, gelatoKey, encodedTxData);
+  const gelatoGasLimit = BigInt(GAS_LIMIT_SETTLEMENT);
+
+  taskId = await executeTxUsingGelato(
+    parifiContracts[chainId].OrderManager.address,
+    chainId,
+    gelatoKey,
+    encodedTxData,
+    gelatoGasLimit,
+  );
 
   // We need these console logs for feedback to Tenderly actions and other scripts
   console.log('Task ID:', taskId);
