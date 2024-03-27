@@ -10,6 +10,10 @@ import Decimal from 'decimal.js';
 import { getLatestPricesFromPyth, normalizePythPriceForParifi } from '../../pyth/pyth';
 import { AxiosInstance } from 'axios';
 
+// const matchChain: Record<SupportedChain, Chain> = {
+//   [SupportedChain.ARBITRUM_SEPOLIA]: arbitrumSepolia,
+// };
+
 // Get all vaults from subgraph
 export const getAllVaults = async (subgraphEndpoint: string): Promise<Vault[]> => {
   try {
