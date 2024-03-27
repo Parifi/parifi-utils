@@ -12,8 +12,8 @@ export const DECIMAL_10 = new Decimal(10);
 export const DECIMAL_ZERO = new Decimal(0);
 export const DEFAULT_BATCH_COUNT = 10;
 
-export const GAS_LIMIT_SETTLEMENT = 1000000   // 1M gas
-export const GAS_LIMIT_LIQUIDATION = 6000000   // 6M gas
+export const GAS_LIMIT_SETTLEMENT = 3000000   // 2M gas
+export const GAS_LIMIT_LIQUIDATION = 10000000   // 19M gas
 
 export const ONE_GWEI = 1000000000 // 10^9
 export const DEFAULT_GAS_PRICE = 2 * ONE_GWEI // 1 gwei
