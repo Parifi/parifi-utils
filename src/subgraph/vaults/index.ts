@@ -1,18 +1,14 @@
 import { request } from 'graphql-request';
 import { Vault, VaultPositionsResponse } from '../../interfaces';
-import { fetchAllVaultsQuery, fetchUserAllVaultsQuery } from './subgraphQueries';
+import { fetchAllVaultsQuery, fetchUserAllVaultsQuery, fetchVaultAprDetails } from './subgraphQueries';
 import { mapVaultsArrayToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 import { Chain as SupportedChain, availableVaultsPerChain } from '@parifi/references';
 
-import { PRICE_FEED_DECIMALS, getNormalizedPriceByIdFromPriceIdArray } from '../../common';
+import { DECIMAL_ZERO, PRICE_FEED_DECIMALS, getNormalizedPriceByIdFromPriceIdArray } from '../../common';
 import Decimal from 'decimal.js';
 import { getLatestPricesFromPyth, normalizePythPriceForParifi } from '../../pyth/pyth';
 import { AxiosInstance } from 'axios';
-
-// const matchChain: Record<SupportedChain, Chain> = {
-//   [SupportedChain.ARBITRUM_SEPOLIA]: arbitrumSepolia,
-// };
 
 // Get all vaults from subgraph
 export const getAllVaults = async (subgraphEndpoint: string): Promise<Vault[]> => {
@@ -134,4 +130,56 @@ export const getTotalPoolsValue = async (
   });
   const totalPoolValue = data.reduce((a, b) => a + b.totatVaultValue, 0);
   return { data, totalPoolValue };
+};
+
+export const getVaultApr = async (
+  subgraphEndpoint: string,
+  vaultId: string,
+): Promise<{ apr7Days: Decimal; apr30Days: Decimal; aprAllTime: Decimal }> => {
+  // Interface for subgraph response
+  interface VaultAprInterface {
+    vaultDailyDatas: {
+      apr: Decimal;
+      vault: {
+        allTimeApr: Decimal;
+      };
+    }[];
+  }
+
+  let apr7Days: Decimal = DECIMAL_ZERO;
+  let apr30Days: Decimal = DECIMAL_ZERO;
+  let aprAllTime: Decimal = DECIMAL_ZERO;
+
+  try {
+    const subgraphResponse: VaultAprInterface = await request(subgraphEndpoint, fetchVaultAprDetails(vaultId));
+    console.log(subgraphResponse);
+    const vaultDatas = subgraphResponse.vaultDailyDatas;
+
+    // If no APR data found, return 0;
+    if (vaultDatas.length == 0) {
+      return { apr7Days, apr30Days, aprAllTime };
+    } else {
+      // Set All Time APR for the vault from response
+      aprAllTime = vaultDatas[0].vault.allTimeApr;
+    }
+
+    /// Calculate the APR of vault based on timeframe data. If enough data points are not available,
+    /// the value is set to 0;
+    for (let index = 0; index < vaultDatas.length; index++) {
+      const vaultData = vaultDatas[index];
+
+      // Do not calculate 7 day APR if less than 7 days of data is available
+      if (index < 7 && vaultDatas.length >= 7) {
+        apr7Days = apr7Days.add(vaultData.apr);
+      }
+
+      // Do not calculate 30 day APR if less than 30 days of data is available
+      if (index < 30 && vaultDatas.length >= 30) {
+        apr30Days = apr30Days.add(vaultData.apr);
+      }
+    }
+    return { apr7Days: apr7Days.div(7), apr30Days: apr30Days.div(30), aprAllTime: aprAllTime };
+  } catch (error) {
+    throw error;
+  }
 };

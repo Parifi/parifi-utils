@@ -76,3 +76,17 @@ query vaultInfo {
   }
 }
 `;
+
+export const fetchVaultAprDetails = (vaultId: string) => gql`
+  {
+    vaultDailyDatas(
+      first: 30
+      orderBy: startTimestamp
+      orderDirection: desc
+      where: { vault: "${vaultId}" }
+    ) {
+    	vault { allTimeApr }
+      apr
+    }
+  }
+`;
