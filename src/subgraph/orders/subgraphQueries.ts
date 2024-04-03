@@ -138,3 +138,23 @@ export const fetchPriceIdsFromOrderIdsQuery = (orderIds: string[]) =>
     }
   }
 `;
+
+export const fetchPartnerRewards = (partnerAddress: string, count: number = 20, skip: number = 0) => gql`
+  {
+    referrals(
+      first: ${count}
+      skip: ${skip}
+      orderBy: timestamp
+      orderDirection: desc
+      where: { partner: "${partnerAddress}" }
+    ) {
+      id
+      partner { id }
+      referredUser { id }
+      sizeInUsd
+      timestamp
+      txHash
+      referralRewardsInUsd
+    }
+  }
+`;

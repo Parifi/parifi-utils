@@ -1,4 +1,10 @@
-import { getAllOrdersByUserAddress, getAllPendingOrders, getOrderById, getPythPriceIdsForOrderIds } from './orders';
+import {
+  getAllOrdersByUserAddress,
+  getAllPendingOrders,
+  getOrderById,
+  getPythPriceIdsForOrderIds,
+  getReferralDataForPartner,
+} from './orders';
 import { PythConfig, RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
 import {
   getAllPositionsByUserAddress,
@@ -13,7 +19,7 @@ import {
   getTotalUnrealizedPnlInUsd,
 } from './positions';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
-import { Market, Order, Position, Vault } from '../interfaces/subgraphTypes';
+import { Market, Order, Position, Referral, Vault } from '../interfaces/subgraphTypes';
 import { Chain } from '@parifi/references';
 import request, { GraphQLClient } from 'graphql-request';
 import { getPublicSubgraphEndpoint } from './common';
@@ -227,5 +233,14 @@ export class Subgraph {
   public async getVaultApr(vaultId: string): Promise<{ apr7Days: Decimal; apr30Days: Decimal; aprAllTime: Decimal }> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getVaultApr(subgraphEndpoint, vaultId);
+  }
+
+  public async getReferralDataForPartner(
+    partnerAddress: string,
+    count: number = 20,
+    skip: number = 0,
+  ): Promise<Referral[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getReferralDataForPartner(subgraphEndpoint, partnerAddress, count, skip);
   }
 }

@@ -1,3 +1,8 @@
+//// NOTE: All fields from the subgraph interfaces have their type as string
+//// and are marked as optional. This is because the logic to fetch these data might
+//// differ based on the requirement or function, and only required fields are fetched
+//// with queries to keep it concise and avoid fetching unnecessary data.
+
 ////////////////////////////////////////////////////////////////
 ////////////////////    ENUMS     //////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -51,10 +56,10 @@ export interface Account {
   referralFeesInUsd?: string;
 
   // " Total Realized P&L from Positions in USD "
-  totalRealizedPnlPositions: string
+  totalRealizedPnlPositions?: string;
 
   // " Total Realized P&L from Vaults in USD "
-  totalRealizedPnlVaults: string
+  totalRealizedPnlVaults?: string;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -524,4 +529,28 @@ export interface VaultPosition {
 
 export interface VaultPositionsResponse {
   vaultPositions: VaultPosition[];
+}
+
+// Subgraph interface for partner referrals
+export interface Referral {
+  // " Partner (Referrer) address + Referred address + log Index "
+  id?: string;
+
+  // " Partner (Referrer) address that referred another user "
+  partner?: Account;
+
+  // " Referred user - User that was referred by the partner"
+  referredUser?: Account;
+
+  // " Position Size in USD "
+  sizeInUsd?: string;
+
+  // " Timestamp "
+  timestamp?: string;
+
+  // " Transaction hash of the create position tx for user referral "
+  txHash?: string;
+
+  // " Referral rewards in USD "
+  referralRewardsInUsd?: string;
 }
