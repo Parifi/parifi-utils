@@ -47,4 +47,12 @@ describe('Order fetching logic from subgraph', () => {
     const { gelatoTaskId: taskId } = await parifiSdk.core.settleOrderUsingGelato(orderId);
     console.log('taskId', taskId);
   });
+
+  it('should return referral data for partner address', async () => {
+    await parifiSdk.init();
+    const partnerAddress = '0x30f06f86f107f9523f5b91a8e8aeb602b7b260bd';
+
+    const referralData = await parifiSdk.subgraph.getReferralDataForPartner(partnerAddress);
+    console.log('referralData', referralData);
+  });
 });

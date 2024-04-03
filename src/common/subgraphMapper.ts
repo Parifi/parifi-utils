@@ -5,6 +5,7 @@ import {
   Position,
   PriceFeedSnapshot,
   PythData,
+  Referral,
   Token,
   Vault,
   VaultPosition,
@@ -288,6 +289,34 @@ export const mapVaultsArrayToInterface = (response: any): Vault[] | undefined =>
   try {
     return response.vaults.map((vault: Vault) => {
       return mapSingleVaultToInterface(vault);
+    });
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
+
+export const mapReferralDataToInterface = (response: any): Referral | undefined => {
+  try {
+    return {
+      id: response.id,
+      partner: response.partner ? mapSubgraphResponseToAccountInterface(response.partner) : undefined,
+      referredUser: response.partner ? mapSubgraphResponseToAccountInterface(response.partner) : undefined,
+      sizeInUsd: response.sizeInUsd,
+      timestamp: response.timestamp,
+      txHash: response.txHash,
+      referralRewardsInUsd: response.referralRewardsInUsd,
+    };
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
+
+export const mapReferralsArrayToInterface = (response: any): Referral[] | undefined => {
+  try {
+    return response.referrals.map((referral: Referral) => {
+      return mapReferralDataToInterface(referral);
     });
   } catch (error) {
     console.log('Error while mapping data', error);
