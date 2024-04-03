@@ -22,6 +22,7 @@ import {
   getTotalPoolsValue,
   getUserTotalPoolsValue,
   getUserVaultDataByChain,
+  getVaultApr,
   getVaultDataByChain,
 } from './vaults';
 import { Pyth } from '../pyth';
@@ -221,5 +222,10 @@ export class Subgraph {
     await this.init();
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getUserTotalPoolsValue(userAddress, this.rpcConfig.chainId, subgraphEndpoint, this.pyth.pythClient);
+  }
+
+  public async getVaultApr(vaultId: string): Promise<{ apr7Days: Decimal; apr30Days: Decimal; aprAllTime: Decimal }> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getVaultApr(subgraphEndpoint, vaultId);
   }
 }
