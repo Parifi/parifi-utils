@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
 import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
+import Decimal from 'decimal.js';
 
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
@@ -131,5 +132,20 @@ describe('Order fetching logic from subgraph', () => {
         expect(totalNetUnrealizedPnlInUsd.toNumber()).toBeLessThan(0);
       }
     }
+  });
+
+  it('multi user - should return valid total unrealized PNL from all user positions', async () => {
+    await parifiSdk.init();
+    const userAddresses = ['0xd60202464e7d923dea9c2b2f5435597e51de2683', '0x'];
+    const totalMultiUserNetUnrealizedPnlInUsd = await parifiSdk.subgraph.getMultiUserTotalUnrealizedPnlInUsd(userAddresses);
+    console.log('totalNetUnrealizedPnlInUsd', totalMultiUserNetUnrealizedPnlInUsd);
+    const result = (totalMultiUserNetUnrealizedPnlInUsd[0].totalNetUnrealizedPnlInUsd as Decimal)
+    if (result.isPositive()) {
+      expect(result.toNumber()).toBeGreaterThan(0);
+    } else {
+      expect(result.toNumber()).toBeLessThan(0);
+    }
+    const zeroResult = (totalMultiUserNetUnrealizedPnlInUsd[1].totalNetUnrealizedPnlInUsd as Decimal)
+    expect(zeroResult.toNumber()).toEqual(0);
   });
 });
