@@ -78,7 +78,7 @@ export const getUserVaultDataByChain = async (chainId: SupportedChain, subgraphE
 export const getMultiUserVaultDataByChain = async (chainId: SupportedChain, subgraphEndpoint: string, userAddresses: string[]): Promise<VaultData[]> => {
   let subgraphResponse: VaultPositionsResponse = await request(subgraphEndpoint, fetchMultiUserAllVaultsQuery(userAddresses));
   const result = userAddresses.map((userAddress: string) => {
-    const vaultPositionsByUser = subgraphResponse.vaultPositions.filter((vault) => vault.user.id === userAddress);
+    const vaultPositionsByUser = subgraphResponse.vaultPositions.filter((vault) => vault.user.id.toLowerCase() === userAddress.toLowerCase());
     if (!vaultPositionsByUser.length) return {userAddress, vaults: []}
     const _vaults =  vaultPositionsByUser.map((vault) => {
       const vaultAddress = availableVaultsPerChain[chainId].find(

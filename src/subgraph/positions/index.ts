@@ -299,7 +299,7 @@ export const getMultiUserTotalUnrealizedPnlInUsd = async (subgraphEndpoint: stri
     // For each user address's position, calculate the USD value of the deposited collateral
     const result = userAddresses.map((userAddress: string) => {
       let totalNetUnrealizedPnlInUsd: Decimal = DECIMAL_ZERO;
-      const positions = subgraphResponse.positions.filter((position) => position.user.id === userAddress);
+      const positions = subgraphResponse.positions.filter((position) => position.user.id.toLowerCase() === userAddress.toLowerCase());
       // @todo should we set totalNetUnrealizedPnlInUsd to zero or undefined 
       // if position for given userAddress does not exists?
       // setting it to zero for now

@@ -56,7 +56,7 @@ export const getMultiUserRealizedPnl = async (
     const subgraphResponse: MultiUserRealizedPnlSubgraphResponse = await request(subgraphEndpoint, query);
     const result = userAddresses.map((userAddress: string) => {
       // check if values exist for current user address, esle set value to null
-      const account = subgraphResponse.accounts.find((account: Account) => account.id === userAddress)
+      const account = subgraphResponse.accounts.find((account: Account) => account.id.toLowerCase() === userAddress.toLowerCase())
       return {
         userAddress,
         totalRealizedPnlPositions: account?.totalRealizedPnlPositions ? new Decimal(account?.totalRealizedPnlPositions) : DECIMAL_ZERO, // @todo set to zero or undefined?
