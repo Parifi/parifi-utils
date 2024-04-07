@@ -180,19 +180,7 @@ export const fetchAllPositionsForCollateralData = (userAddress: string) => gql`
 `;
 
 // Fetches the unrealized PNL for all positions of a `userAddress`
-export const fetchAllPositionsUnrealizedPnl = (userAddress: string) => gql`
-  {
-    positions(
-      first: 1000
-      orderBy: positionCollateral
-      orderDirection: desc
-      where: { user: "${userAddress}", status: OPEN }
-    ) {
-      id
-      netUnrealizedPnlInUsd
-    }
-  }
-`;
+export const fetchAllPositionsUnrealizedPnl = (userAddress: string) => fetchAllPositionsMultiUserUnrealizedPnl([userAddress]);
 
 // Fetches the unrealized PNL for all positions of a `userAddress`
 export const fetchAllPositionsMultiUserUnrealizedPnl = (userAddresses: string[]) => gql`

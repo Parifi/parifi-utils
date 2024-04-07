@@ -227,6 +227,9 @@ export const getTotalUnrealizedPnlInUsd = async (subgraphEndpoint: string, userA
       positions: {
         id: string;
         netUnrealizedPnlInUsd: string;
+        user: {
+          id: string;
+        }
       }[];
     }
 

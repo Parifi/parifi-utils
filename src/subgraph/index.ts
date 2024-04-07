@@ -27,6 +27,7 @@ import request, { GraphQLClient } from 'graphql-request';
 import { getPublicSubgraphEndpoint } from './common';
 import {
   getAllVaults,
+  getMultiUserTotalPoolsValue,
   getTotalPoolsValue,
   getUserTotalPoolsValue,
   getUserVaultDataByChain,
@@ -240,6 +241,12 @@ export class Subgraph {
     await this.init();
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getUserTotalPoolsValue(userAddress, this.rpcConfig.chainId, subgraphEndpoint, this.pyth.pythClient);
+  }
+
+  public async getMultiUserTotalPoolsValue(userAddresses: string[]) {
+    await this.init();
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getMultiUserTotalPoolsValue(userAddresses, this.rpcConfig.chainId, subgraphEndpoint, this.pyth.pythClient);
   }
 
   public async getVaultApr(vaultId: string): Promise<{ apr7Days: Decimal; apr30Days: Decimal; aprAllTime: Decimal }> {

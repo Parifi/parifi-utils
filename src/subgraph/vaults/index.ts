@@ -1,6 +1,6 @@
 import { request } from 'graphql-request';
-import { Vault, VaultPositionsResponse } from '../../interfaces';
-import { fetchAllVaultsQuery, fetchUserAllVaultsQuery, fetchVaultAprDetails } from './subgraphQueries';
+import { Vault, VaultPosition, VaultPositionsResponse } from '../../interfaces';
+import { fetchAllVaultsQuery, fetchMultiUserAllVaultsQuery, fetchUserAllVaultsQuery, fetchVaultAprDetails } from './subgraphQueries';
 import { mapVaultsArrayToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 import { Chain as SupportedChain, availableVaultsPerChain } from '@parifi/references';
@@ -9,6 +9,26 @@ import { DECIMAL_ZERO, PRICE_FEED_DECIMALS, getNormalizedPriceByIdFromPriceIdArr
 import Decimal from 'decimal.js';
 import { getLatestPricesFromPyth, normalizePythPriceForParifi } from '../../pyth/pyth';
 import { AxiosInstance } from 'axios';
+
+interface VaultData {
+  userAddress: string;
+  vaults: VaultPosition[];
+}
+
+
+interface TotalPoolsValueData {
+  myBalance: number;
+  normalizedPrice: Decimal;
+  Symbol: string | undefined;
+  priceId: string | undefined;
+  totalVaultValue: number;
+}
+
+interface MultiUserTotalPoolsValue {
+  userAddress: string;
+  data: TotalPoolsValueData[] | 0;
+  myTotalPoolValue: number;
+}
 
 // Get all vaults from subgraph
 export const getAllVaults = async (subgraphEndpoint: string): Promise<Vault[]> => {
@@ -55,16 +75,26 @@ export const getUserVaultDataByChain = async (chainId: SupportedChain, subgraphE
   });
 };
 
-export const getUserTotalPoolsValue = async (
-  userAddress: string,
-  chainId: SupportedChain,
-  subgraphEndpoint: string,
-  pythClient: AxiosInstance,
-) => {
-  const vaults = await getUserVaultDataByChain(chainId, subgraphEndpoint, userAddress);
-  if (vaults.length === 0) {
-    return { data: 0, myTotalPoolValue: 0 };
-  }
+export const getMultiUserVaultDataByChain = async (chainId: SupportedChain, subgraphEndpoint: string, userAddresses: string[]): Promise<VaultData[]> => {
+  let subgraphResponse: VaultPositionsResponse = await request(subgraphEndpoint, fetchMultiUserAllVaultsQuery(userAddresses));
+  const result = userAddresses.map((userAddress: string) => {
+    const vaultPositionsByUser = subgraphResponse.vaultPositions.filter((vault) => vault.user.id === userAddress);
+    if (!vaultPositionsByUser.length) return {userAddress, vaults: []}
+    const _vaults =  vaultPositionsByUser.map((vault) => {
+      const vaultAddress = availableVaultsPerChain[chainId].find(
+        (vaultA) => vaultA.toLowerCase() === vault.vault?.id?.toLowerCase(),
+      );
+      return {
+        ...vault,
+        vault: { ...vault.vault, id: vaultAddress ?? vault.vault.id },
+      };
+    });
+    return {userAddress, vaults: _vaults}
+  });
+  return result;
+};
+
+const calculateUserTotalPoolValue = async (vaults: VaultPosition[], pythClient: AxiosInstance): Promise<{data: TotalPoolsValueData[]; myTotalPoolValue: number}> => {
   const priceIds = vaults.map((v) => v.vault.depositToken?.pyth?.id);
   const res = await getLatestPricesFromPyth(priceIds as string[], pythClient);
   const priceInfos = res.map((pythPrice) => {
@@ -95,9 +125,43 @@ export const getUserTotalPoolsValue = async (
       totalVaultValue: totalVaultValue,
     };
     return returnObj;
-  });
+  }) as TotalPoolsValueData[];
   const myTotalPoolValue = data.reduce((a, b) => a + b.totalVaultValue, 0);
+  return {data, myTotalPoolValue};
+};
+
+export const getUserTotalPoolsValue = async (
+  userAddress: string,
+  chainId: SupportedChain,
+  subgraphEndpoint: string,
+  pythClient: AxiosInstance,
+) => {
+  const vaults = await getUserVaultDataByChain(chainId, subgraphEndpoint, userAddress);
+  if (vaults.length === 0) {
+    return { data: 0, myTotalPoolValue: 0 };
+  }
+  const { data, myTotalPoolValue } = await calculateUserTotalPoolValue(vaults, pythClient);
   return { data, myTotalPoolValue };
+};
+
+export const getMultiUserTotalPoolsValue = async (
+  userAddresses: string[],
+  chainId: SupportedChain,
+  subgraphEndpoint: string,
+  pythClient: AxiosInstance,
+): Promise<MultiUserTotalPoolsValue[]> => {
+  const vaultsData = await getMultiUserVaultDataByChain(chainId, subgraphEndpoint, userAddresses);
+  const result: MultiUserTotalPoolsValue[] = [];
+  for (const userAddr of userAddresses) {
+    const vaultsByUser = vaultsData.find((vault) => vault.userAddress === userAddr);
+    const {userAddress, vaults} = vaultsByUser as VaultData;
+    if (!vaults.length) {
+      result.push({ userAddress, data: 0, myTotalPoolValue: 0 });
+    }
+    const { data, myTotalPoolValue } = await calculateUserTotalPoolValue(vaults, pythClient);
+    result.push({ userAddress, data, myTotalPoolValue });
+  };
+  return result;
 };
 
 export const getTotalPoolsValue = async (

@@ -63,6 +63,20 @@ describe('Vault fetching logic from subgraph', () => {
     expect(data.myTotalPoolValue).not.toBe(0);
   });
 
+  it('multi user - should return correct user total pools vaule', async () => {
+    await parifiSdk.init();
+    const data = await parifiSdk.subgraph.getMultiUserTotalPoolsValue(['0x30f06f86F107f9523f5b91A8E8AEB602b7b260BD', '0x']);
+    console.log(data);
+
+    expect(data[0].myTotalPoolValue).not.toEqual(0);
+    expect(data[0].data).not.toEqual(0);
+    expect(data[0].userAddress).toEqual('0x30f06f86F107f9523f5b91A8E8AEB602b7b260BD');
+
+    expect(data[1].myTotalPoolValue).toEqual(0);
+    expect(data[1].data).toEqual(0);
+    expect(data[1].userAddress).toEqual('0x');
+  });
+
   it('should return correct APR details', async () => {
     await parifiSdk.init();
     const vaultId = '0x13a78809528b02ad5e7c42f39232d332761dfb1d';

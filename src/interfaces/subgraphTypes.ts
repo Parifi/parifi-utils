@@ -513,6 +513,9 @@ export interface Vault {
 }
 
 export interface VaultPosition {
+  user: { 
+    id: string;
+  }
   vault: Vault;
   sharesBalance: string;
   totalMinted: string;
