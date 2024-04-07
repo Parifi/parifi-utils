@@ -14,7 +14,7 @@ export const fetchRealizedPnlData = (userAddress: string) => gql`
 
 // The `fetchRealizedPnlData` query fetches the realized PnL for a user address
 // for vaults and positions
-export const fetchMultipleRealizedPnlData = (userAddresses: string[]) => gql`
+export const fetchMultiUserRealizedPnlData = (userAddresses: string[]) => gql`
 {
   accounts(
     where : {

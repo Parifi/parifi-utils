@@ -53,7 +53,7 @@ describe('Order fetching logic from subgraph', () => {
     const userAddresses = ['0xe4fDB1Fa65b29533D6d3D9Aa74e07E6e87405B32', '0x'];
 
     const result: RealizedPnlForMultipleUsers[] =
-      await parifiSdk.subgraph.getRealizedPnlForMultipleUsers(userAddresses);
+      await parifiSdk.subgraph.getMultiUserRealizedPnl(userAddresses);
 
     expect(result).toHaveLength(2);
     expect(result[1].userAddress).toEqual("0x")

@@ -33,7 +33,7 @@ import {
 } from './vaults';
 import { Pyth } from '../pyth';
 import Decimal from 'decimal.js';
-import { RealizedPnlForMultipleUsers, getRealizedPnlForMultipleUsers, getRealizedPnlForUser } from './accounts';
+import { RealizedPnlForMultipleUsers, getMultiUserRealizedPnl, getRealizedPnlForUser } from './accounts';
 
 export * from './common';
 export * from './markets';
@@ -95,9 +95,9 @@ export class Subgraph {
     return await getRealizedPnlForUser(subgraphEndpoint, userAddress);
   }
 
-  public async getRealizedPnlForMultipleUsers(userAddresses: string[]): Promise<RealizedPnlForMultipleUsers[]> {
+  public async getMultiUserRealizedPnl(userAddresses: string[]): Promise<RealizedPnlForMultipleUsers[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getRealizedPnlForMultipleUsers(subgraphEndpoint, userAddresses);
+    return await getMultiUserRealizedPnl(subgraphEndpoint, userAddresses);
   }
   ////////////////////////////////////////////////////////////////
   //////////////////////    ORDERS    ////////////////////////////

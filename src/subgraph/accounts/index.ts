@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 import { request } from 'graphql-request';
-import { fetchMultipleRealizedPnlData, fetchRealizedPnlData } from './subgraphQueries';
+import { fetchMultiUserRealizedPnlData, fetchRealizedPnlData } from './subgraphQueries';
 
 interface Account {
   id: string;
@@ -14,7 +14,7 @@ interface RealizedPnlSubgraphResponse {
 }
 
 
-interface MultipleRealizedPnlSubgraphResponse {
+interface MultiUserRealizedPnlSubgraphResponse {
   accounts: Account[];
 }
 
@@ -46,13 +46,13 @@ export const getRealizedPnlForUser = async (
 };
 
 /// Returns the Realized PNL for positions and vaults for multiple user addresses
-export const getRealizedPnlForMultipleUsers = async (
+export const getMultiUserRealizedPnl = async (
   subgraphEndpoint: string,
   userAddresses: string[],
 ): Promise<RealizedPnlForMultipleUsers[]> => {
   try {
-    const query = fetchMultipleRealizedPnlData(userAddresses);
-    const subgraphResponse: MultipleRealizedPnlSubgraphResponse = await request(subgraphEndpoint, query);
+    const query = fetchMultiUserRealizedPnlData(userAddresses);
+    const subgraphResponse: MultiUserRealizedPnlSubgraphResponse = await request(subgraphEndpoint, query);
     const result = userAddresses.map((userAddress: string) => {
       // check if values exist for current user address, esle set value to null
       const account = subgraphResponse.accounts.find((account: Account) => account.id === userAddress)
