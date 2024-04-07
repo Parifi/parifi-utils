@@ -1,7 +1,28 @@
 import Decimal from 'decimal.js';
 import { request } from 'graphql-request';
-import { fetchRealizedPnlData } from './subgraphQueries';
+import { fetchMultipleRealizedPnlData, fetchRealizedPnlData } from './subgraphQueries';
 
+interface Account {
+  id: string;
+  totalRealizedPnlPositions: string;
+  totalRealizedPnlVaults: string;
+}
+
+
+interface RealizedPnlSubgraphResponse {
+  account: Account;
+}
+
+
+interface MultipleRealizedPnlSubgraphResponse {
+  accounts: Account[];
+}
+
+export interface RealizedPnlForMultipleUsers {
+  userAddress: string,
+  totalRealizedPnlPositions: Decimal | undefined;
+  totalRealizedPnlVaults: Decimal | undefined;
+}
 
 /// Returns the Realized PNL for positions and vaults for a user address
 export const getRealizedPnlForUser = async (
@@ -12,15 +33,6 @@ export const getRealizedPnlForUser = async (
   totalRealizedPnlVaults: Decimal;
 }> => {
   try {
-    // Interface to map fetched data
-    interface RealizedPnlSubgraphResponse {
-      account: {
-        id: string;
-        totalRealizedPnlPositions: string;
-        totalRealizedPnlVaults: string;
-      };
-    }
-
     const query = fetchRealizedPnlData(userAddress);
     const subgraphResponse: RealizedPnlSubgraphResponse = await request(subgraphEndpoint, query);
 
@@ -28,6 +40,30 @@ export const getRealizedPnlForUser = async (
     const totalRealizedPnlVaults = new Decimal(subgraphResponse.account.totalRealizedPnlVaults);
 
     return { totalRealizedPnlPositions, totalRealizedPnlVaults };
+  } catch (error) {
+    throw error;
+  }
+};
+
+/// Returns the Realized PNL for positions and vaults for multiple user addresses
+export const getRealizedPnlForMultipleUsers = async (
+  subgraphEndpoint: string,
+  userAddresses: string[],
+): Promise<RealizedPnlForMultipleUsers[]> => {
+  try {
+    const query = fetchMultipleRealizedPnlData(userAddresses);
+    const subgraphResponse: MultipleRealizedPnlSubgraphResponse = await request(subgraphEndpoint, query);
+    const result = userAddresses.map((userAddress: string) => {
+      // check if values exist for current user address, esle set value to null
+      const account = subgraphResponse.accounts.find((account: Account) => account.id === userAddress)
+      return {
+        userAddress,
+        totalRealizedPnlPositions: account?.totalRealizedPnlPositions ? new Decimal(account?.totalRealizedPnlPositions) : undefined,
+        totalRealizedPnlVaults: account?.totalRealizedPnlVaults ? new Decimal(account?.totalRealizedPnlVaults) : undefined,
+      }
+    });
+
+    return result;
   } catch (error) {
     throw error;
   }
