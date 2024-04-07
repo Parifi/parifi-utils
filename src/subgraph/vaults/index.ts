@@ -10,13 +10,13 @@ import Decimal from 'decimal.js';
 import { getLatestPricesFromPyth, normalizePythPriceForParifi } from '../../pyth/pyth';
 import { AxiosInstance } from 'axios';
 
-interface VaultData {
+export interface VaultData {
   userAddress: string;
   vaults: VaultPosition[];
 }
 
 
-interface TotalPoolsValueData {
+export interface TotalPoolsValueData {
   myBalance: number;
   normalizedPrice: Decimal;
   Symbol: string | undefined;
@@ -24,7 +24,7 @@ interface TotalPoolsValueData {
   totalVaultValue: number;
 }
 
-interface MultiUserTotalPoolsValue {
+export interface MultiUserTotalPoolsValue {
   userAddress: string;
   data: TotalPoolsValueData[] | 0;
   myTotalPoolValue: number;
