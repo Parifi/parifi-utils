@@ -18,7 +18,7 @@ export const fetchMultiUserRealizedPnlData = (userAddresses: string[]) => gql`
 {
   accounts(
     where : {
-      id_in: ${userAddresses.map((address: string) => `"${address.trim()}"`)}
+      id_in: [${userAddresses.map((address: string) => `"${address.trim()}"`).join(',')}]
     }
   ) {
     id

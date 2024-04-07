@@ -166,7 +166,7 @@ export const fetchAllMultiUserPositionsForCollateralData = (userAddresses: strin
       first: 1000
       orderBy: positionCollateral
       orderDirection: desc
-      where: { user: ${userAddresses.map((address: string) => `"${address.trim()}"`)}, status: OPEN }
+      where: { user: [${userAddresses.map((address: string) => `"${address.trim()}"`).join(',')}], status: OPEN }
     ) {
       user {
         id
@@ -195,7 +195,7 @@ export const fetchAllPositionsMultiUserUnrealizedPnl = (userAddresses: string[])
       first: 1000
       orderBy: positionCollateral
       orderDirection: desc
-      where: { user_in: ${userAddresses.map((address: string) => `"${address.trim()}"`)}, status: OPEN }
+      where: { user_in: [${userAddresses.map((address: string) => `"${address.trim()}"`).join(',')}], status: OPEN }
     ) {
       id
       netUnrealizedPnlInUsd

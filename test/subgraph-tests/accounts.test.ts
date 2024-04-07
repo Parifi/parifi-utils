@@ -46,7 +46,7 @@ describe('Order fetching logic from subgraph', () => {
     console.log("unrealizedPNL", unrealizedPNL)
   });
 
-  it('should return realized PNL details for multiple users', async () => {
+  it('multi user - should return realized PNL details for multiple users', async () => {
     await parifiSdk.init();
 
     // Use an address with a non-zero positions/deposits

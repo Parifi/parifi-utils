@@ -41,7 +41,7 @@ export const fetchUserAllVaultsQuery = (user: string) => fetchMultiUserAllVaults
 
 export const fetchMultiUserAllVaultsQuery = (userAddresses: string[]) => gql`
 query vaultInfo {
-  vaultPositions(where: {user_in: ${userAddresses.map((address: string) => `"${address.trim()}"`)}}) {
+  vaultPositions(where: {user_in: [${userAddresses.map((address: string) => `"${address.trim()}"`).join(',')}]}) {
     user {
       id
     }
