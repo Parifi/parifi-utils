@@ -2,6 +2,7 @@ import { request } from 'graphql-request';
 import { Position } from '../../interfaces/subgraphTypes';
 import {
   fetchAllPositionsForCollateralData,
+  fetchAllPositionsMultiUserUnrealizedPnl,
   fetchAllPositionsUnrealizedPnl,
   fetchPositionByIdQuery,
   fetchPositionsByUserQuery,
@@ -20,6 +21,11 @@ interface PositionIdsSubgraphResponse {
   positions: {
     id: string;
   }[];
+}
+
+export interface MultiUserTotalUnrealizedPnlInUsd {
+  userAddress: string;
+  totalNetUnrealizedPnlInUsd: Decimal | undefined;
 }
 
 // Get all positions by user address
@@ -234,6 +240,41 @@ export const getTotalUnrealizedPnlInUsd = async (subgraphEndpoint: string, userA
       totalNetUnrealizedPnlInUsd = totalNetUnrealizedPnlInUsd.add(unrealizedPnlInUsd);
     });
     return totalNetUnrealizedPnlInUsd;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Returns the USD value of unrealized P&L across all the positions for multiple user addresses
+export const getMultiUserTotalUnrealizedPnlInUsd = async (subgraphEndpoint: string, userAddresses: string[]): Promise<MultiUserTotalUnrealizedPnlInUsd[]> => {
+  try {
+    /// PositionCollateralSubgraphResponse interface to format subgraph response to string array
+    interface PositionUnrealizedPnlSubgraphResponse {
+      positions: {
+        id: string;
+        netUnrealizedPnlInUsd: string;
+        user: {
+          id: string;
+        }
+      }[];
+    }
+    const query = fetchAllPositionsMultiUserUnrealizedPnl(userAddresses);
+    const subgraphResponse: PositionUnrealizedPnlSubgraphResponse = await request(subgraphEndpoint, query);
+
+    // For each user address's position, calculate the USD value of the deposited collateral
+    const result = userAddresses.map((userAddress: string) => {
+      let totalNetUnrealizedPnlInUsd: Decimal = DECIMAL_ZERO;
+      const positions = subgraphResponse.positions.filter((position) => position.user.id === userAddress);
+      // @todo should we set totalNetUnrealizedPnlInUsd to zero or undefined 
+      // if position for given userAddress does not exists?
+      // setting it to zero for now
+      positions.map((position) => {
+        const unrealizedPnlInUsd = new Decimal(position.netUnrealizedPnlInUsd);
+        totalNetUnrealizedPnlInUsd = totalNetUnrealizedPnlInUsd.add(unrealizedPnlInUsd);
+      });
+      return {userAddress, totalNetUnrealizedPnlInUsd};
+    });
+    return result;
   } catch (error) {
     throw error;
   }

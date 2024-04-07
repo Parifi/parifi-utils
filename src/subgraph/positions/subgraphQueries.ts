@@ -193,3 +193,21 @@ export const fetchAllPositionsUnrealizedPnl = (userAddress: string) => gql`
     }
   }
 `;
+
+// Fetches the unrealized PNL for all positions of a `userAddress`
+export const fetchAllPositionsMultiUserUnrealizedPnl = (userAddresses: string[]) => gql`
+  {
+    positions(
+      first: 1000
+      orderBy: positionCollateral
+      orderDirection: desc
+      where: { user_in: ${userAddresses.map((address: string) => `"${address.trim()}"`)}, status: OPEN }
+    ) {
+      id
+      netUnrealizedPnlInUsd
+      user {
+        id
+      }
+    }
+  }
+`;

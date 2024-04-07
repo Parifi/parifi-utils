@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js';
 import { request } from 'graphql-request';
 import { fetchMultiUserRealizedPnlData, fetchRealizedPnlData } from './subgraphQueries';
+import { DECIMAL_ZERO } from '../../common';
 
 interface Account {
   id: string;
@@ -20,8 +21,8 @@ interface MultiUserRealizedPnlSubgraphResponse {
 
 export interface RealizedPnlForMultipleUsers {
   userAddress: string,
-  totalRealizedPnlPositions: Decimal | undefined;
-  totalRealizedPnlVaults: Decimal | undefined;
+  totalRealizedPnlPositions: Decimal;
+  totalRealizedPnlVaults: Decimal;
 }
 
 /// Returns the Realized PNL for positions and vaults for a user address
@@ -58,8 +59,8 @@ export const getMultiUserRealizedPnl = async (
       const account = subgraphResponse.accounts.find((account: Account) => account.id === userAddress)
       return {
         userAddress,
-        totalRealizedPnlPositions: account?.totalRealizedPnlPositions ? new Decimal(account?.totalRealizedPnlPositions) : undefined,
-        totalRealizedPnlVaults: account?.totalRealizedPnlVaults ? new Decimal(account?.totalRealizedPnlVaults) : undefined,
+        totalRealizedPnlPositions: account?.totalRealizedPnlPositions ? new Decimal(account?.totalRealizedPnlPositions) : DECIMAL_ZERO, // @todo set to zero or undefined?
+        totalRealizedPnlVaults: account?.totalRealizedPnlVaults ? new Decimal(account?.totalRealizedPnlVaults) : DECIMAL_ZERO, // @todo set to zero or undefined?
       }
     });
 
