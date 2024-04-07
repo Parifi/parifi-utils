@@ -1,6 +1,7 @@
 import { request } from 'graphql-request';
 import { Position } from '../../interfaces/subgraphTypes';
 import {
+  fetchAllMultiUserPositionsForCollateralData,
   fetchAllPositionsForCollateralData,
   fetchAllPositionsMultiUserUnrealizedPnl,
   fetchAllPositionsUnrealizedPnl,
@@ -26,6 +27,27 @@ interface PositionIdsSubgraphResponse {
 export interface MultiUserTotalUnrealizedPnlInUsd {
   userAddress: string;
   totalNetUnrealizedPnlInUsd: Decimal | undefined;
+}
+
+interface PositionCollateral {
+  user: {
+    id: string;
+  };
+  id: string;
+  positionCollateral: string;
+  market: {
+    depositToken: {
+      decimals: string;
+      pyth: {
+        price: string;
+      };
+    };
+  };
+}
+
+
+interface PositionCollateralSubgraphResponse {
+  positions: PositionCollateral[];
 }
 
 // Get all positions by user address
@@ -178,42 +200,52 @@ export const getPositionsToLiquidate = async (subgraphEndpoint: string, count: n
   }
 };
 
+const calculateTotalDepositedCollateralInUsd = (positions: PositionCollateral[]): Decimal => {
+  let totalCollateralValueInUsd: Decimal = DECIMAL_ZERO;
+  // For each position, calculate the USD value of the deposited collateral
+  positions.forEach((position) => {
+    const positionCollateral = new Decimal(position.positionCollateral);
+    const pythPrice = position.market.depositToken.pyth.price;
+    const tokenDecimalsFactor = new Decimal(10).pow(position.market.depositToken.decimals);
+
+    let amountUsd: Decimal = positionCollateral.times(pythPrice).div(tokenDecimalsFactor).div(PRICE_FEED_PRECISION);
+    totalCollateralValueInUsd = totalCollateralValueInUsd.plus(amountUsd);
+  });
+  return totalCollateralValueInUsd;
+}
+
 // Returns the USD value of collateral deposited across all the positions for a user address
 export const getTotalDepositedCollateralInUsd = async (
   subgraphEndpoint: string,
   userAddress: string,
 ): Promise<Decimal> => {
   try {
-    /// PositionCollateralSubgraphResponse interface to format subgraph response to string array
-    interface PositionCollateralSubgraphResponse {
-      positions: {
-        id: string;
-        positionCollateral: string;
-        market: {
-          depositToken: {
-            decimals: string;
-            pyth: {
-              price: string;
-            };
-          };
-        };
-      }[];
-    }
-
-    let totalCollateralValueInUsd: Decimal = DECIMAL_ZERO;
     const query = fetchAllPositionsForCollateralData(userAddress);
     const subgraphResponse: PositionCollateralSubgraphResponse = await request(subgraphEndpoint, query);
-
-    // For each position, calculate the USD value of the deposited collateral
-    subgraphResponse.positions.forEach((position) => {
-      const positionCollateral = new Decimal(position.positionCollateral);
-      const pythPrice = position.market.depositToken.pyth.price;
-      const tokenDecimalsFactor = new Decimal(10).pow(position.market.depositToken.decimals);
-
-      let amountUsd: Decimal = positionCollateral.times(pythPrice).div(tokenDecimalsFactor).div(PRICE_FEED_PRECISION);
-      totalCollateralValueInUsd = totalCollateralValueInUsd.plus(amountUsd);
-    });
+    const totalCollateralValueInUsd = calculateTotalDepositedCollateralInUsd(subgraphResponse.positions);
     return totalCollateralValueInUsd;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Returns the USD value of collateral deposited across all the positions for multiple user addresses
+export const getMultiUserTotalDepositedCollateralInUsd = async (
+  subgraphEndpoint: string,
+  userAddresses: string[],
+): Promise<{userAddress: string; totalCollateralValueInUsd: Decimal}[]> => {
+  try {
+    const query = fetchAllMultiUserPositionsForCollateralData(userAddresses);
+    const subgraphResponse: PositionCollateralSubgraphResponse = await request(subgraphEndpoint, query);
+
+    const result = userAddresses.map((address: string) => {
+      // For each position, calculate the USD value of the deposited collateral
+      const resByAddress = subgraphResponse.positions.filter((position) => position.user.id === address);
+      if (!resByAddress.length) return {userAddress: address, totalCollateralValueInUsd: DECIMAL_ZERO};
+      const totalCollateralValueInUsd = calculateTotalDepositedCollateralInUsd(resByAddress);
+      return {userAddress: address, totalCollateralValueInUsd};
+    });
+    return result;
   } catch (error) {
     throw error;
   }

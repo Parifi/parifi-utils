@@ -157,14 +157,20 @@ export const fetchPositionsToLiquidateQuery = (count: number) => gql`
 `;
 
 // Fetches the collateral related data for all positions of a `userAddress`
-export const fetchAllPositionsForCollateralData = (userAddress: string) => gql`
+export const fetchAllPositionsForCollateralData = (userAddress: string) => fetchAllMultiUserPositionsForCollateralData([userAddress]);
+
+// Fetches the collateral related data for all positions of a `userAddress`
+export const fetchAllMultiUserPositionsForCollateralData = (userAddresses: string[]) => gql`
   {
     positions(
       first: 1000
       orderBy: positionCollateral
       orderDirection: desc
-      where: { user: "${userAddress}", status: OPEN }
+      where: { user: ${userAddresses.map((address: string) => `"${address.trim()}"`)}, status: OPEN }
     ) {
+      user {
+        id
+      }
       id
       positionCollateral
       market {

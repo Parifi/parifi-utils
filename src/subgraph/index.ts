@@ -11,6 +11,7 @@ import {
   getAllPositionsByUserAddress,
   getClosedPositionsByUserAddress,
   getLiquidatedPositionsByUserAddress,
+  getMultiUserTotalDepositedCollateralInUsd,
   getMultiUserTotalUnrealizedPnlInUsd,
   getOpenPositionsByUserAddress,
   getPositionById,
@@ -187,6 +188,11 @@ export class Subgraph {
   public async getTotalDepositedCollateralInUsd(userAddress: string): Promise<Decimal> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getTotalDepositedCollateralInUsd(subgraphEndpoint, userAddress);
+  }
+
+  public async getMultiUserTotalDepositedCollateralInUsd(userAddresses: string[]): Promise<{userAddress: string; totalCollateralValueInUsd: Decimal}[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getMultiUserTotalDepositedCollateralInUsd(subgraphEndpoint, userAddresses);
   }
 
   public async getTotalUnrealizedPnlInUsd(userAddress: string): Promise<Decimal> {

@@ -117,6 +117,19 @@ describe('Order fetching logic from subgraph', () => {
     }
   });
 
+  it('multi user - should return valid total collateral deposited value from all user positions', async () => {
+    await parifiSdk.init();
+
+    /// Add an address that has active positions
+    const userAddresses = ['0xd60202464e7d923dea9c2b2f5435597e51de2683', '0x'];
+    const data = await parifiSdk.subgraph.getMultiUserTotalDepositedCollateralInUsd(userAddresses);
+    expect(data[0].totalCollateralValueInUsd.toNumber()).toBeGreaterThan(0);
+    expect(data[0].userAddress).toEqual('0xd60202464e7d923dea9c2b2f5435597e51de2683');
+
+    expect(data[1].totalCollateralValueInUsd.toNumber()).toEqual(0);
+    expect(data[1].userAddress).toEqual('0x');
+  });
+
   it('should return valid total unrealized PNL from all user positions', async () => {
     await parifiSdk.init();
 
