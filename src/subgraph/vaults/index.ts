@@ -153,13 +153,14 @@ export const getMultiUserTotalPoolsValue = async (
   const vaultsData = await getMultiUserVaultDataByChain(chainId, subgraphEndpoint, userAddresses);
   const result: MultiUserTotalPoolsValue[] = [];
   for (const userAddr of userAddresses) {
-    const vaultsByUser = vaultsData.find((vault) => vault.userAddress === userAddr);
+    const vaultsByUser = vaultsData.find((vault) => vault.userAddress.toLowerCase() === userAddr.toLowerCase());
     const {userAddress, vaults} = vaultsByUser as VaultData;
     if (!vaults.length) {
       result.push({ userAddress, data: 0, myTotalPoolValue: 0 });
+    } else {
+      const { data, myTotalPoolValue } = await calculateUserTotalPoolValue(vaults, pythClient);
+      result.push({ userAddress, data, myTotalPoolValue });
     }
-    const { data, myTotalPoolValue } = await calculateUserTotalPoolValue(vaults, pythClient);
-    result.push({ userAddress, data, myTotalPoolValue });
   };
   return result;
 };

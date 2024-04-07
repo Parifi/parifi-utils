@@ -240,7 +240,7 @@ export const getMultiUserTotalDepositedCollateralInUsd = async (
 
     const result = userAddresses.map((address: string) => {
       // For each position, calculate the USD value of the deposited collateral
-      const resByAddress = subgraphResponse.positions.filter((position) => position.user.id === address);
+      const resByAddress = subgraphResponse.positions.filter((position) => position.user.id.toLowerCase() === address.toLowerCase());
       if (!resByAddress.length) return {userAddress: address, totalCollateralValueInUsd: DECIMAL_ZERO};
       const totalCollateralValueInUsd = calculateTotalDepositedCollateralInUsd(resByAddress);
       return {userAddress: address, totalCollateralValueInUsd};

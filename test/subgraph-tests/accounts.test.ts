@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { Chain } from '@parifi/references';
-import { ParifiSdk } from '../../src';
+import { DECIMAL_ZERO, ParifiSdk } from '../../src';
 import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 import { RealizedPnlForMultipleUsers } from '../../src/subgraph/accounts';
 
@@ -57,8 +57,8 @@ describe('Order fetching logic from subgraph', () => {
 
     expect(result).toHaveLength(2);
     expect(result[1].userAddress).toEqual("0x")
-    expect(result[1].totalRealizedPnlPositions).toBeUndefined()
-    expect(result[1].totalRealizedPnlVaults).toBeUndefined()
+    expect(result[1].totalRealizedPnlPositions).toEqual(DECIMAL_ZERO)
+    expect(result[1].totalRealizedPnlVaults).toEqual(DECIMAL_ZERO)
 
     console.log('userAddress', result[0].userAddress)
     console.log('totalRealizedPnlPositions', result[0].totalRealizedPnlPositions);
