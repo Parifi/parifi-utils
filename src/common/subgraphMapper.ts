@@ -305,7 +305,9 @@ export const mapReferralDataToInterface = (response: any): Referral | undefined 
       sizeInUsd: response.sizeInUsd,
       timestamp: response.timestamp,
       txHash: response.txHash,
+      rewardToken: response.rewardToken ? mapSubgraphResponseToTokenInterface(response.rewardToken) : undefined,
       referralRewardsInUsd: response.referralRewardsInUsd,
+      referralRewardsInToken: response.referralRewardsInToken,
     };
   } catch (error) {
     console.log('Error while mapping data', error);

@@ -154,7 +154,9 @@ export const fetchPartnerRewards = (partnerAddress: string, count: number = 20, 
       sizeInUsd
       timestamp
       txHash
+      rewardToken { id symbol decimals }
       referralRewardsInUsd
+      referralRewardsInToken
     }
   }
 `;

@@ -553,4 +553,10 @@ export interface Referral {
 
   // " Referral rewards in USD "
   referralRewardsInUsd?: string;
+
+  // " ERC20 Token in which referral rewards are received "
+  rewardToken?: Token;
+
+  // " Referral reward in reward token "
+  referralRewardsInToken?: string;
 }
