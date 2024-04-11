@@ -33,7 +33,8 @@ import {
 } from './vaults';
 import { Pyth } from '../pyth';
 import Decimal from 'decimal.js';
-import { getRealizedPnlForUser } from './accounts';
+import { getPortfolioDataForUsers, getRealizedPnlForUser } from './accounts';
+import { UserPortfolioData } from '../interfaces/sdkTypes';
 
 export * from './common';
 export * from './markets';
@@ -94,6 +95,15 @@ export class Subgraph {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getRealizedPnlForUser(subgraphEndpoint, userAddress);
   }
+
+  /// Returns the current USD value of user portfolio data
+  public async getPortfolioDataForUsers(userAddresses: string[]): Promise<{
+    portfolioData: UserPortfolioData[];
+  }> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getPortfolioDataForUsers(subgraphEndpoint, userAddresses);
+  }
+
   ////////////////////////////////////////////////////////////////
   //////////////////////    ORDERS    ////////////////////////////
   ////////////////////////////////////////////////////////////////

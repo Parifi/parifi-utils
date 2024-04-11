@@ -42,6 +42,20 @@ describe('Order fetching logic from subgraph', () => {
     console.log('totalRealizedPnlVaults', totalRealizedPnlVaults);
 
     const unrealizedPNL = await parifiSdk.subgraph.getTotalUnrealizedPnlInUsd(userAddress);
-    console.log("unrealizedPNL", unrealizedPNL)
+    console.log('unrealizedPNL', unrealizedPNL);
+  });
+
+  it('should return Portfolio total for user addresses', async () => {
+    await parifiSdk.init();
+
+    // Use addresses with a non-zero positions/deposits
+    const userAddresses = [
+      '0xb0881c72cc2aea56cfcaa2e1197b6d87b8f6b11b',
+      '0x58d24685a6982CbEE9d43f3e915B4A6EA12bB3c6',
+      '0xe4fDB1Fa65b29533D6d3D9Aa74e07E6e87405B32',
+    ];
+
+    const { portfolioData } = await parifiSdk.subgraph.getPortfolioDataForUsers(userAddresses);
+    console.log("portfolioData", portfolioData)
   });
 });
