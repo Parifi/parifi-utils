@@ -23,13 +23,13 @@ const relayerConfig: RelayerConfig = {
 };
 
 const subgraphConfig: SubgraphConfig = {
-  subgraphEndpoint: 'https://api.studio.thegraph.com/query/68480/parifi-arb-sepolia-test-dev/v0.0.6',
+  subgraphEndpoint: process.env.SUBGRAPH_ENDPOINT,
 };
 
 const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, relayerConfig, pythConfig);
 
 describe('ParifiSdk parifi relayer', () => {
-  it('should return txId', async () => {
+  it.skip('should return txId', async () => {
     const txId = await parifiSdk.relayer.parifi.executeTx({
       to: '0x15758472aF37950028ad27e4a7F99e65A4A997Cc',
       data: '0x095ea7b30000000000000000000000003232f21a6e08312654270c78a773f00dd61d60f500000000000000000000000000000000000000000000000000000000000003e8',

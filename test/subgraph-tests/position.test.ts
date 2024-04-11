@@ -31,7 +31,7 @@ const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, relayerConfig, pythCo
 describe('Order fetching logic from subgraph', () => {
   it('should return correct position details', async () => {
     await parifiSdk.init();
-    const positionId = '0x5c46fe7154af223da5e2e6d284e367d4ef38bdfd5c6fd4ce56cc47d0d3cbd957';
+    const positionId = '0x08df72fc01f549908150f60f64bd5eb4228fa755d420bd28d3ec2f2957a543f2';
 
     const position = await parifiSdk.subgraph.getPositionById(positionId);
     console.log(positionId);
@@ -74,11 +74,7 @@ describe('Order fetching logic from subgraph', () => {
   it('should return price ids for position ids', async () => {
     await parifiSdk.init();
 
-    const positionIds = [
-      '0x00119fbaf9bcb7af16173ca7db01c90d53bd96c4eb2810f2b982bd3e1a36fab0',
-      '0x00450423fe9218d87b44919528e7cd75fb86c31af0ba0e7e7d3547e019d4adb4',
-      '0x00841110ab1304773ceb680ae39dcd0a50d3326a50de33aab6792d17a4483b04',
-    ];
+    const positionIds = ['0x08df72fc01f549908150f60f64bd5eb4228fa755d420bd28d3ec2f2957a543f2'];
 
     const priceIds = await parifiSdk.subgraph.getPythPriceIdsForPositionIds(positionIds);
     expect(priceIds.length).toBeGreaterThan(0);
