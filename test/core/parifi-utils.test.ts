@@ -25,7 +25,7 @@ const relayerConfig: RelayerConfig = {
 };
 
 const subgraphConfig: SubgraphConfig = {
-  subgraphEndpoint: "https://api.studio.thegraph.com/query/68480/parifi-arb-sepolia-test-dev/v0.0.6",
+  subgraphEndpoint:  process.env.SUBGRAPH_ENDPOINT,
 };
 
 const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, relayerConfig, pythConfig);
@@ -52,13 +52,16 @@ describe('Parifi Utils tests', () => {
 
     // Get orders that can be settled in the next 30 seconds
     const expiryTimestamp = Math.floor(Date.now() / 1000);
-    console.log("expiryTimestamp", expiryTimestamp)
+    console.log('expiryTimestamp', expiryTimestamp);
     const ordersCount = 10;
 
     const pendingOrders = await parifiSdk.subgraph.getAllPendingOrders(expiryTimestamp, ordersCount, 0);
     console.log(pendingOrders);
 
-    const orderIds: string[] = ["0x49d22dae0af965ae8069a28989dbedb645c021bab26750327d5314598674b3e6"];
+    // Return if orders are not available for settlement
+    if (pendingOrders.length == 0) return;
+
+    const orderIds: string[] = [];
     const priceIds: string[] = [];
 
     // Populate the price ids array to fetch price update data
@@ -69,10 +72,9 @@ describe('Parifi Utils tests', () => {
       }
     });
     const collateralPriceIds = parifiSdk.pyth.getPriceIdsForCollaterals();
-
     const priceUpdateData = await parifiSdk.pyth.getVaaPriceUpdateData(priceIds.concat(collateralPriceIds));
 
-    const provider = new ethers.JsonRpcProvider(process.env.RPC_PROVIDER)
+    const provider = new ethers.JsonRpcProvider(process.env.RPC_PROVIDER);
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY ?? '', provider);
     await parifiSdk.core.batchSettleOrdersUsingWallet(orderIds, priceUpdateData, wallet);
   });

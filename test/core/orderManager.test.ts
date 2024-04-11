@@ -10,7 +10,7 @@ const rpcConfig: RpcConfig = {
 };
 
 const subgraphConfig: SubgraphConfig = {
-  subgraphEndpoint: 'https://api.thegraph.com/subgraphs/name/parifi/parifi-arbitrum',
+  subgraphEndpoint: process.env.SUBGRAPH_ENDPOINT,
 };
 
 const pythConfig: PythConfig = {
