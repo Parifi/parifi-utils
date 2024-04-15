@@ -7,7 +7,7 @@ import {
   // normalizePythPriceForParifi
 } from '../../pyth/pyth';
 import { AxiosInstance } from 'axios';
-import { executeTxUsingGelato } from '../../gelato/gelato-function';
+import { executeTxUsingGelato } from '../../relayers/gelato/gelato-function';
 import { getAllPendingOrders, getPythPriceIdsForPositionIds } from '../../subgraph';
 import { BatchExecute } from '../../interfaces/subgraphTypes';
 import {
