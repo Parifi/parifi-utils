@@ -5,7 +5,7 @@ import { ParifiSdk } from '../../src';
 import { PythConfig, RelayerConfig, RelayerI, RpcConfig } from '../../src/interfaces/classConfigs';
 
 const rpcConfig: RpcConfig = {
-  chainId: Chain.ARBITRUM_SEPOLIA,
+  chainId: Chain.ARBITRUM_MAINNET,
 };
 
 const pythConfig: PythConfig = {

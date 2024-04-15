@@ -3,7 +3,7 @@ import { ParifiSdk } from '../../src';
 import { RelayerConfig, RelayerI, RpcConfig } from '../../src/interfaces/classConfigs';
 
 const rpcConfig: RpcConfig = {
-  chainId: Chain.ARBITRUM_SEPOLIA,
+  chainId: Chain.ARBITRUM_MAINNET,
 };
 const gelatoConfig: RelayerI = {
   apiKey: process.env.GELATO_KEY || '',

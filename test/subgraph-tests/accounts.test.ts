@@ -4,7 +4,7 @@ import { ParifiSdk } from '../../src';
 import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 
 const rpcConfig: RpcConfig = {
-  chainId: Chain.ARBITRUM_SEPOLIA,
+  chainId: Chain.ARBITRUM_MAINNET,
 };
 
 const subgraphConfig: SubgraphConfig = {
@@ -56,6 +56,6 @@ describe('Order fetching logic from subgraph', () => {
     ];
 
     const { portfolioData } = await parifiSdk.subgraph.getPortfolioDataForUsers(userAddresses);
-    console.log("portfolioData", portfolioData)
+    console.log('portfolioData', portfolioData);
   });
 });

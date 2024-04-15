@@ -4,7 +4,7 @@ import { Chain } from '@parifi/references';
 import { OrderStatus, OrderType, ParifiSdk } from '../../src';
 import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 const rpcConfig: RpcConfig = {
-  chainId: Chain.ARBITRUM_SEPOLIA,
+  chainId: Chain.ARBITRUM_MAINNET,
 };
 
 const subgraphConfig: SubgraphConfig = {

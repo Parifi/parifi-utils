@@ -3,7 +3,7 @@ import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
 import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
 
-const chain = Chain.ARBITRUM_SEPOLIA;
+const chain = Chain.ARBITRUM_MAINNET;
 const rpcConfig: RpcConfig = {
   chainId: chain,
 };

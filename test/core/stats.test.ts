@@ -6,7 +6,7 @@ import { RelayerConfig, RelayerI, RpcConfig } from '../../src/interfaces/classCo
 import { getMarketBorrowingRatePerHour, getMarketOpenInterestInUsd } from '../../src/core/pages/statsPage';
 
 const rpcConfig: RpcConfig = {
-  chainId: Chain.ARBITRUM_SEPOLIA,
+  chainId: Chain.ARBITRUM_MAINNET,
 };
 
 const gelatoConfig: RelayerI = {
