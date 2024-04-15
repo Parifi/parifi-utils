@@ -1,29 +1,13 @@
-import 'dotenv/config';
-import { Chain } from '@parifi/references';
-import { ParifiSdk } from '../../src';
 import Decimal from 'decimal.js';
-import { RelayerConfig, RelayerI, RpcConfig } from '../../src/interfaces/classConfigs';
 import { getMarketBorrowingRatePerHour, getMarketOpenInterestInUsd } from '../../src/core/pages/statsPage';
-
-const rpcConfig: RpcConfig = {
-  chainId: Chain.ARBITRUM_MAINNET,
-};
-
-const gelatoConfig: RelayerI = {
-  apiKey: process.env.GELATO_KEY || '',
-};
-
-const relayerConfig: RelayerConfig = {
-  gelatoConfig: gelatoConfig,
-};
-
-const parifiSdk = new ParifiSdk(rpcConfig, {}, relayerConfig, {});
+import { getParifiSdkInstanceForTesting } from '..';
+import { TEST_MARKET_ID1 } from '../common/constants';
 
 describe('Stats tests', () => {
   it('should return correct borrowing fees for market', async () => {
-    await parifiSdk.init();
-    const marketId = '0x122d17f9d86438d3f9d12c1366a56e45c03ae191f705a5d850617739f76605d5';
-    const market = await parifiSdk.subgraph.getMarketById(marketId);
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+
+    const market = await parifiSdk.subgraph.getMarketById(TEST_MARKET_ID1);
 
     const totalLongs = new Decimal(market.totalLongs ?? '0');
     const totalShorts = new Decimal(market.totalShorts ?? '0');
@@ -39,10 +23,9 @@ describe('Stats tests', () => {
   });
 
   it('should return correct Open Interest market', async () => {
-    await parifiSdk.init();
-    const marketId = '0x122d17f9d86438d3f9d12c1366a56e45c03ae191f705a5d850617739f76605d5';
+    const parifiSdk = await getParifiSdkInstanceForTesting();
 
-    const market = await parifiSdk.subgraph.getMarketById(marketId);
+    const market = await parifiSdk.subgraph.getMarketById(TEST_MARKET_ID1);
     const normalizedMarketPrice = new Decimal(market.pyth?.price ?? '1800000000'); // Price fetched from the subgraph for testing
 
     const totalOIInUsd = new Decimal(market.totalOI ?? '0');
