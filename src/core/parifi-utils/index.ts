@@ -8,7 +8,7 @@ import {
 } from '../../pyth/pyth';
 import { AxiosInstance } from 'axios';
 import { executeTxUsingGelato } from '../../relayers/gelato/gelato-function';
-import { getAllPendingOrders, getPythPriceIdsForPositionIds } from '../../subgraph';
+import { getAllPendingOrders, getPythPriceIdsForOrderIds, getPythPriceIdsForPositionIds } from '../../subgraph';
 import { BatchExecute } from '../../interfaces/subgraphTypes';
 import {
   DEFAULT_BATCH_COUNT,
@@ -16,6 +16,7 @@ import {
   GAS_LIMIT_SETTLEMENT,
   getPriceIdsForCollaterals,
 } from '../../common';
+import { executeTxUsingPimlico } from '../../relayers/pimlico/utils';
 // import { checkIfOrderCanBeSettled } from '../order-manager';
 
 // Returns an Order Manager contract instance without signer
@@ -247,4 +248,78 @@ export const batchSettleOrdersUsingWallet = async (
     }
   }
   return { txHash: '0x' };
+};
+
+// Returns encoded tx data to batch settle multiple orders
+export const getBatchSettleTxData = async (
+  chainId: Chain,
+  subgraphEndpoint: string,
+  pythClient: AxiosInstance,
+  orderIds: string[],
+): Promise<{ txData: string }> => {
+  if (orderIds.length == 0) {
+    console.log('Orders not available for settlement');
+    return { txData: '0x' };
+  }
+
+  const priceIds = await getPythPriceIdsForOrderIds(subgraphEndpoint, orderIds);
+
+  // Get Price IDs of collateral tokens
+  const priceIdsForCollaterals = getPriceIdsForCollaterals(true);
+
+  // Get Price update data and latest prices from Pyth
+  const priceUpdateData = await getVaaPriceUpdateData(priceIds.concat(priceIdsForCollaterals), pythClient);
+
+  // Populate batched orders for settlement for orders that can be settled
+  const batchedOrders: BatchExecute[] = [];
+
+  orderIds.forEach((orderId) => {
+    batchedOrders.push({
+      id: orderId,
+      priceUpdateData: priceUpdateData,
+    });
+  });
+
+  if (batchedOrders.length != 0) {
+    const parifiUtils = getParifiUtilsInstance(chainId);
+    const { data: txData } = await parifiUtils.batchSettleOrders.populateTransaction(batchedOrders);
+    return { txData };
+  }
+  return { txData: '0x' };
+};
+
+// Returns encoded tx data to batch liquidate multiple positions
+export const getBatchLiquidateTxData = async (
+  chainId: Chain,
+  subgraphEndpoint: string,
+  pythClient: AxiosInstance,
+  positionIds: string[],
+): Promise<{ txData: string }> => {
+  if (positionIds.length == 0) return { txData: '0x' };
+
+  // Get unique price ids for all the positions
+  const priceIds = await getPythPriceIdsForPositionIds(subgraphEndpoint, positionIds);
+
+  // Get Price IDs of collateral tokens
+  const priceIdsForCollaterals = getPriceIdsForCollaterals(true);
+
+  // Get Price update data from Pyth
+  const priceUpdateData = await getVaaPriceUpdateData(priceIds.concat(priceIdsForCollaterals), pythClient);
+
+  // Populate batched positions for positions that can be liquidated
+  const batchedPositions: BatchExecute[] = [];
+  positionIds.forEach((positionId) => {
+    batchedPositions.push({
+      id: positionId,
+      priceUpdateData: priceUpdateData,
+    });
+  });
+
+  // Encode transaction data
+  if (batchedPositions.length != 0) {
+    const parifiUtils = getParifiUtilsInstance(chainId);
+    const { data: txData } = await parifiUtils.batchLiquidatePositions.populateTransaction(batchedPositions);
+    return { txData };
+  }
+  return { txData: '0x' };
 };

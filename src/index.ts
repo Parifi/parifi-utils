@@ -36,7 +36,7 @@ export class ParifiSdk {
     this.relayer = {
       gelato: new Gelato(relayerConfig['gelatoConfig'], rpcConfig),
       parifi: new ParifiRelayer(relayerConfig['parifiRealyerConfig'], rpcConfig.chainId),
-      pimlico: new Pimlico(relayerConfig['pimlicoConfig'], rpcConfig),
+      pimlico: new Pimlico(relayerConfig['pimlicoConfig'], rpcConfig, subgraphConfig),
     };
   }
 
