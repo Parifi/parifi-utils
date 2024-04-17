@@ -4,7 +4,7 @@ import { RpcConfig } from '../../src/interfaces/classConfigs';
 import { gql } from 'graphql-request';
 
 const rpcConfig: RpcConfig = {
-  chainId: Chain.ARBITRUM_SEPOLIA,
+  chainId: Chain.ARBITRUM_MAINNET,
 };
 
 const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {});

@@ -17,7 +17,7 @@ import { AxiosInstance } from 'axios';
 import { getPythPriceIdsForOrderIds, getPythPriceIdsForPositionIds } from '../../subgraph';
 import { getVaaPriceUpdateData } from '../../pyth/pyth';
 import { getPriceIdsForCollaterals } from '../../common';
-import { executeTxUsingGelato } from '../../gelato/gelato-function';
+import { executeTxUsingGelato } from '../../relayers/gelato/gelato-function';
 
 // Returns an Order Manager contract instance without signer
 export const getOrderManagerInstance = (chain: Chain): Contract => {

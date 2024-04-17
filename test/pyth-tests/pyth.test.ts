@@ -2,10 +2,12 @@ import 'dotenv/config';
 import { Chain } from '@parifi/references';
 // import { getPythClient, getVaaPriceUpdateData } from '../../src/pyth';
 import { ParifiSdk } from '../../src';
-import { PythConfig, RelayerConfig, RelayerI, RpcConfig } from '../../src/interfaces/classConfigs';
+import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
+import { getParifiSdkInstanceForTesting } from '..';
+import { TEST_ORDER_ID1, TEST_ORDER_ID2, TEST_ORDER_ID3, TEST_PRICE_ID_1 } from '../common/constants';
 
 const rpcConfig: RpcConfig = {
-  chainId: Chain.ARBITRUM_SEPOLIA,
+  chainId: Chain.ARBITRUM_MAINNET,
 };
 
 const pythConfig: PythConfig = {
@@ -23,39 +25,31 @@ const relayerConfig: RelayerConfig = {
   gelatoConfig: gelatoConfig,
 };
 
-const parifiSdk = new ParifiSdk(rpcConfig, {}, relayerConfig, pythConfig);
-
 describe('Pyth tests', () => {
   it('should return price update data from public endpoint', async () => {
-    await parifiSdk.init();
-    const ethPriceIdStable = '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace';
-
     // SDK is initialized without any fields for Pyth config, so public endpoints are used
     const sdkWithPublicPyth = new ParifiSdk(rpcConfig, {}, relayerConfig, pythConfig);
     await sdkWithPublicPyth.init();
 
-    const priceUpdateData = await sdkWithPublicPyth.pyth.getVaaPriceUpdateData([ethPriceIdStable]);
+    const priceUpdateData = await sdkWithPublicPyth.pyth.getVaaPriceUpdateData([TEST_PRICE_ID_1]);
     console.log(priceUpdateData);
     expect(priceUpdateData).not.toBeNull();
   });
 
   it('should return price update data from dedicated endpoint with authentication', async () => {
-    await parifiSdk.init();
-    const ethPriceIdStable = '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace';
+    const parifiSdk = await getParifiSdkInstanceForTesting();
 
     // Parifi SDK uses authentication using the above Pyth config
-    const priceUpdateData = await parifiSdk.pyth.getVaaPriceUpdateData([ethPriceIdStable]);
+    const priceUpdateData = await parifiSdk.pyth.getVaaPriceUpdateData([TEST_PRICE_ID_1]);
 
     console.log(priceUpdateData);
     expect(priceUpdateData).not.toBeNull();
   });
 
   it('should return price ids from subgraph', async () => {
-    await parifiSdk.init();
-    const orderIds = [
-      '0xb160ae39e7a45b21fb8f247fb11f551f996ed90d3eb9a6263e49b98827e1fc4b',
-      '0xbd8bdf1ed20ac4a074c0c6ccc49e1716b80cb734ed75b53668c15956c2bba494',
-    ];
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+
+    const orderIds = [TEST_ORDER_ID1, TEST_ORDER_ID2, TEST_ORDER_ID3];
 
     const priceIds: string[] = await parifiSdk.subgraph.getPythPriceIdsForOrderIds(orderIds);
     console.log('priceIds from fn: ', priceIds);

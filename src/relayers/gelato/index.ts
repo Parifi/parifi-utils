@@ -1,5 +1,5 @@
 import { TransactionStatusResponse } from '@gelatonetwork/relay-sdk';
-import { RelayerConfig, RpcConfig } from '../interfaces';
+import { RelayerConfig, RpcConfig } from '../../interfaces';
 import { checkGelatoTaskStatus, executeTxUsingGelato } from './gelato-function';
 
 export class Gelato {
