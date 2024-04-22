@@ -11,6 +11,9 @@ import {
 import { Contract, Signer } from 'ethers';
 import {
   calculatePositionLeverage,
+  canBeSettled,
+  canBeSettledPriceId,
+  checkIfOrderCanBeSettledId,
   getNetProfitOrLossInCollateral,
   getOrderManagerInstance,
   getProfitOrLossInUsd,
@@ -128,8 +131,56 @@ export class Core {
     return getNetProfitOrLossInCollateral(position, market, normalizedMarketPrice, normalizedCollateralPrice);
   };
 
+  canBeSettled = (
+    isLimitOrder: boolean,
+    triggerAbove: boolean,
+    isLong: boolean,
+    maxSlippage: Decimal,
+    expectedPrice: Decimal,
+    normalizedMarketPrice: Decimal,
+  ): boolean => {
+    return canBeSettled(isLimitOrder, triggerAbove, isLong, maxSlippage, expectedPrice, normalizedMarketPrice);
+  };
+
+  canBeSettledPriceId = async (
+    isLimitOrder: boolean,
+    triggerAbove: boolean,
+    isLong: boolean,
+    maxSlippage: Decimal,
+    expectedPrice: Decimal,
+    orderPriceId: string,
+  ): Promise<boolean> => {
+    const pythClient = await getPythClient(
+      this.pythConfig.pythEndpoint,
+      this.pythConfig.username,
+      this.pythConfig.password,
+      this.pythConfig.isStable,
+    );
+
+    return await canBeSettledPriceId(
+      isLimitOrder,
+      triggerAbove,
+      isLong,
+      maxSlippage,
+      expectedPrice,
+      orderPriceId,
+      pythClient,
+    );
+  };
+
   checkIfOrderCanBeSettled = (order: Order, normalizedMarketPrice: Decimal): boolean => {
     return checkIfOrderCanBeSettled(order, normalizedMarketPrice);
+  };
+
+  checkIfOrderCanBeSettledId = async (orderId: string): Promise<boolean> => {
+    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+    const pythClient = await getPythClient(
+      this.pythConfig.pythEndpoint,
+      this.pythConfig.username,
+      this.pythConfig.password,
+      this.pythConfig.isStable,
+    );
+    return await checkIfOrderCanBeSettledId(subgraphEndpoint, orderId, pythClient);
   };
 
   liquidatePositionUsingGelato = async (positionId: string): Promise<{ gelatoTaskId: string }> => {

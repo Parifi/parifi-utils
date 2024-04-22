@@ -1,11 +1,7 @@
 import { Contract, Signer, ethers } from 'ethers';
 import { Chain } from '@parifi/references';
 import { contracts as parifiContracts } from '@parifi/references';
-import {
-  getVaaPriceUpdateData,
-  // getLatestPricesFromPyth,
-  // normalizePythPriceForParifi
-} from '../../pyth/pyth';
+import { getVaaPriceUpdateData, getLatestPricesFromPyth, normalizePythPriceForParifi } from '../../pyth/pyth';
 import { AxiosInstance } from 'axios';
 import { executeTxUsingGelato } from '../../relayers/gelato/gelato-function';
 import { getAllPendingOrders, getPythPriceIdsForOrderIds, getPythPriceIdsForPositionIds } from '../../subgraph';
@@ -16,8 +12,7 @@ import {
   GAS_LIMIT_SETTLEMENT,
   getPriceIdsForCollaterals,
 } from '../../common';
-import { executeTxUsingPimlico } from '../../relayers/pimlico/utils';
-// import { checkIfOrderCanBeSettled } from '../order-manager';
+import { checkIfOrderCanBeSettled } from '../order-manager';
 
 // Returns an Order Manager contract instance without signer
 export const getParifiUtilsInstance = (chain: Chain): Contract => {
@@ -56,7 +51,7 @@ export const batchSettlePendingOrdersUsingGelato = async (
 
   // Get Price update data and latest prices from Pyth
   const priceUpdateData = await getVaaPriceUpdateData(priceIds.concat(priceIdsForCollaterals), pythClient);
-  // const pythLatestPrices = await getLatestPricesFromPyth(priceIds, pythClient);
+  const pythLatestPrices = await getLatestPricesFromPyth(priceIds, pythClient);
 
   // Populate batched orders for settlement for orders that can be settled
   const batchedOrders: BatchExecute[] = [];
@@ -65,25 +60,25 @@ export const batchSettlePendingOrdersUsingGelato = async (
     if (order.id) {
       // Pyth returns price id without '0x' at the start, hence the price id from order
       // needs to be formatted
-      // const orderPriceId = order.market?.pyth?.id ?? '0x';
-      // const formattedPriceId = orderPriceId.startsWith('0x') ? orderPriceId.substring(2) : orderPriceId;
+      const orderPriceId = order.market?.pyth?.id ?? '0x';
+      const formattedPriceId = orderPriceId.startsWith('0x') ? orderPriceId.substring(2) : orderPriceId;
 
-      // const assetPrice = pythLatestPrices.find((pythPrice) => pythPrice.id === formattedPriceId);
-      // const normalizedMarketPrice = normalizePythPriceForParifi(
-      //   parseInt(assetPrice?.price.price ?? '0'),
-      //   assetPrice?.price.expo ?? 0,
-      // );
+      const assetPrice = pythLatestPrices.find((pythPrice) => pythPrice.id === formattedPriceId);
+      const normalizedMarketPrice = normalizePythPriceForParifi(
+        parseInt(assetPrice?.price.price ?? '0'),
+        assetPrice?.price.expo ?? 0,
+      );
 
-      // if (checkIfOrderCanBeSettled(order, normalizedMarketPrice)) {
-      batchedOrders.push({
-        id: order.id,
-        priceUpdateData: priceUpdateData,
-      });
-      // We need these console logs for feedback to Tenderly actions and other scripts
-      // console.log('Order ID available for settlement:', order.id);
-      // } else {
-      //   console.log('Order ID not available for settlement because of price mismatch:', order.id);
-      // }
+      if (checkIfOrderCanBeSettled(order, normalizedMarketPrice)) {
+        batchedOrders.push({
+          id: order.id,
+          priceUpdateData: priceUpdateData,
+        });
+        // We need these console logs for feedback to Tenderly actions and other scripts
+        // console.log('Order ID available for settlement:', order.id);
+      } else {
+        console.log('Order ID not available for settlement because of price mismatch:', order.id);
+      }
     }
   });
 
