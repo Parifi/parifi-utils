@@ -14,8 +14,8 @@ import { Chain } from '@parifi/references';
 import { contracts as parifiContracts } from '@parifi/references';
 import { Contract, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
-import { getPythPriceIdsForOrderIds, getPythPriceIdsForPositionIds } from '../../subgraph';
-import { getVaaPriceUpdateData } from '../../pyth/pyth';
+import { getOrderById, getPythPriceIdsForOrderIds, getPythPriceIdsForPositionIds } from '../../subgraph';
+import { getLatestPricesFromPyth, getVaaPriceUpdateData, normalizePythPriceForParifi } from '../../pyth/pyth';
 import { getPriceIdsForCollaterals } from '../../common';
 import { executeTxUsingGelato } from '../../relayers/gelato/gelato-function';
 
@@ -275,22 +275,14 @@ export const getNetProfitOrLossInCollateral = (
 
 // Returns true if the price of market is within the range configured in order struct
 // The function can be used to check if a pending order can be settled or not
-export const checkIfOrderCanBeSettled = (order: Order, normalizedMarketPrice: Decimal): boolean => {
-  const isLimitOrder = order.isLimitOrder;
-  const triggerAbove = order.triggerAbove;
-  const isLong = order.isLong;
-  // Return false if any of the fields is undefined
-  if (isLimitOrder === undefined || triggerAbove === undefined || isLong === undefined) {
-    return false;
-  }
-
-  // Return false if any of the fields is undefined
-  if (order.expectedPrice === undefined || order.maxSlippage === undefined) {
-    return false;
-  }
-  const expectedPrice = new Decimal(order.expectedPrice);
-  const maxSlippage = new Decimal(order.maxSlippage);
-
+export const canBeSettled = (
+  isLimitOrder: boolean,
+  triggerAbove: boolean,
+  isLong: boolean,
+  maxSlippage: Decimal,
+  expectedPrice: Decimal,
+  normalizedMarketPrice: Decimal,
+): boolean => {
   if (isLimitOrder) {
     // If its a limit order, check if the limit price is reached, either above or below
     // depending on the triggerAbove flag
@@ -313,6 +305,80 @@ export const checkIfOrderCanBeSettled = (order: Order, normalizedMarketPrice: De
     }
   }
   return true;
+};
+
+// Returns true if the price of market is within the range configured in order struct
+// The function can be used to check if a pending order can be settled or not
+export const canBeSettledPriceId = async (
+  isLimitOrder: boolean,
+  triggerAbove: boolean,
+  isLong: boolean,
+  maxSlippage: Decimal,
+  expectedPrice: Decimal,
+  orderPriceId: string,
+  pythClient: AxiosInstance,
+): Promise<boolean> => {
+  // Pyth returns price id without '0x' at the start, hence the price id from order
+  // needs to be formatted
+  const formattedPriceId = orderPriceId.startsWith('0x') ? orderPriceId.substring(2) : orderPriceId;
+
+  const pythLatestPrices = await getLatestPricesFromPyth([orderPriceId], pythClient);
+
+  const assetPrice = pythLatestPrices.find((pythPrice) => pythPrice.id === formattedPriceId);
+  const normalizedMarketPrice = normalizePythPriceForParifi(
+    parseInt(assetPrice?.price.price ?? '0'),
+    assetPrice?.price.expo ?? 0,
+  );
+
+  return canBeSettled(isLimitOrder, triggerAbove, isLong, maxSlippage, expectedPrice, normalizedMarketPrice);
+};
+
+// Returns true if the price of market is within the range configured in order struct
+// The function can be used to check if a pending order can be settled or not
+export const checkIfOrderCanBeSettled = (order: Order, normalizedMarketPrice: Decimal): boolean => {
+  // Return false if any of the fields is undefined
+  if (order.isLimitOrder === undefined || order.triggerAbove === undefined || order.isLong === undefined) {
+    return false;
+  }
+
+  // Return false if any of the fields is undefined
+  if (order.expectedPrice === undefined || order.maxSlippage === undefined) {
+    return false;
+  }
+
+  return canBeSettled(
+    order.isLimitOrder,
+    order.triggerAbove,
+    order.isLong,
+    new Decimal(order.maxSlippage),
+    new Decimal(order.expectedPrice),
+    normalizedMarketPrice,
+  );
+};
+
+// Returns true if the price of market is within the range configured in order struct
+// The function can be used to check if a pending order can be settled or not
+export const checkIfOrderCanBeSettledId = async (
+  subgraphEndpoint: string,
+  orderId: string,
+  pythClient: AxiosInstance,
+): Promise<boolean> => {
+  const order = await getOrderById(subgraphEndpoint, orderId);
+
+  // Pyth returns price id without '0x' at the start, hence the price id from order
+  // needs to be formatted
+  const orderPriceId = order.market?.pyth?.id ?? '0x';
+  const formattedPriceId = orderPriceId.startsWith('0x') ? orderPriceId.substring(2) : orderPriceId;
+
+  const pythLatestPrices = await getLatestPricesFromPyth([orderPriceId], pythClient);
+
+  const assetPrice = pythLatestPrices.find((pythPrice) => pythPrice.id === formattedPriceId);
+  const normalizedMarketPrice = normalizePythPriceForParifi(
+    parseInt(assetPrice?.price.price ?? '0'),
+    assetPrice?.price.expo ?? 0,
+  );
+
+  return checkIfOrderCanBeSettled(order, normalizedMarketPrice);
 };
 
 // Liquidates a position using Gelato as the relayer
