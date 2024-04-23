@@ -12,8 +12,13 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10, 
     orderDirection: desc
   ) {
     id
-		market { 
-    	id
+    market {
+      id
+      pyth {
+        id
+        price
+        lastUpdatedTimestamp
+      }
     }
     user { id }
     deadline
@@ -93,6 +98,11 @@ export const fetchOrdersByIdQuery = (orderId: string) =>
     }
     market {
       id
+      pyth {
+        id
+        price
+        lastUpdatedTimestamp
+      }
     }
     orderType
     isLong
