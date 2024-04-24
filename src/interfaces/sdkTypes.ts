@@ -8,3 +8,8 @@ export type UserPortfolioData = {
   depositedLiquidity: Decimal;
   depositedCollateral: Decimal;
 };
+
+export interface NormalizedPrice {
+  priceId: string;
+  normalizedPrice: Decimal;
+}

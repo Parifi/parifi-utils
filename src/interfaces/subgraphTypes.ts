@@ -527,10 +527,6 @@ export interface VaultPosition {
   id: string;
 }
 
-export interface VaultPositionsResponse {
-  vaultPositions: VaultPosition[];
-}
-
 // Subgraph interface for partner referrals
 export interface Referral {
   // " Partner (Referrer) address + Referred address + log Index "
