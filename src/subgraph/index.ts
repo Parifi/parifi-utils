@@ -23,14 +23,7 @@ import { Market, Order, Position, Referral, Vault } from '../interfaces/subgraph
 import { Chain } from '@parifi/references';
 import request, { GraphQLClient } from 'graphql-request';
 import { getPublicSubgraphEndpoint } from './common';
-import {
-  getAllVaults,
-  getTotalPoolsValue,
-  getUserTotalPoolsValue,
-  getUserVaultDataByChain,
-  getVaultApr,
-  getVaultDataByChain,
-} from './vaults';
+import { getAllVaults, getTotalPoolsValue, getUserTotalPoolsValue, getUserVaultData, getVaultApr } from './vaults';
 import { Pyth } from '../pyth';
 import Decimal from 'decimal.js';
 import { getPortfolioDataForUsers, getRealizedPnlForUser } from './accounts';
@@ -218,26 +211,21 @@ export class Subgraph {
     return getAllVaults(subgraphEndpoint);
   }
 
-  public async getVaultDataByChain(): Promise<Vault[]> {
+  public async getUserVaultData(userAddress: string): Promise<Vault[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return getVaultDataByChain(this.rpcConfig.chainId, subgraphEndpoint);
-  }
-
-  public async getUserVaultDataByChain(userAddress: string): Promise<Vault[]> {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return getUserVaultDataByChain(this.rpcConfig.chainId, subgraphEndpoint, userAddress);
+    return getUserVaultData(subgraphEndpoint, userAddress);
   }
 
   public async getTotalPoolsValue() {
     await this.init();
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getTotalPoolsValue(this.rpcConfig.chainId, subgraphEndpoint, this.pyth.pythClient);
+    return await getTotalPoolsValue(subgraphEndpoint, this.pyth.pythClient);
   }
 
   public async getUserTotalPoolsValue(userAddress: string) {
     await this.init();
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getUserTotalPoolsValue(userAddress, this.rpcConfig.chainId, subgraphEndpoint, this.pyth.pythClient);
+    return await getUserTotalPoolsValue(subgraphEndpoint, userAddress, this.pyth.pythClient);
   }
 
   public async getVaultApr(vaultId: string): Promise<{ apr7Days: Decimal; apr30Days: Decimal; aprAllTime: Decimal }> {

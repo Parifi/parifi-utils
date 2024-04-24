@@ -6,33 +6,29 @@ describe('Vault fetching logic from subgraph', () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
 
     const vaults = await parifiSdk.subgraph.getAllVaults();
-    console.log('vaults', vaults);
-
     expect(vaults.length).not.toBe(0);
   });
 
   it('should return correct Total Pool Value', async () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
-    const data = await parifiSdk.subgraph.getTotalPoolsValue();
-    console.log(data);
-
-    expect(data.totalPoolValue).not.toBe(0);
+    const totalPoolsValue = await parifiSdk.subgraph.getTotalPoolsValue();
+    console.log(totalPoolsValue);
+    expect(totalPoolsValue).not.toBe(0);
   });
 
   it('should return correct user vault data', async () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
-    const data = await parifiSdk.subgraph.getUserVaultDataByChain(TEST_USER_ID1);
-    console.log(data);
+    const data = await parifiSdk.subgraph.getUserVaultData(TEST_USER_ID1);
+    console.log('User vault data', data);
 
     expect(data.length).not.toBe(0);
   });
 
   it('should return correct user total pools vaule', async () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
-    const data = await parifiSdk.subgraph.getUserTotalPoolsValue(TEST_USER_ID1);
-    console.log(data);
-
-    expect(data.myTotalPoolValue).not.toBe(0);
+    const userTotalPoolsValue = await parifiSdk.subgraph.getUserTotalPoolsValue(TEST_USER_ID1);
+    console.log(userTotalPoolsValue);
+    expect(userTotalPoolsValue).not.toBe(0);
   });
 
   it('should return correct APR details', async () => {
