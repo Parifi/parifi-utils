@@ -1,14 +1,14 @@
+import Decimal from 'decimal.js';
+import { AxiosInstance } from 'axios';
 import { request } from 'graphql-request';
-import { Vault, VaultPositionsResponse } from '../../interfaces';
-import { fetchAllVaultsQuery, fetchUserAllVaultsQuery, fetchVaultAprDetails } from './subgraphQueries';
+
+import { Vault, VaultPosition } from '../../interfaces';
+import { fetchAllVaultsQuery, fetchUserVaultPositionsQuery, fetchVaultAprDetails } from './subgraphQueries';
 import { mapVaultsArrayToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
-import { Chain as SupportedChain, availableVaultsPerChain } from '@parifi/references';
 
-import { DECIMAL_ZERO, PRICE_FEED_DECIMALS, getNormalizedPriceByIdFromPriceIdArray } from '../../common';
-import Decimal from 'decimal.js';
-import { getLatestPricesFromPyth, normalizePythPriceForParifi } from '../../pyth/pyth';
-import { AxiosInstance } from 'axios';
+import { DECIMAL_ZERO, PRICE_FEED_PRECISION } from '../../common';
+import { getLatestPricesNormalized } from '../../pyth/pyth';
 
 // Get all vaults from subgraph
 export const getAllVaults = async (subgraphEndpoint: string): Promise<Vault[]> => {
@@ -24,112 +24,111 @@ export const getAllVaults = async (subgraphEndpoint: string): Promise<Vault[]> =
   }
 };
 
-export const getVaultDataByChain = async (chainId: SupportedChain, subgraphEndpoint: string) => {
-  const vaults = await getAllVaults(subgraphEndpoint);
+export const getUserVaultData = async (subgraphEndpoint: string, user: string): Promise<VaultPosition[]> => {
+  try {
+    interface VaultPositionsResponse {
+      vaultPositions: VaultPosition[];
+    }
 
-  return vaults.map((vault) => {
-    const vaultAddress = availableVaultsPerChain[chainId].find(
-      (vaultA) => vaultA.toLowerCase() === vault?.id?.toLowerCase(),
-    );
-    return {
-      ...vault,
-      id: vaultAddress ?? vault.id,
-    };
-  });
-};
-
-export const getUserVaultDataByChain = async (chainId: SupportedChain, subgraphEndpoint: string, user: string) => {
-  let subgraphResponse: any = await request(subgraphEndpoint, fetchUserAllVaultsQuery(user));
-  const vaults: VaultPositionsResponse = subgraphResponse;
-  if (vaults.vaultPositions.length === 0) {
-    return [];
+    let subgraphResponse: any = await request(subgraphEndpoint, fetchUserVaultPositionsQuery(user));
+    const vaults: VaultPositionsResponse = subgraphResponse;
+    if (vaults.vaultPositions.length === 0) {
+      return [];
+    }
+    return vaults.vaultPositions;
+  } catch (error) {
+    throw error;
   }
-  return vaults.vaultPositions.map((vault) => {
-    const vaultAddress = availableVaultsPerChain[chainId].find(
-      (vaultA) => vaultA.toLowerCase() === vault.vault?.id?.toLowerCase(),
-    );
-    return {
-      ...vault,
-      vault: { ...vault.vault, id: vaultAddress ?? vault.vault.id },
-    };
-  });
 };
 
 export const getUserTotalPoolsValue = async (
-  userAddress: string,
-  chainId: SupportedChain,
   subgraphEndpoint: string,
+  userAddress: string,
   pythClient: AxiosInstance,
-) => {
-  const vaults = await getUserVaultDataByChain(chainId, subgraphEndpoint, userAddress);
-  if (vaults.length === 0) {
-    return { data: 0, myTotalPoolValue: 0 };
+): Promise<{ userTotalPoolsValue: Decimal }> => {
+  try {
+    // Interface to map fetched data
+    interface VaultPositionsResponse {
+      vaultPositions: {
+        user: {
+          id: string;
+        };
+        vault: {
+          id: string;
+          assetsPerShare: string;
+          sharesPerAsset: string;
+          depositToken: {
+            decimals: string;
+            pyth: {
+              id: string;
+              price: string;
+            };
+          };
+        };
+        sharesBalance: string;
+      }[];
+    }
+
+    /// Dictionary to store the final result of data
+    let userTotalPoolsValue: Decimal = DECIMAL_ZERO;
+
+    const query = fetchUserVaultPositionsQuery(userAddress);
+    const subgraphResponse = await request(subgraphEndpoint, query);
+    const mappedRes: VaultPositionsResponse = subgraphResponse as unknown as VaultPositionsResponse;
+
+    const priceIds = mappedRes.vaultPositions.map((v) => v.vault.depositToken?.pyth?.id);
+    const normalizedPythPrices = await getLatestPricesNormalized(priceIds as string[], pythClient);
+
+    mappedRes.vaultPositions.map(async (vaultPosition) => {
+      // Convert deposited liquidity amount to USD
+      const sharesBalance = new Decimal(vaultPosition.sharesBalance);
+      const tokenDecimalsFactor = new Decimal(10).pow(vaultPosition.vault.depositToken.decimals);
+      const pythPrice = new Decimal(vaultPosition.vault.depositToken.pyth.price);
+
+      const normalizedPrice = normalizedPythPrices.find(
+        (prices) => prices.priceId === vaultPosition.vault.depositToken?.pyth?.id,
+      )?.normalizedPrice;
+
+      const amountUsd: Decimal = sharesBalance
+        .mul(new Decimal(vaultPosition.vault.assetsPerShare))
+        .mul(new Decimal(normalizedPrice ?? '0'))
+        .div(PRICE_FEED_PRECISION)
+        .div(tokenDecimalsFactor)
+        .div(tokenDecimalsFactor);
+
+      userTotalPoolsValue = userTotalPoolsValue.add(amountUsd);
+    });
+
+    return { userTotalPoolsValue };
+  } catch (error) {
+    throw error;
   }
-  const priceIds = vaults.map((v) => v.vault.depositToken?.pyth?.id);
-  const res = await getLatestPricesFromPyth(priceIds as string[], pythClient);
-  const priceInfos = res.map((pythPrice) => {
-    const normalizedPrice = normalizePythPriceForParifi(Number(pythPrice.price.price), pythPrice.price.expo);
-    const collateralPrice = new Decimal(normalizedPrice).div(10 ** PRICE_FEED_DECIMALS);
-    const returnObj = { priceId: `0x${pythPrice.id}`, normalizedPrice: collateralPrice };
-    return returnObj;
-  });
-
-  const data = vaults.map((vault) => {
-    const normalizedPrice = getNormalizedPriceByIdFromPriceIdArray(
-      vault.vault.depositToken?.pyth?.id as string,
-      priceInfos,
-    );
-    const vaultPerShare = vault.vault.assetsPerShare;
-    const userShare = vault.sharesBalance;
-    const myBalance =
-      (Number(userShare || 0) * Number(vaultPerShare || 0)) /
-      Number(10 ** (vault.vault?.vaultDecimals || 18)) /
-      Number(10 ** parseInt(vault.vault.depositToken?.decimals || ''));
-
-    const totalVaultValue = myBalance * Number(normalizedPrice);
-    const returnObj = {
-      myBalance: myBalance,
-      normalizedPrice: normalizedPrice,
-      Symbol: vault.vault.depositToken?.symbol,
-      priceId: vault.vault.depositToken?.pyth?.id,
-      totalVaultValue: totalVaultValue,
-    };
-    return returnObj;
-  });
-  const myTotalPoolValue = data.reduce((a, b) => a + b.totalVaultValue, 0);
-  return { data, myTotalPoolValue };
 };
 
 export const getTotalPoolsValue = async (
-  chainId: SupportedChain,
   subgraphEndpoint: string,
   pythClient: AxiosInstance,
-) => {
-  const vaults = await getVaultDataByChain(chainId, subgraphEndpoint);
+): Promise<{ totalPoolsValue: Decimal }> => {
+  const vaults = await getAllVaults(subgraphEndpoint);
   const priceIds = vaults.map((v) => v.depositToken?.pyth?.id);
-  const res = await getLatestPricesFromPyth(priceIds as string[], pythClient);
-  const priceInfos = res.map((pythPrice) => {
-    const normalizedPrice = normalizePythPriceForParifi(Number(pythPrice.price.price), pythPrice.price.expo);
-    const collateralPrice = new Decimal(normalizedPrice).div(10 ** PRICE_FEED_DECIMALS);
-    const returnObj = { priceId: `0x${pythPrice.id}`, normalizedPrice: collateralPrice };
-    return returnObj;
-  });
+  const normalizedPythPrices = await getLatestPricesNormalized(priceIds as string[], pythClient);
 
-  const data = vaults.map((vault) => {
-    const normalizedPrice = getNormalizedPriceByIdFromPriceIdArray(vault.depositToken?.pyth?.id as string, priceInfos);
-    const totatVaultValue = (Number(vault.totalAssets) / 10 ** (vault.vaultDecimals || 18)) * Number(normalizedPrice);
-    const returnObj = {
-      totalAssets: vault.totalAssets,
-      decimal: vault.vaultDecimals,
-      normalizedPrice: normalizedPrice,
-      Symbol: vault.depositToken?.symbol,
-      priceId: vault.depositToken?.pyth?.id,
-      totatVaultValue: totatVaultValue,
-    };
-    return returnObj;
+  let totalPoolsValue: Decimal = DECIMAL_ZERO;
+
+  vaults.map((vault) => {
+    const normalizedPrice = normalizedPythPrices.find(
+      (prices) => prices.priceId === vault.depositToken?.pyth?.id,
+    )?.normalizedPrice;
+
+    if (normalizedPrice) {
+      const depositsInUsd = new Decimal(vault.totalAssets as string)
+        .mul(normalizedPrice)
+        .div(PRICE_FEED_PRECISION)
+        .div(new Decimal(10).pow(vault.vaultDecimals || 18));
+      totalPoolsValue = totalPoolsValue.add(depositsInUsd);
+    }
   });
-  const totalPoolValue = data.reduce((a, b) => a + b.totatVaultValue, 0);
-  return { data, totalPoolValue };
+  return { totalPoolsValue };
 };
 
 export const getVaultApr = async (
@@ -152,7 +151,6 @@ export const getVaultApr = async (
 
   try {
     const subgraphResponse: VaultAprInterface = await request(subgraphEndpoint, fetchVaultAprDetails(vaultId));
-    console.log(subgraphResponse);
     const vaultDatas = subgraphResponse.vaultDailyDatas;
 
     // If no APR data found, return 0;

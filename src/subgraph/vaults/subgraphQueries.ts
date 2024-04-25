@@ -37,42 +37,30 @@ export const fetchAllVaultsQuery = () => gql`
   }
 `;
 
-export const fetchUserAllVaultsQuery = (user: string) => gql`
-query vaultInfo {
-  vaultPositions(where: {user: "${user}"}) {
-    vault {
-      vaultSymbol
-      assetsPerShareDec
-      assetsPerShare
+export const fetchUserVaultPositionsQuery = (user: string) => gql`
+{
+  vaultPositions(
+    first: 1000
+    orderBy: sharesBalance
+    orderDirection: desc
+    where: {user: "${user}"}
+  ) {
+    user {
       id
-      cooldownPeriod
-      withdrawalWindow
-      withdrawalFee
-      vaultDecimals
+    }
+    vault {
+      id
+      assetsPerShare
+      sharesPerAsset
       depositToken {
-        id
-        name
-        symbol
         decimals
-        lastPriceUSD
-        lastPriceTimestamp
         pyth {
           id
+          price
         }
       }
-      totalAssets
-      totalShares
-  }
-  sharesBalance
-  totalMinted
-  totalRedeemed
-  totalDeposited
-  totalWithdrawn
-  avgMintPrice
-  avgMintPriceDec
-  unrealizedPNL
-  realizedPNL
-  realizedPNLInUsd
+    }
+    sharesBalance
   }
 }
 `;
