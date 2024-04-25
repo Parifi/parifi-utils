@@ -27,6 +27,8 @@ import {
   batchSettleOrdersUsingGelato,
   batchSettleOrdersUsingWallet,
   batchSettlePendingOrdersUsingGelato,
+  getBatchLiquidateTxData,
+  getBatchSettleTxData,
   getParifiUtilsInstance,
 } from './parifi-utils';
 import { convertCollateralAmountToUsd, convertMarketAmountToCollateral, convertMarketAmountToUsd } from './price-feed';
@@ -297,6 +299,32 @@ export class Core {
     wallet: Signer,
   ): Promise<{ txHash: string }> => {
     return await batchSettleOrdersUsingWallet(this.rpcConfig.chainId, orderIds, priceUpdateData, wallet);
+  };
+
+  // Returns encoded tx data to batch settle multiple orders
+  getBatchSettleTxData = async (orderIds: string[]): Promise<{ txData: string }> => {
+    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+    const pythClient = await getPythClient(
+      this.pythConfig.pythEndpoint,
+      this.pythConfig.username,
+      this.pythConfig.password,
+      this.pythConfig.isStable,
+    );
+
+    return await getBatchSettleTxData(this.rpcConfig.chainId, subgraphEndpoint, pythClient, orderIds);
+  };
+
+  // Returns encoded tx data to batch liquidate multiple positions
+  getBatchLiquidateTxData = async (positionIds: string[]): Promise<{ txData: string }> => {
+    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+    const pythClient = await getPythClient(
+      this.pythConfig.pythEndpoint,
+      this.pythConfig.username,
+      this.pythConfig.password,
+      this.pythConfig.isStable,
+    );
+
+    return await getBatchLiquidateTxData(this.rpcConfig.chainId, subgraphEndpoint, pythClient, positionIds);
   };
 
   ////////////////////////////////////////////////////////////////
