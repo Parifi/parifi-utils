@@ -8,14 +8,13 @@ import { Chain, Hex, Transport, createPublicClient, http } from 'viem';
 
 import { createPimlicoBundlerClient, createPimlicoPaymasterClient } from 'permissionless/clients/pimlico';
 
-import { generatePrivateKey } from 'viem/accounts';
-
 import { EntryPoint } from 'permissionless/types/entrypoint';
 import { FACTORY_ADDRESS_SIMPLE_ACCOUNT } from '../../common';
 
 export const getPimlicoSmartAccountClient = async (
   pimlicoConfig: RelayerI,
   rpcConfig: RpcConfig,
+  privateKey: `0x${string}`,
 ): Promise<SmartAccountClient<EntryPoint, Transport, Chain, SmartAccount<EntryPoint>>> => {
   const apiKey = pimlicoConfig.apiKey ?? '';
   const viemChain = getViemChainById(rpcConfig.chainId as number);
@@ -31,15 +30,6 @@ export const getPimlicoSmartAccountClient = async (
     transport: http(paymasterUrl),
     entryPoint: ENTRYPOINT_ADDRESS_V07,
   });
-
-  /// Create Smart account for user address EOA
-  const privateKey =
-    (process.env.PRIVATE_KEY as Hex) ??
-    (() => {
-      const pk = generatePrivateKey();
-      appendFileSync('.env', `PRIVATE_KEY=${pk}`);
-      return pk;
-    })();
 
   const account = await privateKeyToSimpleSmartAccount(publicClient, {
     privateKey,

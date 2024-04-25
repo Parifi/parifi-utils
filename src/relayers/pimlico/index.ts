@@ -2,12 +2,13 @@ import 'dotenv/config';
 import { RelayerConfig, RpcConfig, SubgraphConfig } from '../../interfaces';
 import { executeTxUsingPimlico, getPimlicoSmartAccountClient } from './utils';
 import { SmartAccount } from 'permissionless/accounts';
-import { Chain, Transport } from 'viem';
+import { Chain, Hex, Transport } from 'viem';
 import { EntryPoint } from 'permissionless/types/entrypoint';
 import { SmartAccountClient } from 'permissionless';
 import { getBatchLiquidateTxData, getBatchSettleTxData, getParifiUtilsInstance } from '../../core/parifi-utils';
 import { getPublicSubgraphEndpoint } from '../../subgraph';
 import { getPythClient } from '../../pyth/pyth';
+import { generatePrivateKey } from 'viem/accounts';
 
 import { contracts as parifiContracts } from '@parifi/references';
 
@@ -39,7 +40,16 @@ export class Pimlico {
       return;
     }
 
-    this.smartAccountClient = await getPimlicoSmartAccountClient(this.pimlicoConfig, this.rpcConfig);
+    /// Create Smart account for user address EOA
+    const privateKey =
+      ((process.env.PRIVATE_KEY as Hex) || this.pimlicoConfig.password) ??
+      (() => {
+        const pk = generatePrivateKey();
+        this.pimlicoConfig.password = pk;
+        return pk;
+      })();
+
+    this.smartAccountClient = await getPimlicoSmartAccountClient(this.pimlicoConfig, this.rpcConfig, privateKey);
 
     // Set the Pimlico Relayer as initialized
     this.isInitialized = true;
