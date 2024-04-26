@@ -1,6 +1,12 @@
 import { AxiosInstance } from 'axios';
 import { PythConfig } from '../interfaces/classConfigs';
-import { getLatestPricesFromPyth, getPythClient, getVaaPriceUpdateData, normalizePythPriceForParifi } from './pyth';
+import {
+  getLatestPricesFromPyth,
+  getLatestPricesNormalized,
+  getPythClient,
+  getVaaPriceUpdateData,
+  normalizePythPriceForParifi,
+} from './pyth';
 import { getPriceIdsForCollaterals } from '../common';
 
 export class Pyth {
@@ -29,6 +35,10 @@ export class Pyth {
 
   public async getLatestPricesFromPyth(priceIds: string[]) {
     return await getLatestPricesFromPyth(priceIds, this.pythClient);
+  }
+
+  public async getLatestPricesNormalized(priceIds: string[]) {
+    return await getLatestPricesNormalized(priceIds, this.pythClient);
   }
 
   public getPriceIdsForCollaterals() {
