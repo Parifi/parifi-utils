@@ -52,7 +52,7 @@ jobs:
               echo "New files detected, committing and pushing them"
               git add package.json
               git commit -S -m "Bump package version"
-              git push
+              git push -f
           else
               echo "No new files, exiting cleanly"
           fi
