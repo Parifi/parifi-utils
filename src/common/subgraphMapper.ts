@@ -25,6 +25,10 @@ export const mapSubgraphResponseToAccountInterface = (response: any): Account | 
       referralFeesInUsd: response.referralFeesInUsd,
       totalRealizedPnlPositions: response.totalRealizedPnlPositions,
       totalRealizedPnlVaults: response.totalRealizedPnlVaults,
+      countProfitablePositions: response.countProfitablePositions,
+      countLossPositions: response.countLossPositions,
+      totalStaked: response.totalStaked,
+      esPRFBalance: response.esPRFBalance,
     };
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -289,6 +293,43 @@ export const mapVaultsArrayToInterface = (response: any): Vault[] | undefined =>
   try {
     return response.vaults.map((vault: Vault) => {
       return mapSingleVaultToInterface(vault);
+    });
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
+
+export const mapVaultPositionToInterface = (response: any): VaultPosition | undefined => {
+  try {
+    return {
+      id: response.id,
+      vault: response.vault ? mapSingleVaultToInterface(response.vault) : undefined,
+      user: response.user ? mapSubgraphResponseToAccountInterface(response.user) : undefined,
+      sharesBalance: response.sharesBalance,
+      totalMinted: response.totalMinted,
+      totalRedeemed: response.totalRedeemed,
+      totalDeposited: response.totalDeposited,
+      totalWithdrawn: response.totalWithdrawn,
+      avgMintPrice: response.avgMintPrice,
+      avgMintPriceDec: response.avgMintPriceDec,
+      realizedPNL: response.realizedPNL,
+      realizedPNLInUsd: response.realizedPNLInUsd,
+      timestamp: response.timestamp,
+      cooldownInitiatedTimestamp: response.cooldownInitiatedTimestamp,
+      cooldownEnd: response.cooldownEnd,
+      withdrawalEnds: response.withdrawalEnds,
+    };
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
+
+export const mapVaultPositionsArrayToInterface = (response: any): VaultPosition[] | undefined => {
+  try {
+    return response.vaultPositions.map((vaultPosition: VaultPosition) => {
+      return mapVaultPositionToInterface(vaultPosition);
     });
   } catch (error) {
     console.log('Error while mapping data', error);

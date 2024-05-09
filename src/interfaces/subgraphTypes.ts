@@ -60,6 +60,21 @@ export interface Account {
 
   // " Total Realized P&L from Vaults in USD "
   totalRealizedPnlVaults?: string;
+
+  // " Count of total profitable positions "
+  countProfitablePositions?: string
+
+  // " Count of total positions with loss "
+  countLossPositions?: string
+
+  // streams: [Stream!]!
+
+  totalStaked?: string
+
+  // gaugeEarnings: [GaugeEarning!]!
+
+  esPRFBalance?: string
+
 }
 
 ////////////////////////////////////////////////////////////////
@@ -512,19 +527,48 @@ export interface Vault {
   // vaultPnl?: [VaultPnl]
 }
 
+// " Vault position data per user "
 export interface VaultPosition {
-  vault: Vault;
-  sharesBalance: string;
-  totalMinted: string;
-  totalRedeemed: string;
-  totalDeposited: string;
-  totalWithdrawn: string;
-  avgMintPrice: string;
-  avgMintPriceDec: string;
-  unrealizedPNL: string;
-  realizedPNL: string;
-  realizedPNLInUsd: string;
-  id: string;
+  // " {User Address}-{Vault Address} "
+  id?: string
+
+  // " Vault Details "
+  vault?: Vault
+
+  // " User Details "
+  user?: Account
+
+  sharesBalance?: string
+
+  totalMinted?: string
+
+  totalRedeemed?: string
+
+  totalDeposited?: string
+
+  totalWithdrawn?: string
+
+  avgMintPrice?: string
+
+  avgMintPriceDec?: string
+
+  realizedPNL?: string
+
+  realizedPNLInUsd?: string
+
+  unrealizedPNL?: string
+
+  // " Last Updated "
+  timestamp?: string
+
+  // " Cooldown initiated timstamp "
+  cooldownInitiatedTimestamp?: string
+
+  // " Cooldown finishes, withdrawal period starts "
+  cooldownEnd?: string
+
+  // " Withdrawal findow finishes, no withdrawals allowed "
+  withdrawalEnds?: string
 }
 
 // Subgraph interface for partner referrals
