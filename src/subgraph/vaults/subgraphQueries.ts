@@ -45,6 +45,7 @@ export const fetchUserVaultPositionsQuery = (user: string) => gql`
     orderDirection: desc
     where: {user: "${user}"}
   ) {
+    id
     user {
       id
     }
@@ -61,6 +62,19 @@ export const fetchUserVaultPositionsQuery = (user: string) => gql`
       }
     }
     sharesBalance
+    totalMinted
+    totalRedeemed
+    totalDeposited
+    totalWithdrawn
+    avgMintPrice
+    avgMintPriceDec
+    realizedPNL
+    realizedPNLInUsd
+    unrealizedPNL
+    timestamp
+    cooldownInitiatedTimestamp
+    cooldownEnd
+    withdrawalEnds
   }
 }
 `;

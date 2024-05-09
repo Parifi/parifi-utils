@@ -4,7 +4,7 @@ import { request } from 'graphql-request';
 
 import { Vault, VaultPosition } from '../../interfaces';
 import { fetchAllVaultsQuery, fetchUserVaultPositionsQuery, fetchVaultAprDetails } from './subgraphQueries';
-import { mapVaultsArrayToInterface } from '../../common/subgraphMapper';
+import { mapVaultPositionsArrayToInterface, mapVaultsArrayToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 
 import { DECIMAL_ZERO, PRICE_FEED_PRECISION } from '../../common';
@@ -31,11 +31,11 @@ export const getUserVaultData = async (subgraphEndpoint: string, user: string): 
     }
 
     let subgraphResponse: any = await request(subgraphEndpoint, fetchUserVaultPositionsQuery(user));
-    const vaults: VaultPositionsResponse = subgraphResponse;
-    if (vaults.vaultPositions.length === 0) {
+    const vaultPositions = mapVaultPositionsArrayToInterface(subgraphResponse);
+    if (vaultPositions === undefined || vaultPositions?.length === 0) {
       return [];
     }
-    return vaults.vaultPositions;
+    return vaultPositions;
   } catch (error) {
     throw error;
   }
