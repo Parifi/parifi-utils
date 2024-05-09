@@ -92,3 +92,30 @@ export const fetchVaultAprDetails = (vaultId: string) => gql`
     }
   }
 `;
+
+export const fetchCooldownDetails = (user: string) => gql`
+{
+  vaultCooldowns(
+    orderBy: timestamp
+    orderDirection: desc
+    first: 10
+    where: {user: "${user}"}
+  ) {
+    id
+    user {
+      id
+    }
+    vault {
+      id
+      vaultName
+      vaultSymbol
+      cooldownPeriod
+      withdrawalWindow
+    }
+    timestamp
+    cooldownEnd
+    withdrawalEnds
+    amountAssets
+  }
+}
+`;

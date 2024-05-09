@@ -571,6 +571,35 @@ export interface VaultPosition {
   withdrawalEnds?: string
 }
 
+// " User triggers cooldown, requesting a withdrawal "
+export interface VaultCooldown  {
+  // " Transaction Hash "
+  id?: string
+
+  // " Vault Details "
+  vault?: Vault
+
+  // " User Schema "
+  user?: Account
+
+  // " Amount to unlock in deposit token "
+  amountAssets?: string
+
+  // " Cooldown finishes, withdrawal period starts "
+  cooldownEnd?: string
+
+  // " Withdrawal findow finishes, no withdrawals allowed "
+  withdrawalEnds?: string
+
+  // " Block timestamp "
+  timestamp?: string
+}
+
+////////////////////////////////////////////////////////////////
+//////////////////////    OTHERS     ///////////////////////////
+////////////////////////////////////////////////////////////////
+
+
 // Subgraph interface for partner referrals
 export interface Referral {
   // " Partner (Referrer) address + Referred address + log Index "

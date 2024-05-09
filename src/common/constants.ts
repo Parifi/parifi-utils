@@ -11,6 +11,7 @@ export const PRICE_FEED_PRECISION = new Decimal(10).pow(PRICE_FEED_DECIMALS);
 export const DECIMAL_10 = new Decimal(10);
 export const DECIMAL_ZERO = new Decimal(0);
 export const DEFAULT_BATCH_COUNT = 10;
+export const BIGINT_ZERO = BigInt(0);
 
 export const GAS_LIMIT_SETTLEMENT = 10000000   // 10M gas
 export const GAS_LIMIT_LIQUIDATION = 15000000   // 15M gas

@@ -8,6 +8,7 @@ import {
   Referral,
   Token,
   Vault,
+  VaultCooldown,
   VaultPosition,
 } from '../interfaces/subgraphTypes';
 
@@ -336,6 +337,38 @@ export const mapVaultPositionsArrayToInterface = (response: any): VaultPosition[
     throw error;
   }
 };
+
+export const mapVaultCooldownToInterface = (response: any): VaultCooldown | undefined => {
+  try {
+    return {
+      id: response.Id,
+      vault: response.vault ? mapSingleVaultToInterface(response.vault) : undefined,
+      user: response.user ? mapSubgraphResponseToAccountInterface(response.user) : undefined,
+      amountAssets: response.amountAssets,
+      cooldownEnd: response.cooldownEnd,
+      withdrawalEnds: response.withdrawalEnds,
+      timestamp: response.timestamp,
+    };
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
+
+export const mapVaultCooldownArrayToInterface = (response: any): VaultCooldown[] | undefined => {
+  try {
+    return response.vaultCooldowns.map((cooldown: VaultCooldown) => {
+      return mapVaultCooldownToInterface(cooldown);
+    });
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
+
+////////////////////////////////////////////////////////////////
+//////////////////////    OTHERS     ///////////////////////////
+////////////////////////////////////////////////////////////////
 
 export const mapReferralDataToInterface = (response: any): Referral | undefined => {
   try {

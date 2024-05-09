@@ -2,9 +2,18 @@ import Decimal from 'decimal.js';
 import { AxiosInstance } from 'axios';
 import { request } from 'graphql-request';
 
-import { Vault, VaultPosition } from '../../interfaces';
-import { fetchAllVaultsQuery, fetchUserVaultPositionsQuery, fetchVaultAprDetails } from './subgraphQueries';
-import { mapVaultPositionsArrayToInterface, mapVaultsArrayToInterface } from '../../common/subgraphMapper';
+import { Vault, VaultCooldown, VaultPosition } from '../../interfaces';
+import {
+  fetchAllVaultsQuery,
+  fetchCooldownDetails,
+  fetchUserVaultPositionsQuery,
+  fetchVaultAprDetails,
+} from './subgraphQueries';
+import {
+  mapVaultCooldownArrayToInterface,
+  mapVaultPositionsArrayToInterface,
+  mapVaultsArrayToInterface,
+} from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 
 import { DECIMAL_ZERO, PRICE_FEED_PRECISION } from '../../common';
@@ -180,4 +189,17 @@ export const getVaultApr = async (
   } catch (error) {
     throw error;
   }
+};
+
+export const getUserVaultCoolDowns = async (
+  subgraphEndpoint: string,
+  userAddress: string,
+): Promise<VaultCooldown[]> => {
+  const response = await request(subgraphEndpoint, fetchCooldownDetails(userAddress));
+
+  const vaultCooldowns = mapVaultCooldownArrayToInterface(response);
+  if (vaultCooldowns) {
+    return vaultCooldowns;
+  }
+  return [];
 };

@@ -19,11 +19,18 @@ import {
   getTotalUnrealizedPnlInUsd,
 } from './positions';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
-import { Market, Order, Position, Referral, Vault } from '../interfaces/subgraphTypes';
+import { Market, Order, Position, Referral, Vault, VaultCooldown } from '../interfaces/subgraphTypes';
 import { Chain } from '@parifi/references';
 import request, { GraphQLClient } from 'graphql-request';
 import { getPublicSubgraphEndpoint } from './common';
-import { getAllVaults, getTotalPoolsValue, getUserTotalPoolsValue, getUserVaultData, getVaultApr } from './vaults';
+import {
+  getAllVaults,
+  getTotalPoolsValue,
+  getUserTotalPoolsValue,
+  getUserVaultCoolDowns,
+  getUserVaultData,
+  getVaultApr,
+} from './vaults';
 import { Pyth } from '../pyth';
 import Decimal from 'decimal.js';
 import { getPortfolioDataForUsers, getRealizedPnlForUser } from './accounts';
@@ -231,6 +238,11 @@ export class Subgraph {
   public async getVaultApr(vaultId: string): Promise<{ apr7Days: Decimal; apr30Days: Decimal; aprAllTime: Decimal }> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getVaultApr(subgraphEndpoint, vaultId);
+  }
+
+  public async getUserVaultCoolDowns(userAddress: string): Promise<VaultCooldown[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getUserVaultCoolDowns(subgraphEndpoint, userAddress);
   }
 
   public async getReferralDataForPartner(
