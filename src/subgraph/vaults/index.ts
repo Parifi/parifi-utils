@@ -170,6 +170,15 @@ export const getVaultApr = async (
       aprAllTime = vaultDatas[0].vault.allTimeApr;
     }
 
+    // If less than 7 days data for APR is available, return average APR of available data
+    if (vaultDatas.length < 7) {
+      const sumApr = vaultDatas.reduce((accumulator, currentValue) => {
+        return accumulator + currentValue.apr.toNumber();
+      }, 0);
+      apr7Days = new Decimal(sumApr).div(vaultDatas.length);
+      return { apr7Days, apr30Days, aprAllTime };
+    }
+
     /// Calculate the APR of vault based on timeframe data. If enough data points are not available,
     /// the value is set to 0;
     for (let index = 0; index < vaultDatas.length; index++) {
