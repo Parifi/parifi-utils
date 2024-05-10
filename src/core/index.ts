@@ -35,6 +35,8 @@ import { convertCollateralAmountToUsd, convertMarketAmountToCollateral, convertM
 import { getMarketBorrowingRatePerHour, getMarketOpenInterestInUsd } from './pages/statsPage';
 import { getPublicSubgraphEndpoint } from '../subgraph';
 import { getPythClient } from '../pyth/pyth';
+import { UserVaultData } from '../interfaces/sdkTypes';
+import { getPoolPageData } from './pages/poolPage';
 
 export class Core {
   constructor(
@@ -377,5 +379,10 @@ export class Core {
     normalizedMarketPrice: Decimal,
   ): { openInterestInUsdLongs: Decimal; openInterestInUsdShorts: Decimal } => {
     return getMarketOpenInterestInUsd(market, normalizedMarketPrice);
+  };
+
+  getPoolPageData = async (userAddress: string): Promise<UserVaultData[]> => {
+    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getPoolPageData(subgraphEndpoint, userAddress);
   };
 }
