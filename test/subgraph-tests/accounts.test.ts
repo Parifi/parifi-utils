@@ -25,6 +25,6 @@ describe('Order fetching logic from subgraph', () => {
     const userAddresses = [TEST_USER_ID1, TEST_USER_ID2, TEST_USER_ID3];
 
     const { portfolioData } = await parifiSdk.subgraph.getPortfolioDataForUsers(userAddresses);
-    console.log('portfolioData', portfolioData);
+    expect(portfolioData.length).not.toBe(0);
   });
 });

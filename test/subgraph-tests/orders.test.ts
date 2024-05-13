@@ -28,6 +28,6 @@ describe('Order fetching logic from subgraph', () => {
     const partnerAddress = '0x30f06f86f107f9523f5b91a8e8aeb602b7b260bd';
 
     const referralData = await parifiSdk.subgraph.getReferralDataForPartner(partnerAddress);
-    console.log('referralData', referralData);
+    expect(referralData.length).not.toBe(0);
   });
 });

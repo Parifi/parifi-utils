@@ -2,9 +2,18 @@ import Decimal from 'decimal.js';
 import { AxiosInstance } from 'axios';
 import { request } from 'graphql-request';
 
-import { Vault, VaultPosition } from '../../interfaces';
-import { fetchAllVaultsQuery, fetchUserVaultPositionsQuery, fetchVaultAprDetails } from './subgraphQueries';
-import { mapVaultsArrayToInterface } from '../../common/subgraphMapper';
+import { Vault, VaultCooldown, VaultPosition } from '../../interfaces';
+import {
+  fetchAllVaultsQuery,
+  fetchCooldownDetails,
+  fetchUserVaultPositionsQuery,
+  fetchVaultAprDetails,
+} from './subgraphQueries';
+import {
+  mapVaultCooldownArrayToInterface,
+  mapVaultPositionsArrayToInterface,
+  mapVaultsArrayToInterface,
+} from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 
 import { DECIMAL_ZERO, PRICE_FEED_PRECISION } from '../../common';
@@ -31,11 +40,11 @@ export const getUserVaultData = async (subgraphEndpoint: string, user: string): 
     }
 
     let subgraphResponse: any = await request(subgraphEndpoint, fetchUserVaultPositionsQuery(user));
-    const vaults: VaultPositionsResponse = subgraphResponse;
-    if (vaults.vaultPositions.length === 0) {
+    const vaultPositions = mapVaultPositionsArrayToInterface(subgraphResponse);
+    if (vaultPositions === undefined || vaultPositions?.length === 0) {
       return [];
     }
-    return vaults.vaultPositions;
+    return vaultPositions;
   } catch (error) {
     throw error;
   }
@@ -161,6 +170,15 @@ export const getVaultApr = async (
       aprAllTime = vaultDatas[0].vault.allTimeApr;
     }
 
+    // If less than 7 days data for APR is available, return average APR of available data
+    if (vaultDatas.length < 7) {
+      const sumApr = vaultDatas.reduce((accumulator, currentValue) => {
+        return accumulator + currentValue.apr.toNumber();
+      }, 0);
+      apr7Days = new Decimal(sumApr).div(vaultDatas.length);
+      return { apr7Days, apr30Days, aprAllTime };
+    }
+
     /// Calculate the APR of vault based on timeframe data. If enough data points are not available,
     /// the value is set to 0;
     for (let index = 0; index < vaultDatas.length; index++) {
@@ -180,4 +198,17 @@ export const getVaultApr = async (
   } catch (error) {
     throw error;
   }
+};
+
+export const getUserVaultCoolDowns = async (
+  subgraphEndpoint: string,
+  userAddress: string,
+): Promise<VaultCooldown[]> => {
+  const response = await request(subgraphEndpoint, fetchCooldownDetails(userAddress));
+
+  const vaultCooldowns = mapVaultCooldownArrayToInterface(response);
+  if (vaultCooldowns) {
+    return vaultCooldowns;
+  }
+  return [];
 };

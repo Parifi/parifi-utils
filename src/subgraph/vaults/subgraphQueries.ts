@@ -45,6 +45,7 @@ export const fetchUserVaultPositionsQuery = (user: string) => gql`
     orderDirection: desc
     where: {user: "${user}"}
   ) {
+    id
     user {
       id
     }
@@ -61,6 +62,19 @@ export const fetchUserVaultPositionsQuery = (user: string) => gql`
       }
     }
     sharesBalance
+    totalMinted
+    totalRedeemed
+    totalDeposited
+    totalWithdrawn
+    avgMintPrice
+    avgMintPriceDec
+    realizedPNL
+    realizedPNLInUsd
+    unrealizedPNL
+    timestamp
+    cooldownInitiatedTimestamp
+    cooldownEnd
+    withdrawalEnds
   }
 }
 `;
@@ -77,4 +91,31 @@ export const fetchVaultAprDetails = (vaultId: string) => gql`
       apr
     }
   }
+`;
+
+export const fetchCooldownDetails = (user: string) => gql`
+{
+  vaultCooldowns(
+    orderBy: timestamp
+    orderDirection: desc
+    first: 10
+    where: {user: "${user}"}
+  ) {
+    id
+    user {
+      id
+    }
+    vault {
+      id
+      vaultName
+      vaultSymbol
+      cooldownPeriod
+      withdrawalWindow
+    }
+    timestamp
+    cooldownEnd
+    withdrawalEnds
+    amountAssets
+  }
+}
 `;
