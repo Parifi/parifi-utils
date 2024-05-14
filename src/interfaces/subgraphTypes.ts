@@ -374,6 +374,24 @@ export interface Position {
 
   // " Last position updated timestamp in string "
   lastRefreshISO?: string;
+
+  // " Net Profit or Loss of position in collateral (without accounting for closing fees)"
+  netUnrealizedPnlInCollateral: string;
+
+  // " Net Profit or Loss of position in USD (without accounting for closing fees)"
+  netUnrealizedPnlInUsd: string;
+
+  // " Net Profit or Loss of position in collateral for liquidation"
+  liquidationNetPnlInCollateral: string;
+
+  // " Accrued borrowing fees in collateral till last refresh "
+  accruedBorrowingFeesInCollateral: string;
+
+  // " True if the position can be liquidated "
+  canBeLiquidated: boolean
+
+  // " Loss to collateral ratio percentage "
+  lossToCollateralRatioPercent: string;
 }
 
 ////////////////////////////////////////////////////////////////

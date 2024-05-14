@@ -186,6 +186,12 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
       createdTimestamp: response.createdTimestamp,
       lastRefresh: response.lastRefresh,
       lastRefreshISO: response.lastRefreshISO,
+      netUnrealizedPnlInCollateral: response.netUnrealizedPnlInCollateral,
+      netUnrealizedPnlInUsd: response.netUnrealizedPnlInUsd,
+      liquidationNetPnlInCollateral: response.liquidationNetPnlInCollateral,
+      accruedBorrowingFeesInCollateral: response.accruedBorrowingFeesInCollateral,
+      canBeLiquidated: response.canBeLiquidated,
+      lossToCollateralRatioPercent: response.lossToCollateralRatioPercent,
     };
   } catch (error) {
     console.log('Error while mapping data', error);

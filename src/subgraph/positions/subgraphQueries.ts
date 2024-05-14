@@ -37,6 +37,12 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 1
             createdTimestamp
             lastRefresh
             lastRefreshISO
+            netUnrealizedPnlInCollateral
+            netUnrealizedPnlInUsd
+            liquidationNetPnlInCollateral
+            accruedBorrowingFeesInCollateral
+            canBeLiquidated
+            lossToCollateralRatioPercent
         }
     }`;
 
@@ -85,6 +91,12 @@ export const fetchPositionsByUserQueryAndStatus = (
             createdTimestamp
             lastRefresh
             lastRefreshISO
+            netUnrealizedPnlInCollateral
+            netUnrealizedPnlInUsd
+            liquidationNetPnlInCollateral
+            accruedBorrowingFeesInCollateral
+            canBeLiquidated
+            lossToCollateralRatioPercent
         }
     }`;
 
@@ -118,7 +130,13 @@ export const fetchPositionByIdQuery = (positionId: string) =>
             netRealizedPnl
             createdTimestamp
             lastRefresh
-            lastRefreshISO            
+            lastRefreshISO
+            netUnrealizedPnlInCollateral
+            netUnrealizedPnlInUsd
+            liquidationNetPnlInCollateral
+            accruedBorrowingFeesInCollateral
+            canBeLiquidated
+            lossToCollateralRatioPercent            
         }
     }`;
 
