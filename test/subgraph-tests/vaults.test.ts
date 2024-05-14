@@ -39,4 +39,10 @@ describe('Vault fetching logic from subgraph', () => {
     const vaultCooldowns = await parifiSdk.subgraph.getUserVaultCoolDowns(TEST_USER_ID1);
     expect(vaultCooldowns.length).not.toBe(0);
   });
+
+  it('should return 24 Hr volume for all vaults', async () => {
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+    const volumeData = await parifiSdk.subgraph.getPoolVolume24h();
+    expect(volumeData.length).not.toBe(0);
+  });
 });

@@ -119,3 +119,23 @@ export const fetchCooldownDetails = (user: string) => gql`
   }
 }
 `;
+
+// Query to fetch the vault deposit and withdrawal data 
+// for txs having timestamp greater than the `timestamp` parameter 
+export const fetchVaultVolumeData = (timestamp: number) => gql`
+{
+    vaultDeposits(where: { timestamp_gt: ${timestamp}}) {
+      vault {
+        id
+      }
+      timestamp
+      amountUSD
+    }
+    vaultWithdraws(where: { timestamp_gt: ${timestamp}}) {
+      vault {
+        id
+      }
+      timestamp
+      amountUSD
+    }
+  }`
