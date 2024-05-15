@@ -25,6 +25,7 @@ import request, { GraphQLClient } from 'graphql-request';
 import { getPublicSubgraphEndpoint } from './common';
 import {
   getAllVaults,
+  getPoolVolume24h,
   getTotalPoolsValue,
   getUserTotalPoolsValue,
   getUserVaultCoolDowns,
@@ -252,5 +253,10 @@ export class Subgraph {
   ): Promise<Referral[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getReferralDataForPartner(subgraphEndpoint, partnerAddress, count, skip);
+  }
+
+  public async getPoolVolume24h(): Promise<{ [vaultId: string]: Decimal }> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getPoolVolume24h(subgraphEndpoint);
   }
 }

@@ -8,6 +8,7 @@ import {
   fetchCooldownDetails,
   fetchUserVaultPositionsQuery,
   fetchVaultAprDetails,
+  fetchVaultVolumeData,
 } from './subgraphQueries';
 import {
   mapVaultCooldownArrayToInterface,
@@ -211,4 +212,45 @@ export const getUserVaultCoolDowns = async (
     return vaultCooldowns;
   }
   return [];
+};
+
+// Returns the Last 24 hour volume for the vaults in USD
+export const getPoolVolume24h = async (subgraphEndpoint: string): Promise<{ [vaultId: string]: Decimal }> => {
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+  const oneDayInSeconds = 60 * 60 * 24;
+
+  interface VaultTransaction {
+    vault: {
+      id: string;
+    };
+    timestamp: string;
+    amountUSD: string;
+  }
+
+  interface VaultResponse {
+    vaultDeposits: VaultTransaction[];
+    vaultWithdraws: VaultTransaction[];
+  }
+
+  const query = fetchVaultVolumeData(currentTimestamp - oneDayInSeconds);
+  const transactions: VaultResponse = await request(subgraphEndpoint, query);
+  const volumeByVault: { [vaultId: string]: Decimal } = {};
+
+  // Calculate the sum of USD value of all deposit transactions
+  transactions.vaultDeposits.forEach((deposit) => {
+    if (!volumeByVault[deposit.vault.id]) {
+      volumeByVault[deposit.vault.id] = DECIMAL_ZERO;
+    }
+    volumeByVault[deposit.vault.id] = volumeByVault[deposit.vault.id].add(deposit.amountUSD);
+  });
+
+  // Calculate the sum of USD value of all withdraw transactions
+  transactions.vaultWithdraws.forEach((withdrawal) => {
+    if (!volumeByVault[withdrawal.vault.id]) {
+      volumeByVault[withdrawal.vault.id] = DECIMAL_ZERO;
+    }
+    volumeByVault[withdrawal.vault.id] = volumeByVault[withdrawal.vault.id].add(withdrawal.amountUSD);
+  });
+
+  return volumeByVault;
 };
