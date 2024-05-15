@@ -9,12 +9,17 @@ import {
   PRECISION_MULTIPLIER,
 } from '../../common/constants';
 import { getAccruedBorrowFeesInMarket, getMarketUtilization } from '../data-fabric';
-import { convertMarketAmountToCollateral } from '../price-feed';
+import { convertCollateralAmountToUsd, convertMarketAmountToCollateral, convertMarketAmountToUsd } from '../price-feed';
 import { Chain } from '@parifi/references';
 import { contracts as parifiContracts } from '@parifi/references';
 import { Contract, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
-import { getOrderById, getPythPriceIdsForOrderIds, getPythPriceIdsForPositionIds } from '../../subgraph';
+import {
+  getOrderById,
+  getPythPriceIdsForOrderIds,
+  getPythPriceIdsForPositionIds,
+  getTotalUnrealizedPnlInUsd,
+} from '../../subgraph';
 import { getLatestPricesFromPyth, getVaaPriceUpdateData, normalizePythPriceForParifi } from '../../pyth/pyth';
 import { getPriceIdsForCollaterals } from '../../common';
 import { executeTxUsingGelato } from '../../relayers/gelato/gelato-function';
@@ -450,4 +455,51 @@ export const settleOrderUsingGelato = async (
   // We need these console logs for feedback to Tenderly actions and other scripts
   console.log('Task ID:', taskId);
   return { gelatoTaskId: taskId };
+};
+
+// Returns the liquidation price of a Position
+// A position is liquidated when the loss of a position in USD goes above the USD value
+// of liquidation threshold times the deposited collateral value
+export const getLiquidationPrice = (
+  position: Position,
+  market: Market,
+  normalizedMarketPrice: Decimal,
+  normalizedCollateralPrice: Decimal,
+): Decimal => {
+  const collateral = new Decimal(position.positionCollateral ?? '0');
+
+  // Decimal digits for market and collateral token
+  const collateralDecimals = new Decimal(market.depositToken?.decimals ?? '18');
+  const marketDecimals = new Decimal(market.marketDecimals ?? '18');
+
+  // Total fees for the position taking into account closing fee and liquidation fee
+  const accruedBorrowFeesInMarket = getAccruedBorrowFeesInMarket(position, market);
+  const fixedFeesInMarket = new Decimal(position.positionSize ?? '0')
+    .times(new Decimal(market.openingFee ?? '0').add(market.liquidationFee ?? '0'))
+    .div(MAX_FEE);
+
+  const totalFeesInUsd = convertMarketAmountToUsd(
+    accruedBorrowFeesInMarket.add(fixedFeesInMarket),
+    marketDecimals,
+    normalizedMarketPrice,
+  );
+
+  const collateralInUsd = convertCollateralAmountToUsd(collateral, collateralDecimals, normalizedCollateralPrice);
+  const maxLossLimitInUsd = collateralInUsd.times(market.liquidationThreshold ?? '0').div(PRECISION_MULTIPLIER);
+
+  const lossLimitAfterFees = maxLossLimitInUsd.sub(totalFeesInUsd);
+
+  // @todo Revisit this
+  // If loss is already more than the max loss, the position can be liquidated at the current price
+  if (lossLimitAfterFees.lessThan(DECIMAL_ZERO)) return normalizedMarketPrice;
+
+  const lossPerToken = lossLimitAfterFees
+    .times(new Decimal('10').pow(marketDecimals))
+    .div(position.positionSize ?? '1');
+
+  if (position.isLong) {
+    return normalizedMarketPrice.sub(lossPerToken);
+  } else {
+    return normalizedMarketPrice.add(lossPerToken);
+  }
 };

@@ -14,6 +14,7 @@ import {
   canBeSettled,
   canBeSettledPriceId,
   checkIfOrderCanBeSettledId,
+  getLiquidationPrice,
   getNetProfitOrLossInCollateral,
   getOrderManagerInstance,
   getProfitOrLossInUsd,
@@ -231,6 +232,15 @@ export class Core {
       isStablePyth,
       pythClient,
     );
+  };
+
+  getLiquidationPrice = (
+    position: Position,
+    market: Market,
+    normalizedMarketPrice: Decimal,
+    normalizedCollateralPrice: Decimal,
+  ): Decimal => {
+    return getLiquidationPrice(position, market, normalizedMarketPrice, normalizedCollateralPrice);
   };
 
   ////////////////////////////////////////////////////////////////
