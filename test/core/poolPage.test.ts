@@ -18,7 +18,6 @@ describe('Stats tests', () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
 
     const userPoolData = await parifiSdk.core.getPoolPageData(ethers.ZeroAddress);
-    console.log(userPoolData);
     expect(userPoolData.length).not.toBe(0);
     userPoolData.forEach((data) => {
       expect(data.assetBalance).toBe(BIGINT_ZERO);

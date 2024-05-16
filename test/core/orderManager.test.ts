@@ -40,7 +40,7 @@ describe('Order Manager tests', () => {
     console.log(tx);
   });
 
-  it.only('should return valid liquidation price', async () => {
+  it('should return valid liquidation price', async () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
     const position = await parifiSdk.subgraph.getPositionById(
       '0x9a1b314246e76d5f912020961f95d44077df4be8450d25e2c7dddd98582b5b66',
