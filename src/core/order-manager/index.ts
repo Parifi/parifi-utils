@@ -498,8 +498,8 @@ export const getLiquidationPrice = (
     .div(position.positionSize ?? '1');
 
   if (position.isLong) {
-    return normalizedMarketPrice.sub(lossPerToken);
+    return new Decimal(position.avgPrice ?? 0).sub(lossPerToken);
   } else {
-    return normalizedMarketPrice.add(lossPerToken);
+    return new Decimal(position.avgPrice ?? 0).add(lossPerToken);
   }
 };

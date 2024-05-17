@@ -71,9 +71,9 @@ describe('Order Manager tests', () => {
 
     console.log('liquidationPrice', liquidationPrice);
     if (position.isLong) {
-      expect(liquidationPrice.toNumber()).toBeLessThan(normalizedMarketPrice.toNumber());
+      expect(liquidationPrice.toNumber()).toBeLessThan(Number(position.avgPrice));
     } else {
-      expect(liquidationPrice.toNumber()).toBeGreaterThan(normalizedMarketPrice.toNumber());
+      expect(liquidationPrice.toNumber()).toBeGreaterThan(Number(position.avgPrice));
     }
   });
 });
