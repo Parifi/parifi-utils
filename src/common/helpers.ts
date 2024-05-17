@@ -10,6 +10,10 @@ export const getDiff = (a: Decimal, b: Decimal): Decimal => {
   return a.gt(b) ? a.minus(b) : b.minus(a);
 };
 
+export const addDelay = async (ms: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 export const getUniqueValuesFromArray = (originalArray: string[]): string[] => {
   const uniqueArray: string[] = [];
   const seenValues = new Set<string>();

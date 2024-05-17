@@ -5,7 +5,7 @@ export const getParifiSdkInstanceForTesting = async (): Promise<ParifiSdk> => {
   const chain = Chain.ARBITRUM_MAINNET;
   const rpcConfig: RpcConfig = {
     chainId: chain,
-    rpcEndpointUrl: process.env.RPC_ARBITRUM
+    rpcEndpointUrl: process.env.RPC_ARBITRUM,
   };
 
   const subgraphConfig: SubgraphConfig = {
@@ -25,6 +25,7 @@ export const getParifiSdkInstanceForTesting = async (): Promise<ParifiSdk> => {
 
   const pimlicoConfig: RelayerI = {
     apiKey: process.env.PIMLICO_API_KEY,
+    password: process.env.PRIVATE_KEY,
   };
 
   const relayerConfig: RelayerConfig = {
