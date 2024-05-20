@@ -43,7 +43,7 @@ export const fetchUserVaultPositionsQuery = (user: string) => gql`
     first: 1000
     orderBy: sharesBalance
     orderDirection: desc
-    where: {user: "${user}"}
+    where: {user: "${user.toLowerCase()}"}
   ) {
     id
     user {
@@ -85,7 +85,7 @@ export const fetchVaultAprDetails = (vaultId: string) => gql`
       first: 30
       orderBy: startTimestamp
       orderDirection: desc
-      where: { vault: "${vaultId}" }
+      where: { vault: "${vaultId.toLowerCase()}" }
     ) {
     	vault { allTimeApr }
       apr
@@ -99,7 +99,7 @@ export const fetchCooldownDetails = (user: string) => gql`
     orderBy: timestamp
     orderDirection: desc
     first: 10
-    where: {user: "${user}"}
+    where: {user: "${user.toLowerCase()}"}
   ) {
     id
     user {

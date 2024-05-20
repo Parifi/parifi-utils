@@ -4,7 +4,7 @@ import { gql } from 'graphql-request';
 // for vaults and positions
 export const fetchRealizedPnlData = (userAddress: string) => gql`
   {
-    account(id: "${userAddress}") {
+    account(id: "${userAddress.toLowerCase()}") {
       id
       totalRealizedPnlPositions
       totalRealizedPnlVaults
@@ -20,7 +20,7 @@ export const fetchRealizedPnlData = (userAddress: string) => gql`
 /// 4. Deposited collateral of all open positions - positions.positionCollateral
 export const fetchPortfolioData = (userAddresses: string[]) => gql`
 {
-  accounts(where: {id_in: [${userAddresses.map((id) => `"${id}"`).join(', ')}]}) {
+  accounts(where: {id_in: [${userAddresses.map((id) => `"${id.toLowerCase()}"`).join(', ')}]}) {
     id
     totalRealizedPnlPositions
     totalRealizedPnlVaults
@@ -30,7 +30,7 @@ export const fetchPortfolioData = (userAddresses: string[]) => gql`
     orderBy: positionCollateral
     orderDirection: desc
     where: {
-      user_in: [${userAddresses.map((id) => `"${id}"`).join(', ')}], 
+      user_in: [${userAddresses.map((id) => `"${id.toLowerCase()}"`).join(', ')}], 
       status: OPEN
       }
   ) {
@@ -54,7 +54,7 @@ export const fetchPortfolioData = (userAddresses: string[]) => gql`
     first: 1000
     orderBy: sharesBalance
     orderDirection: desc
-    where: {user_in: [${userAddresses.map((id) => `"${id}"`).join(', ')}]}
+    where: {user_in: [${userAddresses.map((id) => `"${id.toLowerCase()}"`).join(', ')}]}
   ) {
     user {
       id
