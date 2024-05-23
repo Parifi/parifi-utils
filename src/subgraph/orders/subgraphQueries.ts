@@ -7,7 +7,7 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10, 
   orders(
     first: ${count}
     skip: ${skip}
-    where: {user: "${userAddress}"}
+    where: {user: "${userAddress.toLowerCase()}"}
     orderBy: createdTimestamp
     orderDirection: desc
   ) {
@@ -156,7 +156,7 @@ export const fetchPartnerRewards = (partnerAddress: string, count: number = 20, 
       skip: ${skip}
       orderBy: timestamp
       orderDirection: desc
-      where: { partner: "${partnerAddress}" }
+      where: { partner: "${partnerAddress.toLowerCase()}" }
     ) {
       id
       partner { id }

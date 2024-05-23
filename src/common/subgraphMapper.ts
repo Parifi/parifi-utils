@@ -322,6 +322,7 @@ export const mapVaultPositionToInterface = (response: any): VaultPosition | unde
       avgMintPriceDec: response.avgMintPriceDec,
       realizedPNL: response.realizedPNL,
       realizedPNLInUsd: response.realizedPNLInUsd,
+      unrealizedPNL: response.unrealizedPNL,
       timestamp: response.timestamp,
       cooldownInitiatedTimestamp: response.cooldownInitiatedTimestamp,
       cooldownEnd: response.cooldownEnd,

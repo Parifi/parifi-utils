@@ -9,7 +9,7 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 1
             skip: ${skip}
             orderBy: createdTimestamp
             orderDirection: desc
-            where: {user: "${userAddress}"}
+            where: {user: "${userAddress.toLowerCase()}"}
         ) {
             id
             market {
@@ -61,7 +61,7 @@ export const fetchPositionsByUserQueryAndStatus = (
             orderBy: createdTimestamp
             orderDirection: desc
             where: {
-                user: "${userAddress}"
+                user: "${userAddress.toLowerCase()}"
                 status: "${status}"
                 }
         ) {
@@ -204,7 +204,7 @@ export const fetchAllPositionsUnrealizedPnl = (userAddress: string) => gql`
       first: 1000
       orderBy: positionCollateral
       orderDirection: desc
-      where: { user: "${userAddress}", status: OPEN }
+      where: { user: "${userAddress.toLowerCase()}", status: OPEN }
     ) {
       id
       netUnrealizedPnlInUsd
