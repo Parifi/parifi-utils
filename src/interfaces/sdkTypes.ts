@@ -34,3 +34,8 @@ export interface UserVaultData {
   unrealizedPNL: Decimal;
   realizedPNLInUsd: Decimal;
 }
+
+export interface ReferralRewardsInUsd {
+  userAddress: string;
+  referralRewardsInUsd: Decimal;
+}

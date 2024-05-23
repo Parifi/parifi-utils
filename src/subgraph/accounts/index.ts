@@ -1,8 +1,9 @@
 import Decimal from 'decimal.js';
 import { request } from 'graphql-request';
-import { fetchPortfolioData, fetchRealizedPnlData } from './subgraphQueries';
+import { fetchPortfolioData, fetchRealizedPnlData, fetchReferralRewardsInUsd } from './subgraphQueries';
 import { DECIMAL_ZERO, PRICE_FEED_PRECISION } from '../../common';
-import { UserPortfolioData } from '../../interfaces/sdkTypes';
+import { ReferralRewardsInUsd, UserPortfolioData } from '../../interfaces/sdkTypes';
+import { mapAccountsArrayToInterface } from '../../common/subgraphMapper';
 
 /// Returns the Realized PNL for positions and vaults for a user address
 export const getRealizedPnlForUser = async (
@@ -162,4 +163,25 @@ export const getPortfolioDataForUsers = async (
   } catch (error) {
     throw error;
   }
+};
+
+// Returns the referral reward earned by wallet addresses in USD
+export const getReferralRewardsInUsd = async (
+  subgraphEndpoint: string,
+  userAddresses: string[],
+): Promise<ReferralRewardsInUsd[]> => {
+  const subgraphResponse = await request(subgraphEndpoint, fetchReferralRewardsInUsd(userAddresses));
+  const accountsData = mapAccountsArrayToInterface(subgraphResponse);
+
+  const referralRewardsInUsd: ReferralRewardsInUsd[] = [];
+
+  if (accountsData) {
+    accountsData.forEach((account) => {
+      referralRewardsInUsd.push({
+        userAddress: account.id ?? '0x',
+        referralRewardsInUsd: new Decimal(account.referralRewardsInUsd ?? 0),
+      });
+    });
+  }
+  return referralRewardsInUsd;
 };

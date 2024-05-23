@@ -75,3 +75,11 @@ export const fetchPortfolioData = (userAddresses: string[]) => gql`
   }
 }
 `
+
+export const fetchReferralRewardsInUsd = (userAddresses: string[]) => gql`
+{
+  accounts(where: {id_in: [${userAddresses.map((id) => `"${id}"`).join(', ')}]}) {
+    id
+    referralRewardsInUsd
+  }
+}`

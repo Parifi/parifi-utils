@@ -23,7 +23,7 @@ export const mapSubgraphResponseToAccountInterface = (response: any): Account | 
       totalOrdersCount: response.totalOrdersCount,
       openPositionsCount: response.openPositionsCount,
       totalPositionsCount: response.totalPositionsCount,
-      referralFeesInUsd: response.referralFeesInUsd,
+      referralRewardsInUsd: response.referralRewardsInUsd,
       totalRealizedPnlPositions: response.totalRealizedPnlPositions,
       totalRealizedPnlVaults: response.totalRealizedPnlVaults,
       countProfitablePositions: response.countProfitablePositions,
@@ -31,6 +31,17 @@ export const mapSubgraphResponseToAccountInterface = (response: any): Account | 
       totalStaked: response.totalStaked,
       esPRFBalance: response.esPRFBalance,
     };
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
+
+export const mapAccountsArrayToInterface = (response: any): Account[] | undefined => {
+  try {
+    return response.accounts.map((account: Account) => {
+      return mapSubgraphResponseToAccountInterface(account);
+    });
   } catch (error) {
     console.log('Error while mapping data', error);
     throw error;
