@@ -52,8 +52,8 @@ export interface Account {
   // " Total count of positions created by user - open and closed positions "
   totalPositionsCount?: string;
 
-  // " Referral Fees claimed by partner/referrer in USD "
-  referralFeesInUsd?: string;
+  // " Total Partner/referral fees in USD (accounted/converted to USD during order creation by referrals) "
+  referralRewardsInUsd?: string;
 
   // " Total Realized P&L from Positions in USD "
   totalRealizedPnlPositions?: string;
