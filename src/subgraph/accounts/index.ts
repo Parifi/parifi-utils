@@ -1,6 +1,11 @@
 import Decimal from 'decimal.js';
 import { request } from 'graphql-request';
-import { fetchPortfolioData, fetchRealizedPnlData, fetchReferralRewardsInUsd } from './subgraphQueries';
+import {
+  fetchPortfolioData,
+  fetchRealizedPnlData,
+  fetchReferralRewardsInUsd,
+  fetchTopAccountsByReferralFees,
+} from './subgraphQueries';
 import { DECIMAL_ZERO, PRICE_FEED_PRECISION } from '../../common';
 import { ReferralRewardsInUsd, UserPortfolioData } from '../../interfaces/sdkTypes';
 import { mapAccountsArrayToInterface } from '../../common/subgraphMapper';
@@ -171,6 +176,28 @@ export const getReferralRewardsInUsd = async (
   userAddresses: string[],
 ): Promise<ReferralRewardsInUsd[]> => {
   const subgraphResponse = await request(subgraphEndpoint, fetchReferralRewardsInUsd(userAddresses));
+  const accountsData = mapAccountsArrayToInterface(subgraphResponse);
+
+  const referralRewardsInUsd: ReferralRewardsInUsd[] = [];
+
+  if (accountsData) {
+    accountsData.forEach((account) => {
+      referralRewardsInUsd.push({
+        userAddress: account.id ?? '0x',
+        referralRewardsInUsd: new Decimal(account.referralRewardsInUsd ?? 0),
+      });
+    });
+  }
+  return referralRewardsInUsd;
+};
+
+// Returns the top addresses by referral rewards earned in USD
+export const getTopAccountsByReferralRewards = async (
+  subgraphEndpoint: string,
+  count: number = 20,
+  skip: number = 0,
+): Promise<ReferralRewardsInUsd[]> => {
+  const subgraphResponse = await request(subgraphEndpoint, fetchTopAccountsByReferralFees(count, skip));
   const accountsData = mapAccountsArrayToInterface(subgraphResponse);
 
   const referralRewardsInUsd: ReferralRewardsInUsd[] = [];

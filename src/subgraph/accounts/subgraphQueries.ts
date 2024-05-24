@@ -74,12 +74,29 @@ export const fetchPortfolioData = (userAddresses: string[]) => gql`
     sharesBalance
   }
 }
-`
+`;
 
 export const fetchReferralRewardsInUsd = (userAddresses: string[]) => gql`
 {
-  accounts(where: {id_in: [${userAddresses.map((id) => `"${id}"`).join(', ')}]}) {
+  accounts(
+    orderBy: referralRewardsInUsd
+    orderDirection: desc
+    where: {id_in: [${userAddresses.map((id) => `"${id}"`).join(', ')}]}
+  ) {
     id
     referralRewardsInUsd
   }
-}`
+}`;
+
+export const fetchTopAccountsByReferralFees = (count: number = 20, skip: number = 0) => gql`
+{
+  accounts(
+    first: ${count}
+    skip: ${skip}
+    orderBy: referralRewardsInUsd
+    orderDirection: desc
+  ) {
+    id
+    referralRewardsInUsd
+  }
+}`;
