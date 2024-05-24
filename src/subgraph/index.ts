@@ -34,7 +34,12 @@ import {
 } from './vaults';
 import { Pyth } from '../pyth';
 import Decimal from 'decimal.js';
-import { getPortfolioDataForUsers, getRealizedPnlForUser, getReferralRewardsInUsd } from './accounts';
+import {
+  getPortfolioDataForUsers,
+  getRealizedPnlForUser,
+  getReferralRewardsInUsd,
+  getTopAccountsByReferralRewards,
+} from './accounts';
 import { ReferralRewardsInUsd, UserPortfolioData } from '../interfaces/sdkTypes';
 
 export * from './common';
@@ -108,6 +113,11 @@ export class Subgraph {
   public async getReferralRewardsInUsd(userAddresses: string[]): Promise<ReferralRewardsInUsd[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getReferralRewardsInUsd(subgraphEndpoint, userAddresses);
+  }
+
+  public async getTopAccountsByReferralRewards(count: number = 20, skip?: number): Promise<ReferralRewardsInUsd[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getTopAccountsByReferralRewards(subgraphEndpoint, count, skip);
   }
 
   ////////////////////////////////////////////////////////////////
