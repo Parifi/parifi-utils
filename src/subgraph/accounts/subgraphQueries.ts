@@ -79,12 +79,14 @@ export const fetchPortfolioData = (userAddresses: string[]) => gql`
 export const fetchReferralRewardsInUsd = (userAddresses: string[]) => gql`
 {
   accounts(
-    orderBy: referralRewardsInUsd
+    orderBy: totalReferralRewardsInUsd
     orderDirection: desc
     where: {id_in: [${userAddresses.map((id) => `"${id}"`).join(', ')}]}
   ) {
     id
-    referralRewardsInUsd
+    totalReferralRewardsInUsd
+    unclaimedReferralRewardsUsdc
+    unclaimedReferralRewardsWeth
   }
 }`;
 
@@ -93,10 +95,12 @@ export const fetchTopAccountsByReferralFees = (count: number = 20, skip: number 
   accounts(
     first: ${count}
     skip: ${skip}
-    orderBy: referralRewardsInUsd
+    orderBy: totalReferralRewardsInUsd
     orderDirection: desc
   ) {
     id
-    referralRewardsInUsd
+    totalReferralRewardsInUsd
+    unclaimedReferralRewardsUsdc
+    unclaimedReferralRewardsWeth
   }
 }`;

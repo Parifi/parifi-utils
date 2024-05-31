@@ -45,8 +45,8 @@ describe('Order fetching logic from subgraph', () => {
     expect(referralRewards.length).not.toBe(0);
     // If we have two accounts with referral rewards, 1st account should have equal or more than the second account
     if (referralRewards.length > 1) {
-      expect(referralRewards[0].referralRewardsInUsd.toNumber()).toBeGreaterThanOrEqual(
-        referralRewards[1].referralRewardsInUsd.toNumber(),
+      expect(referralRewards[0].totalReferralRewardsInUsd.toNumber()).toBeGreaterThanOrEqual(
+        referralRewards[1].totalReferralRewardsInUsd.toNumber(),
       );
     }
   });

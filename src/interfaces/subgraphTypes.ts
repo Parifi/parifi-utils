@@ -52,8 +52,17 @@ export interface Account {
   // " Total count of positions created by user - open and closed positions "
   totalPositionsCount?: string;
 
-  // " Total Partner/referral fees in USD (accounted/converted to USD during order creation by referrals) "
-  referralRewardsInUsd?: string;
+  // " Count of total orders when referral fee was credited/accumulated to this account "
+  totalReferralsCount?: string;
+
+  // " Total Partner/referral fees in USD (accounted/converted to USD during order creation by referrals), includes both claimed/unclaimed "
+  totalReferralRewardsInUsd?: string;
+
+  // " Unclaimed Referral rewards for WETH Vault tokens "
+  unclaimedReferralRewardsWeth?: string;
+
+  // " Unclaimed Referral rewards for USDC Vault tokens "
+  unclaimedReferralRewardsUsdc?: string;
 
   // " Total Realized P&L from Positions in USD "
   totalRealizedPnlPositions?: string;
@@ -62,19 +71,18 @@ export interface Account {
   totalRealizedPnlVaults?: string;
 
   // " Count of total profitable positions "
-  countProfitablePositions?: string
+  countProfitablePositions?: string;
 
   // " Count of total positions with loss "
-  countLossPositions?: string
+  countLossPositions?: string;
 
   // streams: [Stream!]!
 
-  totalStaked?: string
+  totalStaked?: string;
 
   // gaugeEarnings: [GaugeEarning!]!
 
-  esPRFBalance?: string
-
+  esPRFBalance?: string;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -388,7 +396,7 @@ export interface Position {
   accruedBorrowingFeesInCollateral: string;
 
   // " True if the position can be liquidated "
-  canBeLiquidated: boolean
+  canBeLiquidated: boolean;
 
   // " Loss to collateral ratio percentage "
   lossToCollateralRatioPercent: string;
@@ -548,75 +556,74 @@ export interface Vault {
 // " Vault position data per user "
 export interface VaultPosition {
   // " {User Address}-{Vault Address} "
-  id?: string
+  id?: string;
 
   // " Vault Details "
-  vault?: Vault
+  vault?: Vault;
 
   // " User Details "
-  user?: Account
+  user?: Account;
 
-  sharesBalance?: string
+  sharesBalance?: string;
 
-  totalMinted?: string
+  totalMinted?: string;
 
-  totalRedeemed?: string
+  totalRedeemed?: string;
 
-  totalDeposited?: string
+  totalDeposited?: string;
 
-  totalWithdrawn?: string
+  totalWithdrawn?: string;
 
-  avgMintPrice?: string
+  avgMintPrice?: string;
 
-  avgMintPriceDec?: string
+  avgMintPriceDec?: string;
 
-  realizedPNL?: string
+  realizedPNL?: string;
 
-  realizedPNLInUsd?: string
+  realizedPNLInUsd?: string;
 
-  unrealizedPNL?: string
+  unrealizedPNL?: string;
 
   // " Last Updated "
-  timestamp?: string
+  timestamp?: string;
 
   // " Cooldown initiated timstamp "
-  cooldownInitiatedTimestamp?: string
+  cooldownInitiatedTimestamp?: string;
 
   // " Cooldown finishes, withdrawal period starts "
-  cooldownEnd?: string
+  cooldownEnd?: string;
 
   // " Withdrawal findow finishes, no withdrawals allowed "
-  withdrawalEnds?: string
+  withdrawalEnds?: string;
 }
 
 // " User triggers cooldown, requesting a withdrawal "
-export interface VaultCooldown  {
+export interface VaultCooldown {
   // " Transaction Hash "
-  id?: string
+  id?: string;
 
   // " Vault Details "
-  vault?: Vault
+  vault?: Vault;
 
   // " User Schema "
-  user?: Account
+  user?: Account;
 
   // " Amount to unlock in deposit token "
-  amountAssets?: string
+  amountAssets?: string;
 
   // " Cooldown finishes, withdrawal period starts "
-  cooldownEnd?: string
+  cooldownEnd?: string;
 
   // " Withdrawal findow finishes, no withdrawals allowed "
-  withdrawalEnds?: string
+  withdrawalEnds?: string;
 
   // " Block timestamp "
-  timestamp?: string
+  timestamp?: string;
 }
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    OTHERS     ///////////////////////////
 ////////////////////////////////////////////////////////////////
-
 
 // Subgraph interface for partner referrals
 export interface Referral {
