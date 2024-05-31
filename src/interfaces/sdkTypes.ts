@@ -37,5 +37,7 @@ export interface UserVaultData {
 
 export interface ReferralRewardsInUsd {
   userAddress: string;
-  referralRewardsInUsd: Decimal;
+  totalReferralRewardsInUsd: Decimal;
+  unclaimedReferralRewardsUsdc: BigInt;
+  unclaimedReferralRewardsWeth: BigInt;
 }

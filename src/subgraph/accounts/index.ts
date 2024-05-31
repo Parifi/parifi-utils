@@ -184,7 +184,9 @@ export const getReferralRewardsInUsd = async (
     accountsData.forEach((account) => {
       referralRewardsInUsd.push({
         userAddress: account.id ?? '0x',
-        referralRewardsInUsd: new Decimal(account.referralRewardsInUsd ?? 0),
+        totalReferralRewardsInUsd: new Decimal(account.totalReferralRewardsInUsd ?? 0),
+        unclaimedReferralRewardsUsdc: BigInt(account.unclaimedReferralRewardsUsdc ?? 0),
+        unclaimedReferralRewardsWeth: BigInt(account.unclaimedReferralRewardsWeth ?? 0),
       });
     });
   }
@@ -206,7 +208,9 @@ export const getTopAccountsByReferralRewards = async (
     accountsData.forEach((account) => {
       referralRewardsInUsd.push({
         userAddress: account.id ?? '0x',
-        referralRewardsInUsd: new Decimal(account.referralRewardsInUsd ?? 0),
+        totalReferralRewardsInUsd: new Decimal(account.totalReferralRewardsInUsd ?? 0),
+        unclaimedReferralRewardsUsdc: BigInt(account.unclaimedReferralRewardsUsdc ?? 0),
+        unclaimedReferralRewardsWeth: BigInt(account.unclaimedReferralRewardsWeth ?? 0),
       });
     });
   }
