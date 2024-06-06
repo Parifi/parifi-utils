@@ -105,12 +105,13 @@ export const getLiquidatedPositionsByUserAddress = async (
 // Get position from subgraph by position ID
 export const getPositionById = async (subgraphEndpoint: string, positionId: string): Promise<Position> => {
   try {
-    const formattedPositionId = positionId.toLowerCase();
+    const formattedPositionId = positionId?.toLowerCase();
     let subgraphResponse: any = await request(subgraphEndpoint, fetchPositionByIdQuery(formattedPositionId));
-
-    const position = mapSinglePositionToInterface(subgraphResponse.position);
-    if (position) {
-      return position;
+    if(subgraphResponse){
+      const position = mapSinglePositionToInterface(subgraphResponse.position);
+      if (position) {
+        return position;
+      }
     }
     throw new NotFoundError('Position not found');
   } catch (error) {

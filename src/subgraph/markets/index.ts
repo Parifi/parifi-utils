@@ -22,11 +22,12 @@ export const getMarketById = async (subgraphEndpoint: string, marketId: string):
   try {
     const formattedMarketId = marketId.toLowerCase();
     const subgraphResponse: any = await request(subgraphEndpoint, fetchMarketByIdQuery(formattedMarketId));
-
+  if (subgraphResponse) {
     const market = mapSingleMarketToInterface(subgraphResponse.market);
     if (market && market.id === marketId) {
       return market;
     }
+  }
     throw new NotFoundError('Market does not exists');
   } catch (error) {
     throw error;
