@@ -1,6 +1,7 @@
 import { getParifiSdkInstanceForTesting } from '..';
-import { OrderStatus } from '../../src';
+import { EMPTY_BYTES32, OrderStatus } from '../../src';
 import { TEST_ORDER_ID1, TEST_SETTLE_ORDER_ID } from '../common/constants';
+import { zeroAddress } from 'viem';
 
 describe('Order fetching logic from subgraph', () => {
   it('should return correct order details', async () => {
@@ -29,5 +30,16 @@ describe('Order fetching logic from subgraph', () => {
 
     const referralData = await parifiSdk.subgraph.getReferralDataForPartner(partnerAddress);
     expect(referralData.length).not.toBe(0);
+  });
+
+  it('should return correct position id for an order id', async () => {
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+    const orderIds = [TEST_ORDER_ID1, TEST_SETTLE_ORDER_ID, zeroAddress];
+
+    const response = await parifiSdk.subgraph.getPositionIdsFromOrderIds(orderIds);
+    expect(response.length).toBeGreaterThan(0);
+
+    // Invalid order id should have position id as Bytes32(0);
+    expect(response.at(2)?.positionId).toBe(EMPTY_BYTES32)
   });
 });
