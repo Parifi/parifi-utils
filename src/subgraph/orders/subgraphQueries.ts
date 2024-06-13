@@ -91,7 +91,7 @@ export const fetchPendingOrdersQuery = (
 export const fetchOrdersByIdQuery = (orderId: string) =>
   gql`
   {
-    order(id: "${orderId}") {
+    order(id: "${orderId.toLowerCase()}") {
     id
     user {
       id
@@ -136,7 +136,7 @@ export const fetchPriceIdsFromOrderIdsQuery = (orderIds: string[]) =>
   {
     orders(
       where: {
-        id_in: [${orderIds.map((id) => `"${id}"`).join(', ')}]
+        id_in: [${orderIds.map((id) => `"${id.toLowerCase()}"`).join(', ')}]
       }
     ) {
       id
@@ -169,4 +169,17 @@ export const fetchPartnerRewards = (partnerAddress: string, count: number = 20, 
       referralRewardsInToken
     }
   }
+`;
+
+export const fetchPositionIdsForOrderIds = (orderIds: string[]) => gql`
+{
+  orders(
+    where: {
+      id_in: [${orderIds.map((id) => `"${id.toLowerCase()}"`).join(', ')}]
+    }
+  ) {
+    id
+    position { id }
+  }
+}
 `;

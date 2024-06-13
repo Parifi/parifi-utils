@@ -5,6 +5,7 @@ import {
   fetchOrdersByUserQuery,
   fetchPartnerRewards,
   fetchPendingOrdersQuery,
+  fetchPositionIdsForOrderIds,
   fetchPriceIdsFromOrderIdsQuery,
 } from './subgraphQueries';
 import {
@@ -12,7 +13,7 @@ import {
   mapReferralsArrayToInterface,
   mapSingleOrderToInterface,
 } from '../../common/subgraphMapper';
-import { EMPTY_BYTES32, getPriceIdsForCollaterals, getUniqueValuesFromArray } from '../../common';
+import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
 import { NotFoundError } from '../../error/not-found.error';
 
 // Get all order by a user address
@@ -107,4 +108,40 @@ export const getReferralDataForPartner = async (
   } catch (error) {
     throw error;
   }
+};
+
+// Returns the position id related to the order id. If the order ID or position Id does not exists
+// EMPTY_BYTES32 (0x0000) is returned
+export const getPositionIdsFromOrderIds = async (
+  subgraphEndpoint: string,
+  orderIds: string[],
+): Promise<{ orderId: string; positionId: string }[]> => {
+  let result: { orderId: string; positionId: string }[] = [];
+
+  // Interface for subgraph response
+  interface ApiResponse {
+    orders: Array<{
+      id: string;
+      position: {
+        id: string;
+      } | null;
+    }>;
+  }
+
+  try {
+    const subgraphResponse: ApiResponse = await request(subgraphEndpoint, fetchPositionIdsForOrderIds(orderIds));
+
+    orderIds.forEach((id) => {
+      let pid: string = EMPTY_BYTES32;
+      const res = subgraphResponse.orders.find((order) => order.id === id);
+      if (res) {
+        pid = res.position?.id ?? EMPTY_BYTES32;
+      }
+      result.push({ orderId: id, positionId: pid });
+    });
+  } catch (error) {
+    throw error;
+  }
+  console.log(result);
+  return result;
 };
