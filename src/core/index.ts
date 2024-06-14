@@ -33,7 +33,11 @@ import {
   getParifiUtilsInstance,
 } from './parifi-utils';
 import { convertCollateralAmountToUsd, convertMarketAmountToCollateral, convertMarketAmountToUsd } from './price-feed';
-import { getMarketBorrowingRatePerHour, getMarketOpenInterestInUsd } from './pages/statsPage';
+import {
+  getMarketBorrowingRatePerHour,
+  getMarketOpenInterestInUsd,
+  getTotalOpenInterestInUsd,
+} from './pages/statsPage';
 import { getPublicSubgraphEndpoint } from '../subgraph';
 import { getPythClient } from '../pyth/pyth';
 import { UserVaultData } from '../interfaces/sdkTypes';
@@ -394,5 +398,17 @@ export class Core {
   getPoolPageData = async (userAddress: string): Promise<UserVaultData[]> => {
     const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
     return await getPoolPageData(subgraphEndpoint, userAddress);
+  };
+
+  getTotalOpenInterestInUsd = async (): Promise<Decimal> => {
+    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+    const pythClient = await getPythClient(
+      this.pythConfig.pythEndpoint,
+      this.pythConfig.username,
+      this.pythConfig.password,
+      this.pythConfig.isStable,
+    );
+
+    return await getTotalOpenInterestInUsd(subgraphEndpoint, pythClient);
   };
 }
