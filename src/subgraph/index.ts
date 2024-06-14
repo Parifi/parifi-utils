@@ -2,6 +2,7 @@ import {
   getAllOrdersByUserAddress,
   getAllPendingOrders,
   getOrderById,
+  getPositionIdsFromOrderIds,
   getPythPriceIdsForOrderIds,
   getReferralDataForPartner,
 } from './orders';
@@ -141,6 +142,11 @@ export class Subgraph {
   public async getPythPriceIdsForOrderIds(orderIds: string[]): Promise<string[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getPythPriceIdsForOrderIds(subgraphEndpoint, orderIds);
+  }
+
+  public async getPositionIdsFromOrderIds(orderIds: string[]): Promise<{ orderId: string; positionId: string }[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getPositionIdsFromOrderIds(subgraphEndpoint, orderIds);
   }
 
   ////////////////////////////////////////////////////////////////
