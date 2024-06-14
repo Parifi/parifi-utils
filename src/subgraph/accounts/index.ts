@@ -30,10 +30,9 @@ export const getRealizedPnlForUser = async (
 
     const query = fetchRealizedPnlData(userAddress);
     const subgraphResponse: RealizedPnlSubgraphResponse = await request(subgraphEndpoint, query);
-
+    if (!subgraphResponse) throw new Error('Error While Fetching Users Realized Pnl');
     const totalRealizedPnlPositions = new Decimal(subgraphResponse.account.totalRealizedPnlPositions);
     const totalRealizedPnlVaults = new Decimal(subgraphResponse.account.totalRealizedPnlVaults);
-
     return { totalRealizedPnlPositions, totalRealizedPnlVaults };
   } catch (error) {
     throw error;
@@ -98,6 +97,7 @@ export const getPortfolioDataForUsers = async (
     const formattedAddresses = userAddresses.map((userAddress) => userAddress.toLowerCase());
     const query = fetchPortfolioData(formattedAddresses);
     const subgraphResponse = await request(subgraphEndpoint, query);
+    if (!subgraphResponse) throw new Error('Error While Fetching Portfolio Data For Users');
     const mappedRes: PortfolioDataResponse = subgraphResponse as unknown as PortfolioDataResponse;
 
     /// Iterate through the returned data to calculate final values
@@ -176,8 +176,8 @@ export const getReferralRewardsInUsd = async (
   userAddresses: string[],
 ): Promise<ReferralRewardsInUsd[]> => {
   const subgraphResponse = await request(subgraphEndpoint, fetchReferralRewardsInUsd(userAddresses));
+  if (!subgraphResponse) throw new Error('Error While Fetching Referral Rewards');
   const accountsData = mapAccountsArrayToInterface(subgraphResponse);
-
   const referralRewardsInUsd: ReferralRewardsInUsd[] = [];
 
   if (accountsData) {
@@ -200,6 +200,7 @@ export const getTopAccountsByReferralRewards = async (
   skip: number = 0,
 ): Promise<ReferralRewardsInUsd[]> => {
   const subgraphResponse = await request(subgraphEndpoint, fetchTopAccountsByReferralFees(count, skip));
+  if (!subgraphResponse) throw new Error('Error While Fetching Top Accounts By Referral Rewards');
   const accountsData = mapAccountsArrayToInterface(subgraphResponse);
 
   const referralRewardsInUsd: ReferralRewardsInUsd[] = [];

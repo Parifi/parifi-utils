@@ -24,6 +24,7 @@ import { getLatestPricesNormalized } from '../../pyth/pyth';
 export const getAllVaults = async (subgraphEndpoint: string): Promise<Vault[]> => {
   try {
     let subgraphResponse: any = await request(subgraphEndpoint, fetchAllVaultsQuery());
+    if (!subgraphResponse) throw Error(`Error While Fechting All Vaults`);
     const vaults = mapVaultsArrayToInterface(subgraphResponse);
     if (vaults && vaults?.length != 0) {
       return vaults;
@@ -41,6 +42,7 @@ export const getUserVaultData = async (subgraphEndpoint: string, user: string): 
     }
 
     let subgraphResponse: any = await request(subgraphEndpoint, fetchUserVaultPositionsQuery(user));
+    if (!subgraphResponse) throw Error(`Error While Fechting User Vault Data`);
     const vaultPositions = mapVaultPositionsArrayToInterface(subgraphResponse);
     if (vaultPositions === undefined || vaultPositions?.length === 0) {
       return [];
@@ -84,6 +86,7 @@ export const getUserTotalPoolsValue = async (
 
     const query = fetchUserVaultPositionsQuery(userAddress);
     const subgraphResponse = await request(subgraphEndpoint, query);
+    if (!subgraphResponse) throw new Error('While While Fechting User Total Pools Value');
     const mappedRes: VaultPositionsResponse = subgraphResponse as unknown as VaultPositionsResponse;
 
     const priceIds = mappedRes.vaultPositions.map((v) => v.vault.depositToken?.pyth?.id);
@@ -161,6 +164,7 @@ export const getVaultApr = async (
 
   try {
     const subgraphResponse: VaultAprInterface = await request(subgraphEndpoint, fetchVaultAprDetails(vaultId));
+    if (!subgraphResponse) throw new Error('While While Fechting VaultApr');
     const vaultDatas = subgraphResponse.vaultDailyDatas;
 
     // If no APR data found, return 0;
@@ -206,7 +210,7 @@ export const getUserVaultCoolDowns = async (
   userAddress: string,
 ): Promise<VaultCooldown[]> => {
   const response = await request(subgraphEndpoint, fetchCooldownDetails(userAddress));
-
+  if (!response) throw new Error('While While Fechting User Vault Cool Downs');
   const vaultCooldowns = mapVaultCooldownArrayToInterface(response);
   if (vaultCooldowns) {
     return vaultCooldowns;
@@ -235,7 +239,7 @@ export const getPoolVolume24h = async (subgraphEndpoint: string): Promise<{ [vau
   const query = fetchVaultVolumeData(currentTimestamp - oneDayInSeconds);
   const transactions: VaultResponse = await request(subgraphEndpoint, query);
   const volumeByVault: { [vaultId: string]: Decimal } = {};
-
+  if (!transactions) throw new Error('While Fechting Vault Volume Data');
   // Calculate the sum of USD value of all deposit transactions
   transactions.vaultDeposits.forEach((deposit) => {
     if (!volumeByVault[deposit.vault.id]) {

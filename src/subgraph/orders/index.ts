@@ -25,6 +25,7 @@ export const getAllOrdersByUserAddress = async (
 ): Promise<Order[]> => {
   try {
     const subgraphResponse: any = await request(subgraphEndpoint, fetchOrdersByUserQuery(userAddress, count, skip));
+    if (!subgraphResponse) throw new Error('While While Fechting All Order By user Address');
     const orders = mapOrdersArrayToInterface(subgraphResponse);
     if (!orders) throw new NotFoundError('Orders not found');
     return orders;
@@ -42,6 +43,7 @@ export const getAllPendingOrders = async (
 ): Promise<Order[]> => {
   try {
     const subgraphResponse: any = await request(subgraphEndpoint, fetchPendingOrdersQuery(timestamp, count, skip));
+    if (!subgraphResponse) throw new Error('Error While Fechting All PendingOrders');
     const orders = mapOrdersArrayToInterface(subgraphResponse);
     if (orders) {
       return orders;
@@ -57,6 +59,7 @@ export const getOrderById = async (subgraphEndpoint: string, orderId: string): P
   try {
     const formattedOrderId = orderId.toLowerCase();
     let subgraphResponse: any = await request(subgraphEndpoint, fetchOrdersByIdQuery(formattedOrderId));
+    if (!subgraphResponse) throw new Error('Error While Fechting Order By Id');
     const order = mapSingleOrderToInterface(subgraphResponse.order);
     if (order && order.id === orderId) {
       return order;
@@ -72,7 +75,7 @@ export const getPythPriceIdsForOrderIds = async (subgraphEndpoint: string, order
   try {
     const formattedOrderIds: string[] = orderIds.map((orderId) => orderId.toLowerCase());
     let subgraphResponse: any = await request(subgraphEndpoint, fetchPriceIdsFromOrderIdsQuery(formattedOrderIds));
-
+    if (!subgraphResponse) throw new Error('Error While Fechting Pyth Price Ids For Order Ids');
     const priceIds: string[] = [];
 
     const orders: Order[] = mapOrdersArrayToInterface(subgraphResponse) || [];
@@ -103,6 +106,7 @@ export const getReferralDataForPartner = async (
   try {
     const query = fetchPartnerRewards(partnerAddress.toLowerCase(), count, skip);
     const subgraphResponse = await request(subgraphEndpoint, query);
+    if (!subgraphResponse) throw new Error('Error While Fechting Referral Data For Partner');
     const referrals: Referral[] = mapReferralsArrayToInterface(subgraphResponse) ?? [];
     return referrals;
   } catch (error) {
