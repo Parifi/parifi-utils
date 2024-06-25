@@ -43,4 +43,12 @@ describe('Stats tests', () => {
     // is being used for the calculation in subgraph and here
     // expect(totalOiCalculated.toNumber()).toBeCloseTo(totalOIInUsd.toNumber(), 2);
   });
+
+  it('should return total Open Interest of the protocol across all the markets', async () => {
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+
+    const totalOIInUsd = await parifiSdk.core.getTotalOpenInterestInUsd();
+    console.log('Total Open Interest: ', totalOIInUsd);
+    expect(totalOIInUsd.toNumber()).toBeGreaterThan(0);
+  });
 });

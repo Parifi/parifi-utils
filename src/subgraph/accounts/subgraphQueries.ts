@@ -104,3 +104,23 @@ export const fetchTopAccountsByReferralFees = (count: number = 20, skip: number 
     unclaimedReferralRewardsWeth
   }
 }`;
+
+// Fetch account specific data for a user address for Leaderboard view
+export const fetchLeaderboardUserData = (userAddresses: string[]) => gql`
+{
+  accounts(
+    where: {id_in: [${userAddresses.map((id) => `"${id}"`).join(', ')}]}
+  ) {
+    id
+    totalOrdersCount
+    totalPositionsCount
+    countProfitablePositions
+    countLossPositions
+    countLiquidatedPositions
+    totalVolumeInUsd
+    totalVolumeInUsdLongs
+    totalVolumeInUsdShorts
+    totalRealizedPnlPositions
+    totalAccruedBorrowingFeesInUsd 
+  }
+}`;

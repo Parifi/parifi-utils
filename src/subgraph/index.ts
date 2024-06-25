@@ -36,12 +36,13 @@ import {
 import { Pyth } from '../pyth';
 import Decimal from 'decimal.js';
 import {
+  getLeaderboardUserData,
   getPortfolioDataForUsers,
   getRealizedPnlForUser,
   getReferralRewardsInUsd,
   getTopAccountsByReferralRewards,
 } from './accounts';
-import { ReferralRewardsInUsd, UserPortfolioData } from '../interfaces/sdkTypes';
+import { LeaderboardUserData, ReferralRewardsInUsd, UserPortfolioData } from '../interfaces/sdkTypes';
 
 export * from './common';
 export * from './markets';
@@ -119,6 +120,11 @@ export class Subgraph {
   public async getTopAccountsByReferralRewards(count: number = 20, skip?: number): Promise<ReferralRewardsInUsd[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getTopAccountsByReferralRewards(subgraphEndpoint, count, skip);
+  }
+
+  public async getLeaderboardUserData(userAddresses: string[]): Promise<LeaderboardUserData[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getLeaderboardUserData(subgraphEndpoint, userAddresses);
   }
 
   ////////////////////////////////////////////////////////////////
