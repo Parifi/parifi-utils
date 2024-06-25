@@ -1,13 +1,14 @@
 import Decimal from 'decimal.js';
 import { request } from 'graphql-request';
 import {
+  fetchLeaderboardUserData,
   fetchPortfolioData,
   fetchRealizedPnlData,
   fetchReferralRewardsInUsd,
   fetchTopAccountsByReferralFees,
 } from './subgraphQueries';
 import { DECIMAL_ZERO, PRICE_FEED_PRECISION } from '../../common';
-import { ReferralRewardsInUsd, UserPortfolioData } from '../../interfaces/sdkTypes';
+import { LeaderboardUserData, ReferralRewardsInUsd, UserPortfolioData } from '../../interfaces/sdkTypes';
 import { mapAccountsArrayToInterface } from '../../common/subgraphMapper';
 
 /// Returns the Realized PNL for positions and vaults for a user address
@@ -216,4 +217,18 @@ export const getTopAccountsByReferralRewards = async (
     });
   }
   return referralRewardsInUsd;
+};
+
+// Returns the leaderboard page details for a user address
+export const getLeaderboardUserData = async (
+  subgraphEndpoint: string,
+  userAddresses: string[],
+): Promise<LeaderboardUserData[]> => {
+  const subgraphResponse = await request(
+    subgraphEndpoint,
+    fetchLeaderboardUserData(userAddresses),
+  );
+
+  const leaderboardUserData: LeaderboardUserData[] = subgraphResponse as unknown as LeaderboardUserData[];
+  return leaderboardUserData;
 };

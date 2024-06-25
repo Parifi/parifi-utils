@@ -50,4 +50,12 @@ describe('Order fetching logic from subgraph', () => {
       );
     }
   });
+
+  it('should return leaderboard user data', async () => {
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+
+    const userAddresses = [TEST_USER_ID1, '0x58d24685a6982cbee9d43f3e915b4a6ea12bb3c6', TEST_USER_ID3];
+    const leaderboardUserData = await parifiSdk.subgraph.getLeaderboardUserData(userAddresses);
+    expect(leaderboardUserData.length).not.toBe(0);
+  });
 });

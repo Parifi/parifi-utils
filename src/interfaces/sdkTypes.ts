@@ -41,3 +41,18 @@ export interface ReferralRewardsInUsd {
   unclaimedReferralRewardsUsdc: BigInt;
   unclaimedReferralRewardsWeth: BigInt;
 }
+
+// Interface to return account specific data for Leaderboard stats
+export interface LeaderboardUserData {
+  userAddress: string;
+  totalOrdersCount: number;
+  totalPositionsCount: number;
+  countProfitablePositions: number;
+  countLossPositions: number;
+  countLiquidatedPositions: number;
+  totalVolumeInUsd: Decimal;
+  totalVolumeInUsdLongs: Decimal;
+  totalVolumeInUsdShorts: Decimal;
+  totalRealizedPnlPositions: Decimal;
+  totalAccruedBorrowingFeesInUsd: Decimal;
+}
