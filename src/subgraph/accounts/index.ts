@@ -224,11 +224,10 @@ export const getLeaderboardUserData = async (
   subgraphEndpoint: string,
   userAddresses: string[],
 ): Promise<LeaderboardUserData[]> => {
-  const subgraphResponse = await request(
-    subgraphEndpoint,
-    fetchLeaderboardUserData(userAddresses),
-  );
+  const subgraphResponse: {
+    accounts: LeaderboardUserData[];
+  } = await request(subgraphEndpoint, fetchLeaderboardUserData(userAddresses));
 
-  const leaderboardUserData: LeaderboardUserData[] = subgraphResponse as unknown as LeaderboardUserData[];
+  const leaderboardUserData: LeaderboardUserData[] = subgraphResponse.accounts as LeaderboardUserData[];
   return leaderboardUserData;
 };
