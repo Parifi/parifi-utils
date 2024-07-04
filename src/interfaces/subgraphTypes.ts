@@ -76,6 +76,21 @@ export interface Account {
   // " Count of total positions with loss "
   countLossPositions?: string;
 
+  // " Count of liquidated positions "
+  countLiquidatedPositions?: string;
+
+  // " Total Volume in USD (Snapshot of price during tx timestamp)"
+  totalVolumeInUsd?: string;
+
+  // " Total Volume Longs (Snapshot of price during tx timestamp)"
+  totalVolumeInUsdLongs?: string;
+
+  // " Total Volume Shorts (Snapshot of price during tx timestamp)"
+  totalVolumeInUsdShorts?: string;
+
+  // " Total Borrowing Fees accrued across all positions "
+  totalAccruedBorrowingFeesInUsd?: string;
+
   // streams: [Stream!]!
 
   totalStaked?: string;
@@ -92,6 +107,9 @@ export interface Account {
 export interface Market {
   // " Market ID "
   id?: string;
+
+  // " Market name "
+  name?: string;
 
   // " Vault Address "
   vaultAddress?: string;
@@ -164,6 +182,12 @@ export interface Market {
 
   // " Total Open Interest (assets) "
   totalOIAssets?: string;
+
+  // " Accumulated OI USD at position avgPrice for Longs "
+  accumulatedOILongs?: string;
+
+  // " Accumulated OI USD at position avgPrice for Longs "
+  accumulatedOIShorts?: string;
 
   // " If closeOnlyMode is true, no new positions can be opened. Only existing position can be closed "
   closeOnlyMode?: boolean;
@@ -453,6 +477,7 @@ export interface PythPriceResponse {
   ema_price: PythPrice;
 }
 
+// " The entity saves all the price feed updates on-chain (by Parifi) "
 export interface PriceFeedSnapshot {
   //" Price ID + Timestamp "
   id?: string;
@@ -470,6 +495,7 @@ export interface PriceFeedSnapshot {
   confidence?: string;
 }
 
+// " Pyth Feeds for Parifi market IDs/Token addresses "
 export interface PythData {
   // " Pyth Price ID for market/token "
   id?: string;
@@ -533,6 +559,9 @@ export interface Vault {
   // " Shares received when 1 asset token (with decimals) is deposited to the vault "
   sharesPerAsset?: string;
 
+  // " Shares received when 1 asset token (with decimals) is deposited to the vault (in decimals)"
+  sharesPerAssetDec?: string;
+
   // " Withdrawal fee in basis points "
   withdrawalFee?: string;
 
@@ -548,9 +577,134 @@ export interface Vault {
   // " Withdrawal Window in seconds"
   withdrawalWindow?: string;
 
+  // " total days passed"
+  daysPassed?: string;
+
+  // " cumulative daily APRs"
+  cumulativeAPRs?: string;
+
+  // " All time APR"
+  allTimeApr?: string;
+
   // Vault PNL info can be fetched using a separate query
   // to avoid nested data structure
   // vaultPnl?: [VaultPnl]
+}
+
+// " Entity to save all deposits to the Parifi Vault "
+export interface VaultDeposit {
+  // " deposit-{ Transaction hash }-{ Log Index }"
+  id?: string;
+
+  // "Transaction hash "
+  txHash?: string;
+
+  // " Deposit timestamp "
+  timestamp?: string;
+
+  // " Account that signed/sent the transaction "
+  msgSender?: string;
+
+  // " Address that sent the tokens for deposit "
+  depositor?: string;
+
+  // " Address that received the vault shares after deposit "
+  receiver?: string;
+
+  // " Vault where the tokens were deposited "
+  vault?: Vault;
+
+  // " Amount in asset tokens "
+  amountAssets?: string;
+
+  // " Amount in share/vault tokens "
+  amountShares?: string;
+
+  // " Deposit amount in USD "
+  amountUSD?: string;
+
+  // " Assets received when 1 share token (with decimals) is redeemed for asset "
+  assetsPerShare?: string;
+}
+
+// " Entity to save all withdrawals from the Parifi Vault "
+export interface VaultWithdraw {
+  // " withdraw-{ Transaction hash }-{ Log Index }"
+  id?: string;
+
+  // "Transaction hash "
+  txHash?: string;
+
+  // " Deposit timestamp "
+  timestamp?: string;
+
+  // " Account that signed/sent the transaction "
+  msgSender?: string;
+
+  // " Address that owned the shares (vault tokens) during withdrawal "
+  owner?: string;
+
+  // " Address that received the assets after withdrawal "
+  receiver?: string;
+
+  // " Vault where the tokens were deposited "
+  vault?: Vault;
+
+  // " Amount in asset tokens "
+  amountAssets?: string;
+
+  // " Amount in share/vault tokens "
+  amountShares?: string;
+
+  // " Deposit amount in USD "
+  amountUSD?: string;
+
+  // " Assets received when 1 share token (with decimals) is redeemed for asset "
+  assetsPerShare?: string;
+}
+
+export interface VaultPnl {
+  // " vault-pnl-{ Transaction hash }-{ Log Index }  "
+  id?: string;
+
+  // " Vault Details "
+  vault?: Vault;
+
+  // " Profit/Loss amount in USD "
+  amount?: string;
+
+  // " Profit/Loss amount in deposit token "
+  amountAssets?: string;
+
+  // " Block timestamp "
+  timestamp?: string;
+
+  // " Transaction hash "
+  txHash?: string;
+}
+
+// " User triggers cooldown, requesting a withdrawal "
+export interface VaultCooldown {
+  // " Transaction Hash "
+  id?: string;
+
+  // " Vault Details "
+  vault?: Vault;
+
+  // " User Schema "
+  user?: Account;
+
+  // " Amount to unlock in deposit token "
+  amountAssets?: string;
+
+  // " Cooldown finishes, withdrawal period starts "
+  cooldownEnd?: string;
+
+  // " Withdrawal findow finishes, no withdrawals allowed "
+  withdrawalEnds?: string;
+
+  // " Block timestamp "
+  timestamp?: string;
 }
 
 // " Vault position data per user "
@@ -597,28 +751,68 @@ export interface VaultPosition {
   withdrawalEnds?: string;
 }
 
-// " User triggers cooldown, requesting a withdrawal "
-export interface VaultCooldown {
-  // " Transaction Hash "
+export interface VaultDailyData {
+  // " {vaultAddress}-{ DayNumber }  "
   id?: string;
 
   // " Vault Details "
   vault?: Vault;
 
-  // " User Schema "
-  user?: Account;
+  // " Day Number"
+  dayNumber?: string;
 
-  // " Amount to unlock in deposit token "
-  amountAssets?: string;
+  // " Block timestamp when day starts "
+  startTimestamp?: string;
 
-  // " Cooldown finishes, withdrawal period starts "
-  cooldownEnd?: string;
+  // " Block timestamp when day ends "
+  endTimestamp?: string;
 
-  // " Withdrawal findow finishes, no withdrawals allowed "
-  withdrawalEnds?: string;
+  // " Amount deposited when day starts "
+  startDeposited?: string;
 
-  // " Block timestamp "
-  timestamp?: string;
+  // " Amount deposited when day ends "
+  endDeposited?: string;
+
+  // " Avg amount deposited for this day "
+  avgDeposited?: string;
+
+  // " Amount earned in Assets "
+  totalProfits?: string;
+
+  // " Amount lost in Assets "
+  totalLosses?: string;
+
+  // " Profits - Losses "
+  pnl?: string;
+
+  // " Vault APR for the day "
+  apr?: string;
+}
+
+export interface VaultHourlyData {
+  // " {vaultAddress}-{ HourNumber }  "
+  id?: string;
+
+  // " Vault Details "
+  vault?: Vault;
+
+  // " Hour Number"
+  hourNumber?: string;
+
+  // " Block timestamp when day starts "
+  startTimestamp?: string;
+
+  // " Block timestamp when day ends "
+  endTimestamp?: string;
+
+  // " Total assets deposited in vault "
+  assetsDeposited?: string;
+
+  // " Amount earned in Assets "
+  totalProfits?: string;
+
+  // " Amount lost in Assets "
+  totalLosses?: string;
 }
 
 ////////////////////////////////////////////////////////////////
