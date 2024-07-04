@@ -32,6 +32,11 @@ export const mapSubgraphResponseToAccountInterface = (response: any): Account | 
       totalRealizedPnlVaults: response.totalRealizedPnlVaults,
       countProfitablePositions: response.countProfitablePositions,
       countLossPositions: response.countLossPositions,
+      countLiquidatedPositions: response.countLiquidatedPositions,
+      totalVolumeInUsd: response.totalVolumeInUsd,
+      totalVolumeInUsdLongs: response.totalVolumeInUsdLongs,
+      totalVolumeInUsdShorts: response.totalVolumeInUsdShorts,
+      totalAccruedBorrowingFeesInUsd: response.totalAccruedBorrowingFeesInUsd,
       totalStaked: response.totalStaked,
       esPRFBalance: response.esPRFBalance,
     };
@@ -62,6 +67,7 @@ export const mapSingleMarketToInterface = (response: any): Market | undefined =>
   try {
     return {
       id: response.id,
+      name: response.name,
       vaultAddress: response.vaultAddress,
       depositToken: response.depositToken ? mapSubgraphResponseToTokenInterface(response.depositToken) : undefined,
       isLive: response.isLive,
@@ -86,6 +92,8 @@ export const mapSingleMarketToInterface = (response: any): Market | undefined =>
       netPnlDec: response.netPnlDec,
       totalOI: response.totalOI,
       totalOIAssets: response.totalOIAssets,
+      accumulatedOILongs: response.accumulatedOILongs,
+      accumulatedOIShorts: response.accumulatedOIShorts,
       closeOnlyMode: response.closeOnlyMode,
       feeLastUpdatedTimestamp: response.feeLastUpdatedTimestamp,
       priceDeviationLongs: response.priceDeviationLongs,
@@ -315,11 +323,15 @@ export const mapSingleVaultToInterface = (response: any): Vault | undefined => {
       assetsPerShare: response.assetsPerShare,
       assetsPerShareDec: response.assetsPerShareDec,
       sharesPerAsset: response.sharesPerAsset,
+      sharesPerAssetDec: response.sharesPerAssetDec,
       withdrawalFee: response.withdrawalFee,
       profitFromTraderLosses: response.profitFromTraderLosses,
       lossFromTraderProfits: response.lossFromTraderProfits,
       cooldownPeriod: response.cooldownPeriod,
       withdrawalWindow: response.withdrawalWindow,
+      daysPassed: response.daysPassed,
+      cumulativeAPRs: response.cumulativeAPRs,
+      allTimeApr: response.allTimeApr,
     };
   } catch (error) {
     console.log('Error while mapping data', error);
