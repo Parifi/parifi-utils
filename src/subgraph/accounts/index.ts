@@ -30,10 +30,15 @@ export const getRealizedPnlForUser = async (
     }
 
     const query = fetchRealizedPnlData(userAddress);
-    const subgraphResponse: RealizedPnlSubgraphResponse = await request(subgraphEndpoint, query);
-    if (!subgraphResponse) throw new Error('Error While Fetching Users Realized Pnl');
-    const totalRealizedPnlPositions = new Decimal(subgraphResponse.account.totalRealizedPnlPositions);
-    const totalRealizedPnlVaults = new Decimal(subgraphResponse.account.totalRealizedPnlVaults);
+    const subgraphResponse = await request(subgraphEndpoint, query);
+    const realizedPnlResponse: RealizedPnlSubgraphResponse = subgraphResponse as unknown as RealizedPnlSubgraphResponse;
+
+    if (realizedPnlResponse === null || realizedPnlResponse.account === null) {
+      console.log('Users Realized Pnl data not found');
+      return { totalRealizedPnlPositions: DECIMAL_ZERO, totalRealizedPnlVaults: DECIMAL_ZERO };
+    }
+    const totalRealizedPnlPositions = new Decimal(realizedPnlResponse.account.totalRealizedPnlPositions);
+    const totalRealizedPnlVaults = new Decimal(realizedPnlResponse.account.totalRealizedPnlVaults);
     return { totalRealizedPnlPositions, totalRealizedPnlVaults };
   } catch (error) {
     throw error;

@@ -17,6 +17,7 @@ import {
 ////////////////////////////////////////////////////////////////
 
 export const mapSubgraphResponseToAccountInterface = (response: any): Account | undefined => {
+  if (response === null) return undefined;
   try {
     return {
       id: response.id,
@@ -41,6 +42,7 @@ export const mapSubgraphResponseToAccountInterface = (response: any): Account | 
 };
 
 export const mapAccountsArrayToInterface = (response: any): Account[] | undefined => {
+  if (response === null) return undefined;
   try {
     return response.accounts.map((account: Account) => {
       return mapSubgraphResponseToAccountInterface(account);
@@ -56,6 +58,7 @@ export const mapAccountsArrayToInterface = (response: any): Account[] | undefine
 ////////////////////////////////////////////////////////////////
 
 export const mapSingleMarketToInterface = (response: any): Market | undefined => {
+  if (response === null) return undefined;
   try {
     return {
       id: response.id,
@@ -111,6 +114,7 @@ export const mapSingleMarketToInterface = (response: any): Market | undefined =>
 };
 
 export const mapMarketsArrayToInterface = (response: any): Market[] | undefined => {
+  if (response === null) return undefined;
   try {
     return response.markets.map((market: Market) => {
       return mapSingleMarketToInterface(market);
@@ -126,6 +130,7 @@ export const mapMarketsArrayToInterface = (response: any): Market[] | undefined 
 ////////////////////////////////////////////////////////////////
 
 export const mapSingleOrderToInterface = (response: any): Order | undefined => {
+  if (response === null) return undefined;
   try {
     return {
       id: response.id,
@@ -162,6 +167,7 @@ export const mapSingleOrderToInterface = (response: any): Order | undefined => {
 };
 
 export const mapOrdersArrayToInterface = (response: any): Order[] | undefined => {
+  if (response === null) return undefined;
   try {
     return response.orders.map((order: Order) => {
       return mapSingleOrderToInterface(order);
@@ -177,6 +183,7 @@ export const mapOrdersArrayToInterface = (response: any): Order[] | undefined =>
 ////////////////////////////////////////////////////////////////
 
 export const mapSinglePositionToInterface = (response: any): Position | undefined => {
+  if (response === null) return undefined;
   try {
     return {
       id: response.id,
@@ -214,6 +221,8 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
 };
 
 export const mapPositionsArrayToInterface = (response: any): Position[] | undefined => {
+  if (response === null) return undefined;
+
   try {
     return response.positions.map((position: Position) => {
       return mapSinglePositionToInterface(position);
@@ -229,6 +238,8 @@ export const mapPositionsArrayToInterface = (response: any): Position[] | undefi
 ////////////////////////////////////////////////////////////////
 
 export const mapSubgraphResponseToTokenInterface = (response: any): Token | undefined => {
+  if (response === null) return undefined;
+
   try {
     return {
       id: response.id,
@@ -250,6 +261,8 @@ export const mapSubgraphResponseToTokenInterface = (response: any): Token | unde
 ////////////////////////////////////////////////////////////////
 
 export const mapSubgraphResponseToPriceFeedSnapshotInterface = (response: any): PriceFeedSnapshot | undefined => {
+  if (response === null) return undefined;
+
   try {
     return {
       id: response.id,
@@ -265,6 +278,8 @@ export const mapSubgraphResponseToPriceFeedSnapshotInterface = (response: any): 
 };
 
 export const mapSubgraphResponseToPythDataInterface = (response: any): PythData | undefined => {
+  if (response === null) return undefined;
+
   try {
     return {
       id: response.id,
@@ -284,6 +299,8 @@ export const mapSubgraphResponseToPythDataInterface = (response: any): PythData 
 ////////////////////////////////////////////////////////////////
 
 export const mapSingleVaultToInterface = (response: any): Vault | undefined => {
+  if (response === null) return undefined;
+
   try {
     return {
       id: response.id,
@@ -311,6 +328,8 @@ export const mapSingleVaultToInterface = (response: any): Vault | undefined => {
 };
 
 export const mapVaultsArrayToInterface = (response: any): Vault[] | undefined => {
+  if (response === null) return undefined;
+
   try {
     return response.vaults.map((vault: Vault) => {
       return mapSingleVaultToInterface(vault);
@@ -322,6 +341,8 @@ export const mapVaultsArrayToInterface = (response: any): Vault[] | undefined =>
 };
 
 export const mapVaultPositionToInterface = (response: any): VaultPosition | undefined => {
+  if (response === null) return undefined;
+
   try {
     return {
       id: response.id,
@@ -349,6 +370,8 @@ export const mapVaultPositionToInterface = (response: any): VaultPosition | unde
 };
 
 export const mapVaultPositionsArrayToInterface = (response: any): VaultPosition[] | undefined => {
+  if (response === null) return undefined;
+
   try {
     return response.vaultPositions.map((vaultPosition: VaultPosition) => {
       return mapVaultPositionToInterface(vaultPosition);
@@ -360,6 +383,8 @@ export const mapVaultPositionsArrayToInterface = (response: any): VaultPosition[
 };
 
 export const mapVaultCooldownToInterface = (response: any): VaultCooldown | undefined => {
+  if (response === null) return undefined;
+
   try {
     return {
       id: response.Id,
@@ -377,6 +402,8 @@ export const mapVaultCooldownToInterface = (response: any): VaultCooldown | unde
 };
 
 export const mapVaultCooldownArrayToInterface = (response: any): VaultCooldown[] | undefined => {
+  if (response === null) return undefined;
+
   try {
     return response.vaultCooldowns.map((cooldown: VaultCooldown) => {
       return mapVaultCooldownToInterface(cooldown);
@@ -392,6 +419,8 @@ export const mapVaultCooldownArrayToInterface = (response: any): VaultCooldown[]
 ////////////////////////////////////////////////////////////////
 
 export const mapReferralDataToInterface = (response: any): Referral | undefined => {
+  if (response === null) return undefined;
+
   try {
     return {
       id: response.id,
@@ -411,6 +440,8 @@ export const mapReferralDataToInterface = (response: any): Referral | undefined 
 };
 
 export const mapReferralsArrayToInterface = (response: any): Referral[] | undefined => {
+  if (response === null) return undefined;
+
   try {
     return response.referrals.map((referral: Referral) => {
       return mapReferralDataToInterface(referral);

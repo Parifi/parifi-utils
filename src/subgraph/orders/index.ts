@@ -137,9 +137,11 @@ export const getPositionIdsFromOrderIds = async (
 
     orderIds.forEach((id) => {
       let pid: string = EMPTY_BYTES32;
-      const res = subgraphResponse.orders.find((order) => order.id === id);
-      if (res) {
-        pid = res.position?.id ?? EMPTY_BYTES32;
+      if (subgraphResponse.orders.length !== 0) {
+        const res = subgraphResponse.orders.find((order) => order.id === id);
+        if (res) {
+          pid = res.position?.id ?? EMPTY_BYTES32;
+        }
       }
       result.push({ orderId: id, positionId: pid });
     });

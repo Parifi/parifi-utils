@@ -49,6 +49,8 @@ describe('Pimlico test cases', () => {
     if (positionIds.length !== 0) {
       const { txHash } = await parifiSdk.relayer.pimlico.batchLiquidatePositionsUsingPimlico(positionIds);
       console.log(`User operation included: https://arbiscan.io/tx/${txHash}`);
+    } else {
+      console.log('No positions available for liquidation');
     }
   });
 });

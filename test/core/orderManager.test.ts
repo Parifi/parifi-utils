@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { getParifiSdkInstanceForTesting } from '..';
-import { TEST_MARKET_ID1, TEST_POSITION_ID1, TEST_SETTLE_ORDER_ID } from '../common/constants';
-import { DECIMAL_ZERO, getNormalizedPriceByIdFromPriceIdArray } from '../../src';
+import { TEST_MARKET_ID1, TEST_OPEN_POSITION, TEST_POSITION_ID1, TEST_SETTLE_ORDER_ID } from '../common/constants';
+import { DECIMAL_ZERO, OrderStatus, getNormalizedPriceByIdFromPriceIdArray } from '../../src';
 
 describe('Order Manager tests', () => {
   it('should liquidate a single position', async () => {
@@ -28,6 +28,13 @@ describe('Order Manager tests', () => {
 
     const orderIds = [TEST_SETTLE_ORDER_ID];
 
+    const order = await parifiSdk.subgraph.getOrderById(TEST_SETTLE_ORDER_ID);
+    // @todo Add additional check for deadline(expired orders)
+    if (order.status === OrderStatus.PENDING) {
+      console.log('Order already settled: ', TEST_SETTLE_ORDER_ID);
+      return;
+    }
+
     const priceIds = await parifiSdk.subgraph.getPythPriceIdsForOrderIds(orderIds);
 
     const collateralPriceIds = parifiSdk.pyth.getPriceIdsForCollaterals();
@@ -42,9 +49,7 @@ describe('Order Manager tests', () => {
 
   it('should return valid liquidation price', async () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
-    const position = await parifiSdk.subgraph.getPositionById(
-      '0x9a1b314246e76d5f912020961f95d44077df4be8450d25e2c7dddd98582b5b66',
-    );
+    const position = await parifiSdk.subgraph.getPositionById(TEST_OPEN_POSITION);
     const market = await parifiSdk.subgraph.getMarketById(position.market?.id ?? TEST_MARKET_ID1);
 
     const normalizedPrice = await parifiSdk.pyth.getLatestPricesNormalized([

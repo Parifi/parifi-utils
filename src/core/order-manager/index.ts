@@ -361,6 +361,7 @@ export const checkIfOrderCanBeSettled = (order: Order, normalizedMarketPrice: De
   );
 };
 
+// @todo Add deadline check
 // Returns true if the price of market is within the range configured in order struct
 // The function can be used to check if a pending order can be settled or not
 export const checkIfOrderCanBeSettledId = async (

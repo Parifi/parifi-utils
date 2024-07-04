@@ -167,6 +167,8 @@ export class Subgraph {
     return await getAllPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
   }
 
+  // @todo Add function to get multiple positions in a single call
+   
   public async getPositionById(positionId: string): Promise<Position> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return getPositionById(subgraphEndpoint, positionId);
