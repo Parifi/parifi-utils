@@ -11,7 +11,7 @@ describe('Order fetching logic from subgraph', () => {
     expect(order.id).toBe(TEST_ORDER_ID1);
   });
 
-  it('should settle order using Gelato', async () => {
+  it('should settle order using Pimlico', async () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
     const orderId = TEST_SETTLE_ORDER_ID;
 

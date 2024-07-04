@@ -203,7 +203,7 @@ export const getVaultApr = async (
         apr30Days = apr30Days.add(vaultData.apr);
       }
     }
-    return { apr7Days: apr7Days.mul(365).div(7), apr30Days: apr30Days.mul(365).div(30), aprAllTime: aprAllTime };
+    return { apr7Days: apr7Days.div(7), apr30Days: apr30Days.div(30), aprAllTime: aprAllTime };
   } catch (error) {
     // Instead of throwing error in case of a failure,
     // the function will instead return gracefully with 0 values and console log the error
