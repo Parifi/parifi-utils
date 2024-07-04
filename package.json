@@ -1,6 +1,6 @@
 {
   "name": "@parifi/sdk",
-  "version": "1.0.2-prod",
+  "version": "1.0.4-prod",
   "description": "Parifi SDK with common utility functions",
   "files": [
     "dist",
