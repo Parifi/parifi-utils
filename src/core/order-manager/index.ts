@@ -295,16 +295,18 @@ export const canBeSettled = (
       (triggerAbove && normalizedMarketPrice < expectedPrice) ||
       (!triggerAbove && normalizedMarketPrice > expectedPrice)
     ) {
+      console.log('Order cannot be settled because of Trigger price');
       return false;
     }
   } else {
     // Market Orders
     // Check if current market price is within slippage range
-    if (expectedPrice != DECIMAL_ZERO) {
+    if (!expectedPrice.equals(DECIMAL_ZERO)) {
       const upperLimit = expectedPrice.mul(PRECISION_MULTIPLIER.add(maxSlippage)).div(PRECISION_MULTIPLIER);
       const lowerLimit = expectedPrice.mul(PRECISION_MULTIPLIER.sub(maxSlippage)).div(PRECISION_MULTIPLIER);
 
       if ((isLong && normalizedMarketPrice > upperLimit) || (!isLong && normalizedMarketPrice < lowerLimit)) {
+        console.log('Order cannot be settled because of slippage price limits');
         return false;
       }
     }
@@ -343,11 +345,13 @@ export const canBeSettledPriceId = async (
 export const checkIfOrderCanBeSettled = (order: Order, normalizedMarketPrice: Decimal): boolean => {
   // Return false if any of the fields is undefined
   if (order.isLimitOrder === undefined || order.triggerAbove === undefined || order.isLong === undefined) {
+    console.log('Fields in Order struct undefined. Order cannot be settled');
     return false;
   }
 
   // Return false if any of the fields is undefined
   if (order.expectedPrice === undefined || order.maxSlippage === undefined) {
+    console.log('Fields in Order struct undefined. Order cannot be settled');
     return false;
   }
 
