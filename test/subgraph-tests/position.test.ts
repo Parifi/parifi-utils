@@ -3,6 +3,7 @@ import {
   TEST_POSITION_ID1,
   TEST_POSITION_ID2,
   TEST_POSITION_ID3,
+  TEST_USER_ID1,
   TEST_USER_ID2,
   TEST_USER_ID3,
   TEST_USER_ID4,
@@ -69,7 +70,10 @@ describe('Order fetching logic from subgraph', () => {
     // Get upto 5 positions to liquidate
     const positionIds = await parifiSdk.subgraph.getPositionsToLiquidate(5);
     console.log('positionIds', positionIds);
-    if (positionIds.length == 0) return;
+    if (positionIds.length == 0) {
+      console.log('No positions available for liquidation');
+      return;
+    }
 
     // Get unique price ids for the above positions
     const priceIds = await parifiSdk.subgraph.getPythPriceIdsForPositionIds(positionIds);
@@ -84,11 +88,13 @@ describe('Order fetching logic from subgraph', () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
 
     /// Add an address that has active positions
-    const userAddress = TEST_USER_ID4;
-    const userPositions = await parifiSdk.subgraph.getAllPositionsByUserAddress(userAddress);
+    const userAddress = TEST_USER_ID1;
+    const userPositions = await parifiSdk.subgraph.getOpenPositionsByUserAddress(userAddress);
     if (userPositions.length > 0) {
       const totalCollateralValueInUsd = await parifiSdk.subgraph.getTotalDepositedCollateralInUsd(userAddress);
       expect(totalCollateralValueInUsd.toNumber()).toBeGreaterThan(0);
+    } else {
+      console.log('No open positions found for user address');
     }
   });
 
@@ -96,8 +102,8 @@ describe('Order fetching logic from subgraph', () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
 
     /// Add an address that has active positions
-    const userAddress = TEST_USER_ID4;
-    const userPositions = await parifiSdk.subgraph.getAllPositionsByUserAddress(userAddress);
+    const userAddress = TEST_USER_ID1;
+    const userPositions = await parifiSdk.subgraph.getOpenPositionsByUserAddress(userAddress);
     if (userPositions.length > 0) {
       const totalNetUnrealizedPnlInUsd = await parifiSdk.subgraph.getTotalUnrealizedPnlInUsd(userAddress);
       console.log('totalNetUnrealizedPnlInUsd', totalNetUnrealizedPnlInUsd);
@@ -106,6 +112,8 @@ describe('Order fetching logic from subgraph', () => {
       } else {
         expect(totalNetUnrealizedPnlInUsd.toNumber()).toBeLessThan(0);
       }
+    } else {
+      console.log('No open positions found for user address');
     }
   });
 });

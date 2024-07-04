@@ -178,7 +178,11 @@ export const getVaultApr = async (
     // If less than 7 days data for APR is available, return average APR of available data
     if (vaultDatas.length < 7) {
       const sumApr = vaultDatas.reduce((accumulator, currentValue) => {
-        return accumulator + currentValue.apr.toNumber();
+        if (currentValue !== null) {
+          return accumulator + Number(currentValue.apr);
+        } else {
+          return accumulator; // Skip null values
+        }
       }, 0);
       apr7Days = new Decimal(sumApr).div(vaultDatas.length);
       return { apr7Days, apr30Days, aprAllTime };
@@ -199,9 +203,12 @@ export const getVaultApr = async (
         apr30Days = apr30Days.add(vaultData.apr);
       }
     }
-    return { apr7Days: apr7Days.div(7), apr30Days: apr30Days.div(30), aprAllTime: aprAllTime };
+    return { apr7Days: apr7Days.mul(365).div(7), apr30Days: apr30Days.mul(365).div(30), aprAllTime: aprAllTime };
   } catch (error) {
-    throw error;
+    // Instead of throwing error in case of a failure,
+    // the function will instead return gracefully with 0 values and console log the error
+    console.log(error);
+    return { apr7Days, apr30Days, aprAllTime };
   }
 };
 

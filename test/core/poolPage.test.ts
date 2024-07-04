@@ -6,11 +6,11 @@ describe('Stats tests', () => {
   it('should return pool data for a user with deposits', async () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
 
-    const userWithDeposits = '0xD504CeF7dCfdB5b19fA7E207ee2a697c3EAd88D0';
+    const userWithDeposits = '0xc1f0bece556740a73f125ea147e50df2563e1930';
     const userPoolData = await parifiSdk.core.getPoolPageData(userWithDeposits);
     expect(userPoolData.length).not.toBe(0);
     userPoolData.forEach((data) => {
-      expect(data.assetBalance).not.toBe(BIGINT_ZERO);
+      expect(Number(data.assetBalance.toString())).not.toBe(0);
     });
   });
 
@@ -20,7 +20,7 @@ describe('Stats tests', () => {
     const userPoolData = await parifiSdk.core.getPoolPageData(ethers.ZeroAddress);
     expect(userPoolData.length).not.toBe(0);
     userPoolData.forEach((data) => {
-      expect(data.assetBalance).toBe(BIGINT_ZERO);
+      expect(Number(data.assetBalance.toString())).toBe(0);
     });
   });
 });

@@ -30,7 +30,7 @@ export const getMarketById = async (subgraphEndpoint: string, marketId: string):
         return market;
       }
     }
-    throw Error(`Market Not With Market Id ${formattedMarketId} Not Found`);
+    throw Error(`Market with Market Id ${formattedMarketId} Not Found`);
   } catch (error) {
     throw error;
   }

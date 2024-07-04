@@ -11,11 +11,15 @@ describe('Parifi Utils tests', () => {
   });
 
   it('should liquidate positions in batch using Parifi Utils', async () => {
-    // To test the batch liquidate functionality, add correct position ids below
     const parifiSdk = await getParifiSdkInstanceForTesting();
-    const positionIds = [TEST_LIQUIDATE_POS_ID];
-    const positionsCount = await parifiSdk.core.batchLiquidatePositionsUsingGelato(positionIds);
-    console.log('Positions processed: ', positionsCount);
+
+    const positionIds = await parifiSdk.subgraph.getPositionsToLiquidate();
+    if (positionIds.length !== 0) {
+      const { txHash } = await parifiSdk.relayer.pimlico.batchLiquidatePositionsUsingPimlico(positionIds);
+      console.log(`User operation included: https://arbiscan.io/tx/${txHash}`);
+    } else {
+      console.log('No positions available for liquidation');
+    }
   });
 
   it('should settle orders in batch using an external wallet', async () => {
