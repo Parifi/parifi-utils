@@ -14,6 +14,10 @@ export const addDelay = async (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
+export const getCurrentTimestampInSeconds = (): number => {
+  return Math.floor(Date.now() / 1000);
+};
+
 export const getUniqueValuesFromArray = (originalArray: string[]): string[] => {
   const uniqueArray: string[] = [];
   const seenValues = new Set<string>();
