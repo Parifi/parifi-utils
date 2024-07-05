@@ -1,4 +1,4 @@
-import { Market, Order, Position } from '../../interfaces/subgraphTypes';
+import { Market, Order, OrderStatus, Position } from '../../interfaces/subgraphTypes';
 import { Decimal } from 'decimal.js';
 import {
   DECIMAL_ZERO,
@@ -21,7 +21,7 @@ import {
   getTotalUnrealizedPnlInUsd,
 } from '../../subgraph';
 import { getLatestPricesFromPyth, getVaaPriceUpdateData, normalizePythPriceForParifi } from '../../pyth/pyth';
-import { getPriceIdsForCollaterals } from '../../common';
+import { getCurrentTimestampInSeconds, getPriceIdsForCollaterals } from '../../common';
 import { executeTxUsingGelato } from '../../relayers/gelato/gelato-function';
 
 // Returns an Order Manager contract instance without signer
@@ -280,6 +280,7 @@ export const getNetProfitOrLossInCollateral = (
 
 // Returns true if the price of market is within the range configured in order struct
 // The function can be used to check if a pending order can be settled or not
+// Uses the same code implementation from Smart contract
 export const canBeSettled = (
   isLimitOrder: boolean,
   triggerAbove: boolean,
@@ -289,6 +290,9 @@ export const canBeSettled = (
   normalizedMarketPrice: Decimal,
 ): boolean => {
   if (isLimitOrder) {
+    // For limit orders, expected price cannot be zero
+    if (expectedPrice.equals(DECIMAL_ZERO)) return false;
+
     // If its a limit order, check if the limit price is reached, either above or below
     // depending on the triggerAbove flag
     if (
@@ -355,6 +359,17 @@ export const checkIfOrderCanBeSettled = (order: Order, normalizedMarketPrice: De
     return false;
   }
 
+  if (order.status !== OrderStatus.PENDING) {
+    console.log('Order already settled or cancelled');
+    return false;
+  }
+
+  const orderDeadline = Number(order.deadline);
+  if (orderDeadline < getCurrentTimestampInSeconds() && orderDeadline != 0) {
+    console.log('Order expired, cannot be settled');
+    return false;
+  }
+
   return canBeSettled(
     order.isLimitOrder,
     order.triggerAbove,
@@ -365,7 +380,6 @@ export const checkIfOrderCanBeSettled = (order: Order, normalizedMarketPrice: De
   );
 };
 
-// @todo Add deadline check
 // Returns true if the price of market is within the range configured in order struct
 // The function can be used to check if a pending order can be settled or not
 export const checkIfOrderCanBeSettledId = async (

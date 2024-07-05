@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { getParifiSdkInstanceForTesting } from '..';
 import { TEST_MARKET_ID1, TEST_OPEN_POSITION, TEST_POSITION_ID1, TEST_SETTLE_ORDER_ID } from '../common/constants';
-import { DECIMAL_ZERO, OrderStatus, getNormalizedPriceByIdFromPriceIdArray } from '../../src';
+import { DECIMAL_ZERO, OrderStatus, getCurrentTimestampInSeconds, getNormalizedPriceByIdFromPriceIdArray } from '../../src';
 
 describe('Order Manager tests', () => {
   it('should liquidate a single position', async () => {
@@ -29,12 +29,17 @@ describe('Order Manager tests', () => {
     const orderIds = [TEST_SETTLE_ORDER_ID];
 
     const order = await parifiSdk.subgraph.getOrderById(TEST_SETTLE_ORDER_ID);
-    // @todo Add additional check for deadline(expired orders)
     if (order.status === OrderStatus.PENDING) {
       console.log('Order already settled: ', TEST_SETTLE_ORDER_ID);
       return;
     }
 
+    const orderDeadline = Number(order.deadline);
+    if (orderDeadline < getCurrentTimestampInSeconds() && orderDeadline != 0) {
+      console.log('Order expired, cannot be settled');
+      return;
+    }
+  
     const priceIds = await parifiSdk.subgraph.getPythPriceIdsForOrderIds(orderIds);
 
     const collateralPriceIds = parifiSdk.pyth.getPriceIdsForCollaterals();

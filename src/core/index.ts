@@ -6,6 +6,7 @@ import {
   getBaseBorrowRatePerSecond,
   getDynamicBorrowRatePerSecond,
   getMarketSkew,
+  getMarketSkewUi,
   getMarketUtilization,
 } from './data-fabric';
 import { Contract, Signer } from 'ethers';
@@ -60,6 +61,10 @@ export class Core {
 
   getMarketSkew = (market: Market): Decimal => {
     return getMarketSkew(market);
+  };
+
+  getMarketSkewUi = (market: Market): { skewLongs: Decimal; skewShorts: Decimal } => {
+    return getMarketSkewUi(market);
   };
 
   getDynamicBorrowRatePerSecond = (market: Market): Decimal => {
