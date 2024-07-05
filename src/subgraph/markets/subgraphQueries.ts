@@ -5,6 +5,7 @@ export const fetchAllMarketsDataQuery = gql`
   {
     markets(first: 100) {
       id
+      name
       vaultAddress
       depositToken {
         id
@@ -73,6 +74,7 @@ export const fetchMarketByIdQuery = (marketId: string) => gql`
   {
     market(id: "${marketId.toLowerCase()}") {
       id
+      name
       vaultAddress
       depositToken {
         id
