@@ -18,8 +18,26 @@ export const getMarketSkew = (market: Market): Decimal => {
   const totalShorts = new Decimal(market.totalShorts ?? '0');
 
   const diff = getDiff(totalLongs, totalShorts);
-  if (diff == DECIMAL_ZERO) return DECIMAL_ZERO;
+  if (diff.equals(DECIMAL_ZERO)) return DECIMAL_ZERO;
   return diff.times(PRECISION_MULTIPLIER).dividedBy(new Decimal(totalLongs).add(totalShorts));
+};
+
+// Returns the market skew in percentage based on the total long and total short positions
+export const getMarketSkewPercent = (market: Market): Decimal => {
+  return getMarketSkew(market).times(100);
+};
+
+// Returns the market skew in percentage for interface UI display
+export const getMarketSkewUi = (market: Market): { skewLongs: Decimal; skewShorts: Decimal } => {
+  const skewPercent = getMarketSkewPercent(market).div(PRECISION_MULTIPLIER);
+  const skewHigh = skewPercent.greaterThan(new Decimal(50)) ? skewPercent : new Decimal(50).add(skewPercent);
+  const skewLow = new Decimal(100).minus(skewHigh);
+
+  if (new Decimal(market.totalLongs ?? '0').greaterThan(new Decimal(market.totalShorts ?? '0'))) {
+    return { skewLongs: skewHigh, skewShorts: skewLow };
+  } else {
+    return { skewLongs: skewLow, skewShorts: skewHigh };
+  }
 };
 
 // Returns the Dynamic Borrow rate per second for a market
