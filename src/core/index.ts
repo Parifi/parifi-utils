@@ -5,13 +5,16 @@ import {
   getAccruedBorrowFeesInMarket,
   getBaseBorrowRatePerSecond,
   getDynamicBorrowRatePerSecond,
+  getExecutionFee,
   getMarketSkew,
   getMarketSkewUi,
   getMarketUtilization,
 } from './data-fabric';
 import { Contract, Signer } from 'ethers';
 import {
+  calculateCollateralFromSize,
   calculatePositionLeverage,
+  calculateSizeFromCollateral,
   canBeSettled,
   canBeSettledPriceId,
   checkIfOrderCanBeSettledId,
@@ -55,6 +58,11 @@ export class Core {
   ////////////////////////////////////////////////////////////////
   //////////////////////    DATA FABRIC    ///////////////////////
   ////////////////////////////////////////////////////////////////
+
+  getExecutionFee() {
+    if (!this.rpcConfig.rpcEndpointUrl) throw new Error('RPC endpoint URL is not provided');
+    return getExecutionFee(this.rpcConfig.chainId, this.rpcConfig.rpcEndpointUrl);
+  }
   getMarketUtilization = (market: Market, isLong: boolean): Decimal => {
     return getMarketUtilization(market, isLong);
   };
@@ -84,6 +92,32 @@ export class Core {
   ////////////////////////////////////////////////////////////////
   //////////////////////    ORDER MANAGER    /////////////////////
   ////////////////////////////////////////////////////////////////
+
+  calculateSizeFromCollateral(
+    amount: Decimal,
+    leverage: Decimal,
+    executionFeeInCollateral: Decimal,
+    openingFee: Decimal,
+    normalizedMarketPrice: Decimal,
+    normalizedCollateralPrice: Decimal,
+  ) {
+    return calculateSizeFromCollateral(
+      amount,
+      leverage,
+      executionFeeInCollateral,
+      openingFee,
+      normalizedMarketPrice,
+      normalizedCollateralPrice,
+    );
+  }
+  calculateCollateralFromSize(
+    collateralSize: Decimal,
+    leverage: Decimal,
+    normalizedMarketPrice: Decimal,
+    normalizedCollateralPrice: Decimal,
+  ): Decimal {
+    return calculateCollateralFromSize(collateralSize, leverage, normalizedMarketPrice, normalizedCollateralPrice);
+  }
 
   getOrderManagerInstance = (): Contract => {
     return getOrderManagerInstance(this.rpcConfig.chainId);

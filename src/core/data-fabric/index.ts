@@ -1,7 +1,9 @@
+import { Contract, JsonRpcProvider } from 'ethers';
 import { DECIMAL_ZERO, PRECISION_MULTIPLIER, SECONDS_IN_A_YEAR, WAD } from '../../common/constants';
 import { getDiff } from '../../common/helpers';
 import { Market, Position } from '../../interfaces/subgraphTypes';
 import { Decimal } from 'decimal.js';
+import { Chain, contracts } from '@parifi/references';
 
 // Returns Market Utilization for a Market
 export const getMarketUtilization = (market: Market, isLong: boolean): Decimal => {
@@ -128,4 +130,12 @@ export const getAccruedBorrowFeesInMarket = (position: Position, market: Market)
     .times(accruedFeesCumulative)
     .div(new Decimal(100).times(new Decimal(10).pow(18)))
     .ceil();
+};
+
+export const getExecutionFee = async (chainId: Chain, rpc: string) => {
+  const dataFabric = contracts[chainId].DataFabric;
+  const provider = new JsonRpcProvider(rpc);
+  const contract = new Contract(dataFabric.address, dataFabric.abi, provider);
+  const selectedExecutionFee = await contract.getExecutionFee();
+  return selectedExecutionFee[0] ?? selectedExecutionFee;
 };

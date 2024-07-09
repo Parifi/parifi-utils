@@ -522,3 +522,50 @@ export const getLiquidationPrice = (
     return new Decimal(position.avgPrice ?? 0).add(lossPerToken);
   }
 };
+
+/**
+ * @name calculateCollateralFromSize
+ * @description This function calculates the collateral required based on the given size, leverage and normalized market price and collateral price.
+ * @param {number} collateralSize - The size of the collateral in eth unit.
+ * @param {number} leverage - The degree of financial leverage being used.
+ * @param {Decimal} normalizedMarketPrice - The normalized market price of the underlying asset.
+ * @param {Decimal} normalizedCollateralPrice - The normalized price of the collateral.
+ * @returns {Decimal} - The calculated collateral required to maintain the position.
+ */
+
+export const calculateCollateralFromSize = (
+  collateralSize: Decimal,
+  leverage: Decimal,
+  normalizedMarketPrice: Decimal,
+  normalizedCollateralPrice: Decimal,
+) => {
+  return normalizedMarketPrice.mul(collateralSize).div(normalizedCollateralPrice).div(leverage);
+};
+
+/**
+ * @name calculateSizeFromCollateral
+ * @description Calculates the position size in the base asset given the collateral amount, leverage, execution fee in collateral, opening fee, and normalised market price and collateral price.
+ * @param {Decimal} amount - The collateral amount in eth units.
+ * @param {Decimal} leverage - The total leverage used for this position.
+ * @param {Decimal} executionFeeInCollateral - The execution fee on collateral units.
+ * @param {Decimal} openingFee - The opening fee for the trade.
+ * @param {Decimal} normalizedMarketPrice - The normalised price of the base asset in terms of the quote asset.
+ * @param {Decimal} normalizedCollateralPrice - The normalised price of the collateral asset in terms of the quote asset.
+ * @returns {Decimal} - The calculated position size in the base asset.
+ */
+
+export const calculateSizeFromCollateral = (
+  amount: Decimal,
+  leverage: Decimal,
+  executionFeeInCollateral: Decimal,
+  openingFee: Decimal,
+  normalizedMarketPrice: Decimal,
+  normalizedCollateralPrice: Decimal,
+) => {
+  const collateralInUsd = amount.mul(normalizedCollateralPrice);
+  const executionFeeInUsd = executionFeeInCollateral.mul(normalizedCollateralPrice);
+
+  const sizeInUsd = collateralInUsd.sub(executionFeeInUsd).div(openingFee.add(1).div(leverage));
+
+  return sizeInUsd.div(normalizedMarketPrice);
+};
