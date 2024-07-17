@@ -5,7 +5,6 @@ import {
   getAccruedBorrowFeesInMarket,
   getBaseBorrowRatePerSecond,
   getDynamicBorrowRatePerSecond,
-  getExecutionFee,
   getMarketSkew,
   getMarketSkewUi,
   getMarketUtilization,
@@ -59,10 +58,6 @@ export class Core {
   //////////////////////    DATA FABRIC    ///////////////////////
   ////////////////////////////////////////////////////////////////
 
-  getExecutionFee() {
-    if (!this.rpcConfig.rpcEndpointUrl) throw new Error('RPC endpoint URL is not provided');
-    return getExecutionFee(this.rpcConfig.chainId, this.rpcConfig.rpcEndpointUrl);
-  }
   getMarketUtilization = (market: Market, isLong: boolean): Decimal => {
     return getMarketUtilization(market, isLong);
   };

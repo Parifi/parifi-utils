@@ -43,6 +43,7 @@ import {
   getTopAccountsByReferralRewards,
 } from './accounts';
 import { LeaderboardUserData, ReferralRewardsInUsd, UserPortfolioData } from '../interfaces/sdkTypes';
+import { getExecutionFee } from './protocol';
 
 export * from './common';
 export * from './markets';
@@ -168,7 +169,7 @@ export class Subgraph {
   }
 
   // @todo Add function to get multiple positions in a single call
-   
+
   public async getPositionById(positionId: string): Promise<Position> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return getPositionById(subgraphEndpoint, positionId);
@@ -287,5 +288,13 @@ export class Subgraph {
   public async getPoolVolume24h(): Promise<{ [vaultId: string]: Decimal }> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getPoolVolume24h(subgraphEndpoint);
+  }
+
+  ////////////////////////////////////////////////////////////////
+  /////////////////////    PROTOCOL    ///////////////////////////
+  ////////////////////////////////////////////////////////////////
+  public async getExecutionFee(): Promise<{ executionFeeEth: Decimal; executionFeeUsdc: Decimal }> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return getExecutionFee(subgraphEndpoint);
   }
 }
