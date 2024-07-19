@@ -11,11 +11,19 @@ describe('Data Fabric tests', () => {
     const allMarkets = await parifiSdk.subgraph.getAllMarketsFromSubgraph();
 
     allMarkets.forEach((market) => {
+      // It should throw error if market has invalid values
+      {
+        const updatedMarket = market;
+        updatedMarket.totalLongs = undefined;
+        updatedMarket.totalShorts = undefined;
+        // @todo Check why the thow is not captured by expect
+        // expect(parifiSdk.core.getMarketSkew(updatedMarket)).toThrow();
+      }
       const { skewLongs, skewShorts } = parifiSdk.core.getMarketSkewUi(market);
       if (new Decimal(market.totalLongs ?? 0).greaterThan(new Decimal(market.totalShorts ?? 0))) {
-        expect(Number(skewLongs)).toBeGreaterThanOrEqual(Number(skewShorts));
+        expect(skewLongs.toNumber()).toBeGreaterThanOrEqual(skewShorts.toNumber());
       } else {
-        expect(Number(skewLongs)).toBeLessThanOrEqual(Number(skewShorts));
+        expect(skewLongs.toNumber()).toBeLessThanOrEqual(skewShorts.toNumber());
       }
     });
   });

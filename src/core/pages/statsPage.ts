@@ -5,19 +5,23 @@ import { Market } from '../../interfaces/subgraphTypes';
 import { getAllMarketsFromSubgraph } from '../../subgraph';
 import { getLatestPricesFromPyth, getLatestPricesNormalized } from '../../pyth/pyth';
 import { AxiosInstance } from 'axios';
+import { InvalidValueError } from '../../error/invalid-value.error';
 
 // Returns the total borrowing rate for a market per hour in percentage
 export const getMarketBorrowingRatePerHour = (
   market: Market,
 ): { borrowingRatePerHourLong: Decimal; borrowingRatePerHourShorts: Decimal } => {
+  if (!market.totalLongs || !market.totalShorts) {
+    throw new InvalidValueError('totalLongs/totalShorts');
+  }
   const { baseBorrowRatePerSecondLong, baseBorrowRatePerSecondShort } = getBaseBorrowRatePerSecond(market);
 
   const dynamicBorrowRatePerSecond = getDynamicBorrowRatePerSecond(market);
   let borrowRateLongs: Decimal;
   let borrowRateShorts: Decimal;
 
-  const totalLongs = new Decimal(market.totalLongs ?? '0');
-  const totalShorts = new Decimal(market.totalShorts ?? '0');
+  const totalLongs = new Decimal(market.totalLongs);
+  const totalShorts = new Decimal(market.totalShorts);
 
   // Dynamic borrowing fee is only paid by the side which has higher open interest
   if (totalLongs.greaterThan(totalShorts)) {
@@ -30,8 +34,8 @@ export const getMarketBorrowingRatePerHour = (
 
   // Convert the per second rate to per hour
   return {
-    borrowingRatePerHourLong: borrowRateLongs.mul(3600).div(new Decimal('10').pow(18)),
-    borrowingRatePerHourShorts: borrowRateShorts.mul(3600).div(new Decimal('10').pow(18)),
+    borrowingRatePerHourLong: borrowRateLongs.mul(3600).div(DECIMAL_10.pow(18)),
+    borrowingRatePerHourShorts: borrowRateShorts.mul(3600).div(DECIMAL_10.pow(18)),
   };
 };
 
@@ -40,10 +44,14 @@ export const getMarketOpenInterestInUsd = (
   market: Market,
   normalizedMarketPrice: Decimal,
 ): { openInterestInUsdLongs: Decimal; openInterestInUsdShorts: Decimal } => {
-  const totalLongs = new Decimal(market.totalLongs ?? '0');
-  const totalShorts = new Decimal(market.totalShorts ?? '0');
+  if (!market.totalLongs || !market.totalShorts || !market.marketDecimals) {
+    throw new InvalidValueError('totalLongs/totalShorts');
+  }
 
-  const marketDecimals = new Decimal(market.marketDecimals ?? '1');
+  const totalLongs = new Decimal(market.totalLongs);
+  const totalShorts = new Decimal(market.totalShorts);
+
+  const marketDecimals = new Decimal(market.marketDecimals);
   const decimalFactor = DECIMAL_10.pow(marketDecimals);
 
   const openInterestInUsdLongs = totalLongs
@@ -77,8 +85,11 @@ export const getTotalOpenInterestInUsd = async (
   const latestPrices = await getLatestPricesNormalized(priceIds, pythClient);
 
   markets.forEach((market) => {
-    const totalOi = new Decimal(market.totalLongs ?? 0).add(new Decimal(market.totalShorts ?? 0));
-    const marketDecimals = new Decimal(market.marketDecimals ?? '1');
+    if (!market.totalLongs || !market.totalShorts || !market.marketDecimals) {
+      throw new InvalidValueError('totalLongs/totalShorts');
+    }
+    const totalOi = new Decimal(market.totalLongs).add(new Decimal(market.totalShorts));
+    const marketDecimals = new Decimal(market.marketDecimals);
     const decimalFactor = DECIMAL_10.pow(marketDecimals);
 
     const normalizedMarketPrice =

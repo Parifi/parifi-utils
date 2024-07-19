@@ -1,6 +1,7 @@
 import { Market, Order, OrderStatus, Position } from '../../interfaces/subgraphTypes';
 import { Decimal } from 'decimal.js';
 import {
+  DECIMAL_10,
   DECIMAL_ZERO,
   DEVIATION_PRECISION_MULTIPLIER,
   GAS_LIMIT_LIQUIDATION,
@@ -23,6 +24,7 @@ import {
 import { getLatestPricesFromPyth, getVaaPriceUpdateData, normalizePythPriceForParifi } from '../../pyth/pyth';
 import { getCurrentTimestampInSeconds, getPriceIdsForCollaterals } from '../../common';
 import { executeTxUsingGelato } from '../../relayers/gelato/gelato-function';
+import { InvalidValueError } from '../../error/invalid-value.error';
 
 // Returns an Order Manager contract instance without signer
 export const getOrderManagerInstance = (chain: Chain): Contract => {
@@ -43,7 +45,11 @@ export const getProfitOrLossInUsd = (
   let profitOrLoss: Decimal;
   let isProfit: boolean;
 
-  const positionAvgPrice = new Decimal(userPosition.avgPrice ?? normalizedMarketPrice);
+  if (!userPosition.avgPrice || !userPosition.positionSize) {
+    throw new InvalidValueError('AvgPrice/PositionSize');
+  }
+
+  const positionAvgPrice = new Decimal(userPosition.avgPrice);
 
   if (userPosition.isLong) {
     if (normalizedMarketPrice.gt(positionAvgPrice)) {
@@ -66,9 +72,9 @@ export const getProfitOrLossInUsd = (
       isProfit = true;
     }
   }
-
-  const positionSize = new Decimal(userPosition.positionSize ?? '0');
-  const totalProfitOrLoss = positionSize.times(profitOrLoss).dividedBy(new Decimal(10).pow(marketDecimals));
+  const totalProfitOrLoss = new Decimal(userPosition.positionSize)
+    .times(profitOrLoss)
+    .dividedBy(DECIMAL_10.pow(marketDecimals));
 
   return { totalProfitOrLoss, isProfit };
 };
@@ -82,8 +88,11 @@ export const getPnlWithoutFeesInCollateral = (
   normalizedMarketPrice: Decimal,
   normalizedCollateralPrice: Decimal,
 ): { profitOrLoss: Decimal; isProfit: boolean } => {
-  const depositTokenDecimals = new Decimal(market?.depositToken?.decimals ?? '0');
-  const marketDecimals = new Decimal(market?.marketDecimals ?? '0');
+  if (!market?.depositToken?.decimals || !market?.marketDecimals) {
+    throw new InvalidValueError('decimals');
+  }
+  const depositTokenDecimals = new Decimal(market?.depositToken?.decimals);
+  const marketDecimals = new Decimal(market?.marketDecimals);
 
   const { totalProfitOrLoss: pnlInUsd, isProfit } = getProfitOrLossInUsd(
     position,
@@ -105,15 +114,15 @@ export const getDeviatedMarketPriceInUsd = (
   isLong: boolean,
   isIncrease: boolean,
 ): Decimal => {
-  const deviationCoeff = market.deviationCoeff ?? '0';
-  const deviationConst = market.deviationConst ?? '0';
-
+  if (!market.deviationCoeff || !market.deviationConst) {
+    throw new InvalidValueError('deviationCoeff/deviationConst');
+  }
   const marketUtilization = getMarketUtilization(market, isLong);
 
-  const deviationPoints = new Decimal(deviationCoeff)
+  const deviationPoints = new Decimal(market.deviationCoeff)
     .times(marketUtilization)
     .times(marketUtilization)
-    .add(deviationConst);
+    .add(market.deviationConst);
 
   const PRECISION = DEVIATION_PRECISION_MULTIPLIER.mul(100);
 
@@ -131,6 +140,20 @@ export const isPositionLiquidatable = (
   normalizedMarketPrice: Decimal,
   normalizedCollateralPrice: Decimal,
 ): { canBeLiquidated: boolean } => {
+  if (
+    !market?.depositToken?.decimals ||
+    !market?.marketDecimals ||
+    !market.closingFee ||
+    !market.liquidationFee ||
+    !market.liquidationThreshold
+  ) {
+    throw new InvalidValueError('decimals/fee/liquidationThreshold');
+  }
+
+  if (!position.positionCollateral || !position.positionSize) {
+    throw new InvalidValueError('Position size/collateral');
+  }
+
   let canBeLiquidated: boolean = false;
 
   const { profitOrLoss: pnlInCollateral, isProfit } = getPnlWithoutFeesInCollateral(
@@ -141,9 +164,9 @@ export const isPositionLiquidatable = (
   );
 
   // The fixed fees during liquidation include the closing fee and the liquidation fee
-  const fixedClosingFeeDuringLiquidation = new Decimal(market.liquidationFee ?? '0')
-    .add(market.closingFee ?? '0')
-    .mul(position.positionSize ?? '0')
+  const fixedClosingFeeDuringLiquidation = new Decimal(market.liquidationFee)
+    .add(market.closingFee)
+    .mul(position.positionSize)
     .dividedBy(MAX_FEE);
 
   const accruedBorrowFeesInMarket = getAccruedBorrowFeesInMarket(position, market);
@@ -151,8 +174,8 @@ export const isPositionLiquidatable = (
   const totalFeesMarket = fixedClosingFeeDuringLiquidation.add(accruedBorrowFeesInMarket);
   const feesInCollateral = convertMarketAmountToCollateral(
     totalFeesMarket,
-    new Decimal(market.marketDecimals ?? '0'),
-    new Decimal(market.depositToken?.decimals ?? '0'),
+    new Decimal(market.marketDecimals),
+    new Decimal(market.depositToken?.decimals),
     normalizedMarketPrice,
     normalizedCollateralPrice,
   );
@@ -171,8 +194,8 @@ export const isPositionLiquidatable = (
     lossInCollateral = pnlInCollateral.add(feesInCollateral);
   }
 
-  const liquidationThresholdInCollateral = new Decimal(market.liquidationThreshold ?? '0')
-    .times(position.positionCollateral ?? '0')
+  const liquidationThresholdInCollateral = new Decimal(market.liquidationThreshold)
+    .times(position.positionCollateral)
     .dividedBy(PRECISION_MULTIPLIER);
 
   if (lossInCollateral.gt(liquidationThresholdInCollateral)) canBeLiquidated = true;
@@ -191,15 +214,22 @@ export const calculatePositionLeverage = (
   leverage: string;
   formattedLeverage: number;
 } => {
+  if (!market?.depositToken?.decimals || !market?.marketDecimals) {
+    throw new InvalidValueError('decimals/fee');
+  }
+  if (!position.positionCollateral || !position.positionSize) {
+    throw new InvalidValueError('Position size/collateral');
+  }
+
   let leverage: Decimal = new Decimal('0');
 
-  const positionCollateralAmount = new Decimal(position.positionCollateral ?? '0');
+  const positionCollateralAmount = new Decimal(position.positionCollateral);
 
   // Convert the position size in collateral terms
   const sizeInCollateral = convertMarketAmountToCollateral(
-    new Decimal(position.positionSize ?? '0'),
-    new Decimal(market.marketDecimals ?? '0'),
-    new Decimal(market.depositToken?.decimals ?? '0'),
+    new Decimal(position.positionSize),
+    new Decimal(market.marketDecimals),
+    new Decimal(market.depositToken?.decimals),
     normalizedMarketPrice,
     normalizedCollateralPrice,
   );
@@ -237,6 +267,10 @@ export const getNetProfitOrLossInCollateral = (
   normalizedMarketPrice: Decimal,
   normalizedCollateralPrice: Decimal,
 ): { netPnlInCollateral: Decimal; isNetProfit: boolean } => {
+  if (!market?.depositToken?.decimals || !market?.marketDecimals) {
+    throw new InvalidValueError('decimals');
+  }
+
   // Get profit/loss for the position without fees
   const { profitOrLoss: pnlInCollateral, isProfit } = getPnlWithoutFeesInCollateral(
     position,
@@ -250,8 +284,8 @@ export const getNetProfitOrLossInCollateral = (
 
   const feesInCollateral = convertMarketAmountToCollateral(
     accruedBorrowFeesInMarket,
-    new Decimal(market.marketDecimals ?? '0'),
-    new Decimal(market.depositToken?.decimals ?? '0'),
+    new Decimal(market.marketDecimals),
+    new Decimal(market.depositToken?.decimals),
     normalizedMarketPrice,
     normalizedCollateralPrice,
   );
@@ -336,10 +370,12 @@ export const canBeSettledPriceId = async (
   const pythLatestPrices = await getLatestPricesFromPyth([orderPriceId], pythClient);
 
   const assetPrice = pythLatestPrices.find((pythPrice) => pythPrice.id === formattedPriceId);
-  const normalizedMarketPrice = normalizePythPriceForParifi(
-    parseInt(assetPrice?.price.price ?? '0'),
-    assetPrice?.price.expo ?? 0,
-  );
+
+  if (!assetPrice?.price.price || !assetPrice?.price.expo) {
+    throw new InvalidValueError('assetPrice/expo');
+  }
+
+  const normalizedMarketPrice = normalizePythPriceForParifi(parseInt(assetPrice?.price.price), assetPrice?.price.expo);
 
   return canBeSettled(isLimitOrder, triggerAbove, isLong, maxSlippage, expectedPrice, normalizedMarketPrice);
 };
@@ -397,10 +433,11 @@ export const checkIfOrderCanBeSettledId = async (
   const pythLatestPrices = await getLatestPricesFromPyth([orderPriceId], pythClient);
 
   const assetPrice = pythLatestPrices.find((pythPrice) => pythPrice.id === formattedPriceId);
-  const normalizedMarketPrice = normalizePythPriceForParifi(
-    parseInt(assetPrice?.price.price ?? '0'),
-    assetPrice?.price.expo ?? 0,
-  );
+
+  if (!assetPrice?.price.price || !assetPrice?.price.expo) {
+    throw new InvalidValueError('assetPrice/expo');
+  }
+  const normalizedMarketPrice = normalizePythPriceForParifi(parseInt(assetPrice?.price.price), assetPrice?.price.expo);
 
   return checkIfOrderCanBeSettled(order, normalizedMarketPrice);
 };
@@ -485,16 +522,29 @@ export const getLiquidationPrice = (
   normalizedMarketPrice: Decimal,
   normalizedCollateralPrice: Decimal,
 ): Decimal => {
-  const collateral = new Decimal(position.positionCollateral ?? '0');
+  if (
+    !market?.depositToken?.decimals ||
+    !market?.marketDecimals ||
+    !market.openingFee ||
+    !market.liquidationFee ||
+    !market.liquidationThreshold
+  ) {
+    throw new InvalidValueError('decimals/fee/liquidationThreshold');
+  }
+  if (!position.positionCollateral || !position.positionSize || !position.avgPrice) {
+    throw new InvalidValueError('Position size/collateral/avgPrice');
+  }
+
+  const collateral = new Decimal(position.positionCollateral);
 
   // Decimal digits for market and collateral token
-  const collateralDecimals = new Decimal(market.depositToken?.decimals ?? '18');
-  const marketDecimals = new Decimal(market.marketDecimals ?? '18');
+  const collateralDecimals = new Decimal(market.depositToken?.decimals);
+  const marketDecimals = new Decimal(market.marketDecimals);
 
   // Total fees for the position taking into account closing fee and liquidation fee
   const accruedBorrowFeesInMarket = getAccruedBorrowFeesInMarket(position, market);
-  const fixedFeesInMarket = new Decimal(position.positionSize ?? '0')
-    .times(new Decimal(market.openingFee ?? '0').add(market.liquidationFee ?? '0'))
+  const fixedFeesInMarket = new Decimal(position.positionSize)
+    .times(new Decimal(market.openingFee).add(market.liquidationFee))
     .div(MAX_FEE);
 
   const totalFeesInUsd = convertMarketAmountToUsd(
@@ -504,7 +554,7 @@ export const getLiquidationPrice = (
   );
 
   const collateralInUsd = convertCollateralAmountToUsd(collateral, collateralDecimals, normalizedCollateralPrice);
-  const maxLossLimitInUsd = collateralInUsd.times(market.liquidationThreshold ?? '0').div(PRECISION_MULTIPLIER);
+  const maxLossLimitInUsd = collateralInUsd.times(market.liquidationThreshold).div(PRECISION_MULTIPLIER);
 
   const lossLimitAfterFees = maxLossLimitInUsd.sub(totalFeesInUsd);
 
@@ -513,13 +563,13 @@ export const getLiquidationPrice = (
   if (lossLimitAfterFees.lessThan(DECIMAL_ZERO)) return normalizedMarketPrice;
 
   const lossPerToken = lossLimitAfterFees
-    .times(new Decimal('10').pow(marketDecimals))
+    .times(DECIMAL_10.pow(marketDecimals))
     .div(position.positionSize ?? '1');
 
   if (position.isLong) {
-    return new Decimal(position.avgPrice ?? 0).sub(lossPerToken);
+    return new Decimal(position.avgPrice).sub(lossPerToken);
   } else {
-    return new Decimal(position.avgPrice ?? 0).add(lossPerToken);
+    return new Decimal(position.avgPrice).add(lossPerToken);
   }
 };
 

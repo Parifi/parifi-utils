@@ -13,6 +13,7 @@ import {
   getPriceIdsForCollaterals,
 } from '../../common';
 import { checkIfOrderCanBeSettled } from '../order-manager';
+import { InvalidValueError } from '../../error/invalid-value.error';
 
 // Returns an Order Manager contract instance without signer
 export const getParifiUtilsInstance = (chain: Chain): Contract => {
@@ -58,15 +59,22 @@ export const batchSettlePendingOrdersUsingGelato = async (
 
   pendingOrders.forEach((order) => {
     if (order.id) {
+      if (!order.market?.pyth?.id) {
+        throw new InvalidValueError('orderPriceId');
+      }
       // Pyth returns price id without '0x' at the start, hence the price id from order
       // needs to be formatted
-      const orderPriceId = order.market?.pyth?.id ?? '0x';
+      const orderPriceId = order.market?.pyth?.id;
       const formattedPriceId = orderPriceId.startsWith('0x') ? orderPriceId.substring(2) : orderPriceId;
 
       const assetPrice = pythLatestPrices.find((pythPrice) => pythPrice.id === formattedPriceId);
+      if (!assetPrice?.price.price) {
+        throw new InvalidValueError('assetPrice?.price.price');
+      }
+
       const normalizedMarketPrice = normalizePythPriceForParifi(
-        parseInt(assetPrice?.price.price ?? '0'),
-        assetPrice?.price.expo ?? 0,
+        parseInt(assetPrice?.price.price),
+        assetPrice?.price.expo,
       );
 
       if (checkIfOrderCanBeSettled(order, normalizedMarketPrice)) {
