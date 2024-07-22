@@ -1,4 +1,5 @@
 import { Decimal } from 'decimal.js';
+import { DECIMAL_10 } from '../../common';
 
 // Converts the amount of market tokens to collateral tokens considering the decimal
 // values of both market and collateral tokens
@@ -11,8 +12,8 @@ export const convertMarketAmountToCollateral = (
   normalizedMarketPrice: Decimal,
   normalizedCollateralPrice: Decimal,
 ): Decimal => {
-  const numeratorMultiplier = new Decimal('10').pow(collateralDecimals);
-  const denominatorMultiplier = new Decimal('10').pow(marketDecimals);
+  const numeratorMultiplier = DECIMAL_10.pow(collateralDecimals);
+  const denominatorMultiplier = DECIMAL_10.pow(marketDecimals);
 
   let tokenAmount = normalizedMarketPrice.mul(marketAmount).mul(numeratorMultiplier);
   return tokenAmount.div(normalizedCollateralPrice).div(denominatorMultiplier);
@@ -24,7 +25,7 @@ export const convertMarketAmountToUsd = (
   marketDecimals: Decimal,
   normalizedMarketPrice: Decimal,
 ): Decimal => {
-  const denominatorMultiplier = new Decimal('10').pow(marketDecimals);
+  const denominatorMultiplier = DECIMAL_10.pow(marketDecimals);
   return marketAmount.mul(normalizedMarketPrice).div(denominatorMultiplier);
 };
 
@@ -34,6 +35,6 @@ export const convertCollateralAmountToUsd = (
   collateralDecimals: Decimal,
   normalizedCollateralPrice: Decimal,
 ): Decimal => {
-  const denominatorMultiplier = new Decimal('10').pow(collateralDecimals);
+  const denominatorMultiplier = DECIMAL_10.pow(collateralDecimals);
   return collateralAmount.mul(normalizedCollateralPrice).div(denominatorMultiplier);
 };
