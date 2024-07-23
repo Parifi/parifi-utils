@@ -45,6 +45,7 @@ import { getPublicSubgraphEndpoint } from '../subgraph';
 import { getPythClient } from '../pyth/pyth';
 import { UserVaultData } from '../interfaces/sdkTypes';
 import { getPoolPageData } from './pages/poolPage';
+import { getPositionRefreshTxData } from './subgraph-helper';
 
 export class Core {
   constructor(
@@ -410,6 +411,15 @@ export class Core {
     normalizedCollateralPrice: Decimal,
   ): Decimal => {
     return convertCollateralAmountToUsd(collateralAmount, collateralDecimals, normalizedCollateralPrice);
+  };
+
+  ////////////////////////////////////////////////////////////////
+  //////////////////    SUBGRAPH HELPER    ///////////////////////
+  ////////////////////////////////////////////////////////////////
+
+  getPositionRefreshTxData = async (): Promise<{ txData: string }> => {
+    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getPositionRefreshTxData(this.rpcConfig.chainId, subgraphEndpoint);
   };
 
   ////////////////////////////////////////////////////////////////

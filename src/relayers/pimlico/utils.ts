@@ -74,6 +74,31 @@ export const executeTxUsingPimlico = async (
   return { txHash };
 };
 
+export const executeBatchTxsUsingPimlico = async (
+  smartAccountClient: SmartAccountClient<EntryPoint, Transport, Chain, SmartAccount<EntryPoint>>,
+  targetContractAddresses: string[],
+  txDatas: string[],
+): Promise<{ txHash: string }> => {
+  const batchTxDatas = [];
+
+  if (targetContractAddresses.length != txDatas.length) {
+    throw new Error('Target contract and data lengths do not match');
+  }
+
+  for (let index = 0; index < targetContractAddresses.length; index++) {
+    batchTxDatas.push({
+      to: targetContractAddresses[index] as Hex,
+      value: 0n,
+      data: txDatas[index] as Hex,
+    });
+  }
+
+  const txHash = await smartAccountClient.sendTransactions({
+    transactions: batchTxDatas,
+  });
+  return { txHash };
+};
+
 /**
  * Gets the chain object for the given chain id.
  * @param chainId - Chain id of the target EVM chain.
