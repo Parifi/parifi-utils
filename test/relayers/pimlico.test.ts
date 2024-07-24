@@ -53,4 +53,18 @@ describe('Pimlico test cases', () => {
       console.log('No positions available for liquidation');
     }
   });
+
+  it('should settle orders and refersh positions using Pimlico', async () => {
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+
+    const orderDetails = await parifiSdk.subgraph.getOrderById(TEST_SETTLE_ORDER_ID);
+    if (orderDetails.status == OrderStatus.SETTLED) {
+      return;
+    }
+    const orderIds = [TEST_SETTLE_ORDER_ID];
+
+    const { txHash } = await parifiSdk.relayer.pimlico.batchSettleAndRefreshUsingPimlico(orderIds);
+
+    console.log(`User operation included: https://arbiscan.io/tx/${txHash}`);
+  });
 });

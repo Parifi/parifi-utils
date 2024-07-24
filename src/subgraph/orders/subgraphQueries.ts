@@ -68,22 +68,29 @@ export const fetchPendingOrdersQuery = (
         lastUpdatedTimestamp
       }
     }
+    orderType
+    isLong
+    isLimitOrder
+    triggerAbove
     deadline
     deadlineISO
-    orderType
-    deltaSize
     deltaCollateral
+    deltaSize
+    deltaSizeUsd
    	expectedPrice 
-    executionPrice
-    isLong
-    status
-    createdTimestamp
-    txHash
     maxSlippage
     partnerAddress
     executionFee
+    txHash
+    createdTimestamp
+    status
     settledTxHash
+    settledTimestamp
+    settledTimestampISO
+    executionPrice
+    settledBy { id }
     cancellationTxHash
+    position { id }
   }
 }
 `;
