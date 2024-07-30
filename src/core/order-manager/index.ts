@@ -553,18 +553,28 @@ export const getLiquidationPrice = (
     normalizedMarketPrice,
   );
 
+  let { totalProfitOrLoss: totalProfitOrLossInUsd, isProfit } = getProfitOrLossInUsd(
+    position,
+    normalizedMarketPrice,
+    marketDecimals,
+  );
+
+  // Update the sign of the totalProfitOrLoss. The values is negative when in loss
+  // and positive when in profit
+  if (!isProfit) {
+    totalProfitOrLossInUsd = totalProfitOrLossInUsd.times(-1);
+  }
+
   const collateralInUsd = convertCollateralAmountToUsd(collateral, collateralDecimals, normalizedCollateralPrice);
   const maxLossLimitInUsd = collateralInUsd.times(market.liquidationThreshold).div(PRECISION_MULTIPLIER);
 
-  const lossLimitAfterFees = maxLossLimitInUsd.sub(totalFeesInUsd);
+  const lossLimitAfterFees = maxLossLimitInUsd.sub(totalFeesInUsd).add(totalProfitOrLossInUsd);
 
   // @todo Revisit this
   // If loss is already more than the max loss, the position can be liquidated at the current price
   if (lossLimitAfterFees.lessThan(DECIMAL_ZERO)) return normalizedMarketPrice;
 
-  const lossPerToken = lossLimitAfterFees
-    .times(DECIMAL_10.pow(marketDecimals))
-    .div(position.positionSize ?? '1');
+  const lossPerToken = lossLimitAfterFees.times(DECIMAL_10.pow(marketDecimals)).div(position.positionSize);
 
   if (position.isLong) {
     return new Decimal(position.avgPrice).sub(lossPerToken);
