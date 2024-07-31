@@ -24,7 +24,7 @@ describe('Pimlico test cases', () => {
     }
     const orderIds = [TEST_SETTLE_ORDER_ID];
 
-    const { txHash } = await parifiSdk.relayer.pimlico.batchSettleOrdersUsingPimlico(orderIds);
+    const { txHash } = await parifiSdk.relayer.pimlico.batchSettleAndRefreshUsingPimlico(orderIds);
 
     console.log(`User operation included: https://arbiscan.io/tx/${txHash}`);
   });

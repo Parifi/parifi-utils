@@ -1,7 +1,8 @@
 import { ethers } from 'ethers';
 import { getParifiSdkInstanceForTesting } from '..';
 import { TEST_MARKET_ID1, TEST_OPEN_POSITION, TEST_POSITION_ID1, TEST_SETTLE_ORDER_ID } from '../common/constants';
-import { DECIMAL_ZERO, OrderStatus, getCurrentTimestampInSeconds, getNormalizedPriceByIdFromPriceIdArray } from '../../src';
+import { DECIMAL_ZERO, OrderStatus, getCurrentTimestampInSeconds } from '../../src';
+import Decimal from 'decimal.js';
 
 describe('Order Manager tests', () => {
   it('should liquidate a single position', async () => {
@@ -39,7 +40,7 @@ describe('Order Manager tests', () => {
       console.log('Order expired, cannot be settled');
       return;
     }
-  
+
     const priceIds = await parifiSdk.subgraph.getPythPriceIdsForOrderIds(orderIds);
 
     const collateralPriceIds = parifiSdk.pyth.getPriceIdsForCollaterals();
@@ -71,6 +72,21 @@ describe('Order Manager tests', () => {
 
     console.log('normalizedCollateralPrice', normalizedCollateralPrice);
     console.log('normalizedMarketPrice', normalizedMarketPrice);
+
+    const accruedBorrowFeesInMarket = await parifiSdk.core.getAccruedBorrowFeesInMarket(position, market);
+
+    if (market.marketDecimals && market.depositToken?.decimals && normalizedCollateralPrice) {
+      const accruedFeesInUsd = await parifiSdk.core.convertMarketAmountToCollateral(
+        accruedBorrowFeesInMarket,
+        new Decimal(market.marketDecimals),
+        new Decimal(market.depositToken?.decimals),
+        normalizedMarketPrice,
+        normalizedCollateralPrice,
+      );
+      console.log('accruedFeesInUsd', accruedFeesInUsd);
+    } else {
+      console.log('Invalid values sdk test');
+    }
 
     const liquidationPrice = await parifiSdk.core.getLiquidationPrice(
       position,
