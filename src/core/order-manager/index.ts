@@ -330,8 +330,8 @@ export const canBeSettled = (
     // If its a limit order, check if the limit price is reached, either above or below
     // depending on the triggerAbove flag
     if (
-      (triggerAbove && normalizedMarketPrice < expectedPrice) ||
-      (!triggerAbove && normalizedMarketPrice > expectedPrice)
+      (triggerAbove && normalizedMarketPrice.lessThan(expectedPrice)) ||
+      (!triggerAbove && normalizedMarketPrice.greaterThan(expectedPrice))
     ) {
       console.log('Order cannot be settled because of Trigger price');
       return false;
