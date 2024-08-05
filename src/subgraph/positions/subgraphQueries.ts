@@ -211,3 +211,46 @@ export const fetchAllPositionsUnrealizedPnl = (userAddress: string) => gql`
     }
   }
 `;
+
+// Fetches the order ids related to a specific position id
+export const fetchAllOrdersForPosition = (positionId: string) => gql`
+{
+  orders(
+    where: {position: "${positionId}"}
+  ) {
+    id
+    user {
+      id
+    }
+    market {
+      id
+    }
+    orderType
+    isLong
+    isLimitOrder
+    triggerAbove
+    deadline
+    deadlineISO
+    deltaCollateral
+    deltaSize
+    deltaSizeUsd
+    expectedPrice
+    maxSlippage
+    partnerAddress
+    executionFee
+    txHash
+    createdTimestamp
+    status
+    settledTxHash
+    settledTimestamp
+    settledTimestampISO
+    executionPrice
+    settledBy {
+      id
+    }
+    cancellationTxHash
+    position {
+      id
+    }
+  }
+}`;

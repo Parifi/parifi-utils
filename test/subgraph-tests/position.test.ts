@@ -116,4 +116,11 @@ describe('Order fetching logic from subgraph', () => {
       console.log('No open positions found for user address');
     }
   });
+
+  it('should return all orders related to a position id', async () => {
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+
+    const orders = await parifiSdk.subgraph.getAllOrdersForPosition(TEST_POSITION_ID1);
+    console.log('Orders for position ID:', orders);
+  });
 });
