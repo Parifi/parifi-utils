@@ -640,7 +640,7 @@ export const calculateSizeFromCollateral = (
  * @returns The computed position ID as a hex string.
  */
 
-export const getExpectedPoitionIdFromNounce = (userAddress: string, positionNonce: BigInt, chainId: number): string => {
+export const getExpectedPositionIdFromNonce = (userAddress: string, positionNonce: BigInt, chainId: number): string => {
   const AbiCoder = new ethers.AbiCoder();
   return ethers.keccak256(
     AbiCoder.encode(['string', 'address', 'uint256', 'uint256'], ['POS', userAddress, positionNonce, chainId]),
@@ -674,10 +674,10 @@ export const getUserPositionNonce = async (userAddress: string, chain: Chain): P
  * @returns A Promise that resolves to the position ID as a string, or null if an error occurs.
  */
 
-export const getUserExpectedPoitionId = async (userAddress: string, chain: Chain): Promise<string | null> => {
+export const getUserExpectedPositionId = async (userAddress: string, chain: Chain): Promise<string | null> => {
   const userPositionNonce = await getUserPositionNonce(userAddress, chain);
   if (userPositionNonce !== null) {
-    return getExpectedPoitionIdFromNounce(userAddress, userPositionNonce, chain); // Assuming chain has an id property
+    return getExpectedPositionIdFromNonce(userAddress, userPositionNonce, chain); // Assuming chain has an id property
   }
   return null;
 };
