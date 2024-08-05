@@ -20,7 +20,10 @@ import {
   getLiquidationPrice,
   getNetProfitOrLossInCollateral,
   getOrderManagerInstance,
+  getPositionId,
   getProfitOrLossInUsd,
+  getUserPositionId,
+  getUserPositionNonce,
   isPositionLiquidatable,
   liquidatePositionUsingGelato,
   settleOrderUsingGelato,
@@ -46,6 +49,7 @@ import { getPythClient } from '../pyth/pyth';
 import { UserVaultData } from '../interfaces/sdkTypes';
 import { getPoolPageData } from './pages/poolPage';
 import { getPositionRefreshTxData } from './subgraph-helper';
+import { Chain } from '@parifi/references';
 
 export class Core {
   constructor(
@@ -454,5 +458,17 @@ export class Core {
     );
 
     return await getTotalOpenInterestInUsd(subgraphEndpoint, pythClient);
+  };
+
+  getPoitionId = (userAddress: string, positionNonce: BigInt, chain: Chain): string => {
+    return getPositionId(userAddress, positionNonce, chain);
+  };
+
+  getUserPoitionId = async (userAddress: string, chain: Chain): Promise<string | null> => {
+    return await getUserPositionId(userAddress, chain);
+  };
+
+  getUserPositionNonce = async (userAddress: string, chain: Chain): Promise<BigInt | null> => {
+    return await getUserPositionNonce(userAddress, chain);
   };
 }

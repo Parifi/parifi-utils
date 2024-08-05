@@ -25,6 +25,7 @@ import { getLatestPricesFromPyth, getVaaPriceUpdateData, normalizePythPriceForPa
 import { getCurrentTimestampInSeconds, getPriceIdsForCollaterals } from '../../common';
 import { executeTxUsingGelato } from '../../relayers/gelato/gelato-function';
 import { InvalidValueError } from '../../error/invalid-value.error';
+import { AbiCoder } from 'ethers';
 
 // Returns an Order Manager contract instance without signer
 export const getOrderManagerInstance = (chain: Chain): Contract => {
@@ -628,4 +629,55 @@ export const calculateSizeFromCollateral = (
   const sizeInUsd = collateralInUsd.sub(executionFeeInUsd).div(openingFee.add(1).div(leverage));
 
   return sizeInUsd.div(normalizedMarketPrice);
+};
+
+/**
+ * Computes a unique position ID for a given user, nonce, and chain ID.
+ *
+ * @param userAddress - The address of the user.
+ * @param positionNonce - The nonce associated with the user's position.
+ * @param chainId - The ID of the blockchain network.
+ * @returns The computed position ID as a hex string.
+ */
+
+export const getPositionId = (userAddress: string, positionNonce: BigInt, chainId: number): string => {
+  const AbiCoder = new ethers.AbiCoder();
+  return ethers.keccak256(
+    AbiCoder.encode(['string', 'address', 'uint256', 'uint256'], ['POS', userAddress, positionNonce, chainId]),
+  );
+};
+
+/**
+ * Fetches the position nonce for a given user from the order manager contract.
+ *
+ * @param userAddress - The address of the user.
+ * @param chain - The chain object containing information about the blockchain network.
+ * @returns A Promise that resolves to the position nonce as a BigInt, or null if an error occurs.
+ */
+export const getUserPositionNonce = async (userAddress: string, chain: Chain): Promise<BigInt | null> => {
+  const orderManagerContract = getOrderManagerInstance(chain);
+
+  try {
+    const nonce = await orderManagerContract.positionNonce(userAddress);
+    return nonce;
+  } catch (error) {
+    console.error('Error fetching position nonce:', error);
+    return null;
+  }
+};
+
+/**
+ * Fetches the position ID for a given user from the order manager contract.
+ *
+ * @param userAddress - The address of the user.
+ * @param chain - The chain object containing information about the blockchain network.
+ * @returns A Promise that resolves to the position ID as a string, or null if an error occurs.
+ */
+
+export const getUserPositionId = async (userAddress: string, chain: Chain): Promise<string | null> => {
+  const userPositionNonce = await getUserPositionNonce(userAddress, chain);
+  if (userPositionNonce !== null) {
+    return getPositionId(userAddress, userPositionNonce, chain); // Assuming chain has an id property
+  }
+  return null;
 };
