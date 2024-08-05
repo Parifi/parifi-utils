@@ -20,9 +20,9 @@ import {
   getLiquidationPrice,
   getNetProfitOrLossInCollateral,
   getOrderManagerInstance,
-  getPositionId,
+  getExpectedPoitionIdFromNounce,
   getProfitOrLossInUsd,
-  getUserPositionId,
+  getUserExpectedPoitionId,
   getUserPositionNonce,
   isPositionLiquidatable,
   liquidatePositionUsingGelato,
@@ -460,12 +460,12 @@ export class Core {
     return await getTotalOpenInterestInUsd(subgraphEndpoint, pythClient);
   };
 
-  getPoitionId = (userAddress: string, positionNonce: BigInt, chain: Chain): string => {
-    return getPositionId(userAddress, positionNonce, chain);
+  getExpectedPoitionIdFromNounce = (userAddress: string, positionNonce: BigInt, chain: Chain): string => {
+    return getExpectedPoitionIdFromNounce(userAddress, positionNonce, chain);
   };
 
-  getUserPoitionId = async (userAddress: string, chain: Chain): Promise<string | null> => {
-    return await getUserPositionId(userAddress, chain);
+  getUserExpectedPoitionId = async (userAddress: string, chain: Chain): Promise<string | null> => {
+    return await getUserExpectedPoitionId(userAddress, chain);
   };
 
   getUserPositionNonce = async (userAddress: string, chain: Chain): Promise<BigInt | null> => {
