@@ -8,6 +8,7 @@ import {
 } from './orders';
 import { PythConfig, RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
 import {
+  getAllOrdersForPosition,
   getAllPositionsByUserAddress,
   getClosedPositionsByUserAddress,
   getLiquidatedPositionsByUserAddress,
@@ -225,6 +226,11 @@ export class Subgraph {
   public async getTotalUnrealizedPnlInUsd(userAddress: string): Promise<Decimal> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getTotalUnrealizedPnlInUsd(subgraphEndpoint, userAddress);
+  }
+
+  public async getAllOrdersForPosition(positionId: string): Promise<Order[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getAllOrdersForPosition(subgraphEndpoint, positionId);
   }
   ////////////////////////////////////////////////////////////////
   //////////////////////    MARKET    ////////////////////////////

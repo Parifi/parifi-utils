@@ -1,6 +1,7 @@
 import { request } from 'graphql-request';
-import { Position } from '../../interfaces/subgraphTypes';
+import { Order, Position } from '../../interfaces/subgraphTypes';
 import {
+  fetchAllOrdersForPosition,
   fetchAllPositionsForCollateralData,
   fetchAllPositionsUnrealizedPnl,
   fetchPositionByIdQuery,
@@ -10,7 +11,11 @@ import {
   fetchPositionsToRefreshQuery,
   fetchPriceIdsFromPositionIdsQuery,
 } from './subgraphQueries';
-import { mapPositionsArrayToInterface, mapSinglePositionToInterface } from '../../common/subgraphMapper';
+import {
+  mapPositionsArrayToInterface,
+  mapSingleOrderToInterface,
+  mapSinglePositionToInterface,
+} from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 import { DECIMAL_ZERO, EMPTY_BYTES32, PRICE_FEED_PRECISION, getUniqueValuesFromArray } from '../../common';
 import Decimal from 'decimal.js';
@@ -32,7 +37,7 @@ export const getAllPositionsByUserAddress = async (
   try {
     const query = fetchPositionsByUserQuery(userAddress, count, skip);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
-    if (!subgraphResponse) throw Error(`Error While Fechting All Positions By UserAddress`);
+    if (!subgraphResponse) throw Error(`Error fetching All Positions By UserAddress`);
     const positions = mapPositionsArrayToInterface(subgraphResponse);
     if (positions) {
       return positions;
@@ -53,7 +58,7 @@ export const getOpenPositionsByUserAddress = async (
   try {
     const query = fetchPositionsByUserQueryAndStatus(userAddress, 'OPEN', count, skip);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
-    if (!subgraphResponse) throw Error(`Error While Fechting Open Positions By UserAddress`);
+    if (!subgraphResponse) throw Error(`Error fetching Open Positions By UserAddress`);
     const positions = mapPositionsArrayToInterface(subgraphResponse);
     if (positions) {
       return positions;
@@ -74,7 +79,7 @@ export const getClosedPositionsByUserAddress = async (
   try {
     const query = fetchPositionsByUserQueryAndStatus(userAddress, 'CLOSED', count, skip);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
-    if (!subgraphResponse) throw Error(`Error While Fechting Closed Positions By UserAddress`);
+    if (!subgraphResponse) throw Error(`Error fetching Closed Positions By UserAddress`);
     const positions = mapPositionsArrayToInterface(subgraphResponse);
     if (positions) {
       return positions;
@@ -95,7 +100,7 @@ export const getLiquidatedPositionsByUserAddress = async (
   try {
     const query = fetchPositionsByUserQueryAndStatus(userAddress, 'LIQUIDATED', count, skip);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
-    if (!subgraphResponse) throw Error(`Error While Fechting Liquidated Positions By UserAddress`);
+    if (!subgraphResponse) throw Error(`Error fetching Liquidated Positions By UserAddress`);
     const positions = mapPositionsArrayToInterface(subgraphResponse);
     if (positions) {
       return positions;
@@ -111,7 +116,7 @@ export const getPositionById = async (subgraphEndpoint: string, positionId: stri
   try {
     const formattedPositionId = positionId?.toLowerCase();
     let subgraphResponse: any = await request(subgraphEndpoint, fetchPositionByIdQuery(formattedPositionId));
-    if (!subgraphResponse) throw Error(`Error While Fechting Position By Id`);
+    if (!subgraphResponse) throw Error(`Error fetching Position By Id`);
     if (subgraphResponse) {
       const position = mapSinglePositionToInterface(subgraphResponse.position);
       if (position) {
@@ -135,7 +140,7 @@ export const getPythPriceIdsForPositionIds = async (
       subgraphEndpoint,
       fetchPriceIdsFromPositionIdsQuery(formattedPositionIds),
     );
-    if (!subgraphResponse) throw new Error('Error While Fechting Pyth Price Ids For PositionIds');
+    if (!subgraphResponse) throw new Error('Error fetching Pyth Price Ids For PositionIds');
     const priceIds: string[] = [];
     const positions: Position[] = mapPositionsArrayToInterface(subgraphResponse) || [];
     if (positions.length != 0) {
@@ -160,7 +165,7 @@ export const getPositionsToRefresh = async (subgraphEndpoint: string, count: num
   try {
     const query = fetchPositionsToRefreshQuery(count);
     const subgraphResponse: PositionIdsSubgraphResponse = await request(subgraphEndpoint, query);
-    if (!subgraphResponse) throw new Error('Error While Fechting Position For Uesr');
+    if (!subgraphResponse) throw new Error('Error fetching Position For User');
     return subgraphResponse.positions.map((position) => position.id);
   } catch (error) {
     throw error;
@@ -172,7 +177,7 @@ export const getPositionsToLiquidate = async (subgraphEndpoint: string, count: n
   try {
     const query = fetchPositionsToLiquidateQuery(count);
     const subgraphResponse: PositionIdsSubgraphResponse = await request(subgraphEndpoint, query);
-    if (!subgraphResponse) throw new Error('Error While Fechting Positions To Liquidate For Uesr');
+    if (!subgraphResponse) throw new Error('Error fetching Positions To Liquidate For User');
     return subgraphResponse.positions.map((position) => position.id);
   } catch (error) {
     throw error;
@@ -204,7 +209,7 @@ export const getTotalDepositedCollateralInUsd = async (
     let totalCollateralValueInUsd: Decimal = DECIMAL_ZERO;
     const query = fetchAllPositionsForCollateralData(userAddress);
     const subgraphResponse: PositionCollateralSubgraphResponse = await request(subgraphEndpoint, query);
-    if (!subgraphResponse) throw new Error('While While Fechting Get User Total Deposited Collateral In Usd');
+    if (!subgraphResponse) throw new Error('Error fetching Get User Total Deposited Collateral In Usd');
     // For each position, calculate the USD value of the deposited collateral
     subgraphResponse.positions.forEach((position) => {
       const positionCollateral = new Decimal(position.positionCollateral);
@@ -234,13 +239,45 @@ export const getTotalUnrealizedPnlInUsd = async (subgraphEndpoint: string, userA
     let totalNetUnrealizedPnlInUsd: Decimal = DECIMAL_ZERO;
     const query = fetchAllPositionsUnrealizedPnl(userAddress);
     const subgraphResponse: PositionUnrealizedPnlSubgraphResponse = await request(subgraphEndpoint, query);
-    if (!subgraphResponse) throw new Error('While While Fechting Get User Total Unrealized Pnl In Usd');
+    if (!subgraphResponse) throw new Error('Error fetching Get User Total Unrealized Pnl In Usd');
     // For each position, calculate the USD value of the deposited collateral
     subgraphResponse.positions.forEach((position) => {
       const unrealizedPnlInUsd = new Decimal(position.netUnrealizedPnlInUsd);
       totalNetUnrealizedPnlInUsd = totalNetUnrealizedPnlInUsd.add(unrealizedPnlInUsd);
     });
     return totalNetUnrealizedPnlInUsd;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Returns all orders associated with a position ID
+export const getAllOrdersForPosition = async (subgraphEndpoint: string, positionId: string): Promise<Order[]> => {
+  try {
+    interface PositionRelatedOrders {
+      orders: Order[];
+    }
+
+    const subgraphResponse: PositionRelatedOrders = await request(
+      subgraphEndpoint,
+      fetchAllOrdersForPosition(positionId),
+    );
+
+    if (!subgraphResponse) throw new Error('Error fetching orders for positionId');
+    if (subgraphResponse.orders.length == 0) {
+      return [];
+    }
+
+    // Store the final orders array
+    const orders: Order[] = [];
+
+    subgraphResponse.orders.forEach((order) => {
+      const formattedOrder = mapSingleOrderToInterface(order);
+      if (formattedOrder != undefined) {
+        orders.push(order);
+      }
+    });
+    return orders;
   } catch (error) {
     throw error;
   }
