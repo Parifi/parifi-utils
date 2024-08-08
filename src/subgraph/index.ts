@@ -14,6 +14,7 @@ import {
   getLiquidatedPositionsByUserAddress,
   getOpenPositionsByUserAddress,
   getPositionById,
+  getPositionsHistory,
   getPositionsToLiquidate,
   getPositionsToRefresh,
   getPythPriceIdsForPositionIds,
@@ -231,6 +232,11 @@ export class Subgraph {
   public async getAllOrdersForPosition(positionId: string): Promise<Order[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getAllOrdersForPosition(subgraphEndpoint, positionId);
+  }
+
+  public async getPositionsHistory(userAddress: string, count: number = 100, skip: number = 0): Promise<Position[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getPositionsHistory(subgraphEndpoint, userAddress, count, skip);
   }
   ////////////////////////////////////////////////////////////////
   //////////////////////    MARKET    ////////////////////////////

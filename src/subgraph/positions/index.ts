@@ -5,6 +5,7 @@ import {
   fetchAllPositionsForCollateralData,
   fetchAllPositionsUnrealizedPnl,
   fetchPositionByIdQuery,
+  fetchPositionHistoryQuery,
   fetchPositionsByUserQuery,
   fetchPositionsByUserQueryAndStatus,
   fetchPositionsToLiquidateQuery,
@@ -278,6 +279,27 @@ export const getAllOrdersForPosition = async (subgraphEndpoint: string, position
       }
     });
     return orders;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get all positions by user address
+export const getPositionsHistory = async (
+  subgraphEndpoint: string,
+  userAddress: string,
+  count: number = 100,
+  skip: number = 0,
+): Promise<Position[]> => {
+  try {
+    const query = fetchPositionHistoryQuery(userAddress, count, skip);
+    let subgraphResponse: any = await request(subgraphEndpoint, query);
+    if (!subgraphResponse) throw Error(`Error fetching All Positions By UserAddress`);
+    const positions = mapPositionsArrayToInterface(subgraphResponse);
+    if (positions) {
+      return positions;
+    }
+    throw new NotFoundError('Positions not found');
   } catch (error) {
     throw error;
   }

@@ -554,22 +554,22 @@ export const getLiquidationPrice = (
     normalizedMarketPrice,
   );
 
+  const collateralInUsd = convertCollateralAmountToUsd(collateral, collateralDecimals, normalizedCollateralPrice);
+  const maxLossLimitInUsd = collateralInUsd.times(market.liquidationThreshold).div(PRECISION_MULTIPLIER);
+
+  let lossLimitAfterFees = maxLossLimitInUsd.sub(totalFeesInUsd);
+
   let { totalProfitOrLoss: totalProfitOrLossInUsd, isProfit } = getProfitOrLossInUsd(
     position,
     normalizedMarketPrice,
     marketDecimals,
   );
 
-  // Update the sign of the totalProfitOrLoss. The values is negative when in loss
-  // and positive when in profit
-  if (!isProfit) {
-    totalProfitOrLossInUsd = totalProfitOrLossInUsd.times(-1);
+  // If the position is profitable, add the profits to increase the maxLoss limit, else skip losses
+  // as its already factored in
+  if (isProfit) {
+    lossLimitAfterFees = lossLimitAfterFees.add(totalProfitOrLossInUsd);
   }
-
-  const collateralInUsd = convertCollateralAmountToUsd(collateral, collateralDecimals, normalizedCollateralPrice);
-  const maxLossLimitInUsd = collateralInUsd.times(market.liquidationThreshold).div(PRECISION_MULTIPLIER);
-
-  const lossLimitAfterFees = maxLossLimitInUsd.sub(totalFeesInUsd).add(totalProfitOrLossInUsd);
 
   // @todo Revisit this
   // If loss is already more than the max loss, the position can be liquidated at the current price
