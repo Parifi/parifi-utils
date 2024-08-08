@@ -1,4 +1,5 @@
 import { getParifiSdkInstanceForTesting } from '..';
+import { PositionStatus } from '../../src';
 import {
   TEST_POSITION_ID1,
   TEST_POSITION_ID2,
@@ -122,5 +123,16 @@ describe('Order fetching logic from subgraph', () => {
 
     const orders = await parifiSdk.subgraph.getAllOrdersForPosition(TEST_POSITION_ID1);
     console.log('Orders for position ID:', orders);
+  });
+
+  it('should return position history for a user', async () => {
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+
+    const userAddress = TEST_USER_ID2;
+    const positions = await parifiSdk.subgraph.getPositionsHistory(userAddress);
+    console.log(positions.length);
+    positions.forEach((position) => {
+      expect(position.status).not.toBe(PositionStatus.OPEN);
+    });
   });
 });

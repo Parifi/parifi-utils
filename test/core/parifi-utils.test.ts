@@ -32,7 +32,6 @@ describe('Parifi Utils tests', () => {
     const ordersCount = 10;
 
     const pendingOrders = await parifiSdk.subgraph.getAllPendingOrders(expiryTimestamp, ordersCount, 0);
-    console.log(pendingOrders);
 
     // Return if orders are not available for settlement
     if (pendingOrders.length == 0) return;

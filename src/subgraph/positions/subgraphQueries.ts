@@ -254,3 +254,49 @@ export const fetchAllOrdersForPosition = (positionId: string) => gql`
     }
   }
 }`;
+
+// Fetches all positions by a user (Both open and closed)
+export const fetchPositionHistoryQuery = (userAddress: string, count: number = 100, skip: number = 0) =>
+  gql`
+    {
+        positions(
+            first: ${count}
+            skip: ${skip}
+            orderBy: createdTimestamp
+            orderDirection: desc
+            where: {user: "${userAddress.toLowerCase()}", status_not: OPEN}
+        ) {
+            id
+            market {
+            id
+            }
+            user {
+            id
+            }
+            positionSize
+            positionCollateral
+            avgPrice
+            avgPriceDec
+            isLong
+            createdTimestamp
+            lastCumulativeFee
+            status
+            txHash
+            liquidationTxHash
+            closingPrice
+            realizedPnl
+            realizedPnlCollateral
+            realizedFee
+            realizedFeeCollateral
+            netRealizedPnl
+            createdTimestamp
+            lastRefresh
+            lastRefreshISO
+            netUnrealizedPnlInCollateral
+            netUnrealizedPnlInUsd
+            liquidationNetPnlInCollateral
+            accruedBorrowingFeesInCollateral
+            canBeLiquidated
+            lossToCollateralRatioPercent
+        }
+    }`;
