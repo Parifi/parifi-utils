@@ -55,7 +55,9 @@ describe('Order Manager tests', () => {
 
   it('should return valid liquidation price', async () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
-    const position = await parifiSdk.subgraph.getPositionById(TEST_OPEN_POSITION);
+    const position = await parifiSdk.subgraph.getPositionById(
+      '0x46baf7296ea013c80cb814c3a4c3f0b1547b03a2f02b370a093cead75cfadc94',
+    );
     const market = await parifiSdk.subgraph.getMarketById(position.market?.id ?? TEST_MARKET_ID1);
 
     const normalizedPrice = await parifiSdk.pyth.getLatestPricesNormalized([
@@ -76,14 +78,14 @@ describe('Order Manager tests', () => {
     const accruedBorrowFeesInMarket = await parifiSdk.core.getAccruedBorrowFeesInMarket(position, market);
 
     if (market.marketDecimals && market.depositToken?.decimals && normalizedCollateralPrice) {
-      const accruedFeesInUsd = await parifiSdk.core.convertMarketAmountToCollateral(
+      const accruedFeesInUsdc = await parifiSdk.core.convertMarketAmountToCollateral(
         accruedBorrowFeesInMarket,
         new Decimal(market.marketDecimals),
         new Decimal(market.depositToken?.decimals),
         normalizedMarketPrice,
         normalizedCollateralPrice,
       );
-      console.log('accruedFeesInUsd', accruedFeesInUsd);
+      console.log('accruedFeesInUsdc', accruedFeesInUsdc);
     } else {
       console.log('Invalid values sdk test');
     }
