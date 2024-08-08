@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { getParifiSdkInstanceForTesting } from '..';
-import { TEST_MARKET_ID1, TEST_OPEN_POSITION, TEST_POSITION_ID1, TEST_SETTLE_ORDER_ID } from '../common/constants';
+import { TEST_MARKET_ID1, TEST_SETTLE_ORDER_ID } from '../common/constants';
 import { DECIMAL_ZERO, OrderStatus, getCurrentTimestampInSeconds } from '../../src';
 import Decimal from 'decimal.js';
 

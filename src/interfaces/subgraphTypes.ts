@@ -18,6 +18,7 @@ export enum OrderStatus {
   PENDING = 'PENDING',
   CANCELLED = 'CANCELLED',
   SETTLED = 'SETTLED',
+  INVALID = 'INVALID'
 }
 
 export enum PositionStatus {
