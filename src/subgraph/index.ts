@@ -28,6 +28,7 @@ import { getPublicSubgraphEndpoint } from './common';
 import { Pyth } from '../pyth';
 import Decimal from 'decimal.js';
 import {
+  getAccountByAddress,
   getLeaderboardUserData,
   getPortfolioDataForUsers,
   getRealizedPnlForUser,
@@ -127,7 +128,10 @@ export class Subgraph {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getOrderById(subgraphEndpoint, orderId);
   }
-
+ public async getUserByAddress(userAddress:string):Promise<any>{
+  const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+  return await getAccountByAddress(subgraphEndpoint, userAddress);
+ }
   public async getPythPriceIdsForOrderIds(orderIds: string[]): Promise<string[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getPythPriceIdsForOrderIds(subgraphEndpoint, orderIds);

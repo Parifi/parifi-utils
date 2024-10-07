@@ -114,6 +114,7 @@ export type Order = {
   settledTimestampISO: string;
   settledBy?: Wallet;
   positionId?: Position;
+  formatteddeltaSize?:string
 };
 
 export type Position = {

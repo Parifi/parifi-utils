@@ -160,52 +160,30 @@ export interface Market {
 ////////////////////////////////////////////////////////////////
 // settlementReward, referralFees, partnerAddressts
 export interface Order {
-  //Order ID
   id: string;
-  /** Market details for the created order */
   market?: Market;
-  /** Wallet/Address of the order */
   user?: Wallet;
-  /** Perp account for which this order was created */
-  /** True if it is a limit order */
   isLimitOrder: boolean;
-  /** Acceptable price */
   deadline:string
   expectedPrice: string;
   expectedPriceTime?: string;
-  /** Settlement time */
   settlementTime?: string;
-  /** Tracking code */
   trackingCode?: string;
-  /** Delta collateral amount  */
   deltaCollateral: string;
-  /** Collateral token */
-  /** Delta position size */
   deltaSize: string;
-  /** Delta position size*/
   deltaSizeUsd: string;
-  /** Order execution price during settlement */
   executionPrice: string;
-  /** Collected fees */
   executionFee: string;
-  /** Referral fees */
   referralFees?: string;
-  /** Transaction hash for order creation */
   txHash: string;
-  /** Order creation timestamp */
   createdTimestamp: string;
-  /** Status of the order (pending, cancelled, settled) */
   status: OrderStatus;
-  /** Order settlement transaction hash */
   settledTxHash?: string;
-  /** Order settlement timestamp */
   settledTimestamp?: string;
-  /** Order settlement timestamp in ISO string */
   settledTimestampISO: string;
-  /** Order settled by */
   settledBy?: Wallet;
-  /** Related Position */
   positionId?: Position;
+  formattedDeltaSize:string
 }
 
 ////////////////////////////////////////////////////////////////

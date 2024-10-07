@@ -1,3 +1,4 @@
+import { formatEther } from 'ethers';
 import { Market, Order, Position, PriceFeedSnapshot, PythData, Token, Wallet } from '../interfaces/subgraphTypes';
 
 ////////////////////////////////////////////////////////////////
@@ -108,6 +109,7 @@ export const mapSingleOrderToInterface = (response: any): Order | undefined => {
       executionPrice: response.executionPrice,
       settledBy: response.settledBy ? mapSubgraphResponseToWalletInterface(response.settledBy) : undefined,
       positionId: response.position ? response.position.id : undefined,
+      formattedDeltaSize:formatEther(response.deltaSize)
     };
   } catch (error) {
     console.log('Error while mapping data', error);

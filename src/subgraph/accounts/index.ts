@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js';
 import { request } from 'graphql-request';
 import {
+  fetchAccountByWalletAddress,
   fetchLeaderboardUserData,
   fetchPortfolioData,
   fetchRealizedPnlData,
@@ -188,3 +189,9 @@ export const getLeaderboardUserData = async (
   const leaderboardUserData: LeaderboardUserData[] = subgraphResponse.accounts as LeaderboardUserData[];
   return leaderboardUserData;
 };
+
+export const getAccountByAddress  = async (subgraphEndpoint:string,userAddresses:string)=>{
+  const subgraphResponse:any = await  request(subgraphEndpoint, fetchAccountByWalletAddress(userAddresses))
+  if (!subgraphResponse) throw new Error('Error While Fechting Wallet for Address');
+  return subgraphResponse?.wallet;
+}
