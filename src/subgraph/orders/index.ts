@@ -55,7 +55,7 @@ export const getAllPendingOrders = async (
 // Get order from subgraph by order ID
 export const getOrderById = async (subgraphEndpoint: string, orderId: string): Promise<Order> => {
   try {
-    const formattedOrderId = orderId.toLowerCase();
+    const formattedOrderId = orderId
     let subgraphResponse: any = await request(subgraphEndpoint, fetchOrdersByIdQuery(formattedOrderId));
     if (!subgraphResponse) throw new Error('Error While Fechting Order By Id');
     const order = mapSingleOrderToInterface(subgraphResponse.order);

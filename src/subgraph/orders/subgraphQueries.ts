@@ -80,16 +80,14 @@ export const fetchPendingOrdersQuery = (
 export const fetchOrdersByIdQuery = (orderId: string) =>
   gql`
   {
-    order(id: "${orderId.toLowerCase()}") {
+    order(id: "${orderId}") {
     id
     user {
       id
     }
     market {
-      id,symbol,marketName,marketSymbol,feedId 
+      id,marketSymbol,marketName,marketSymbol,feedId 
     }
-    orderType
-    isLong
     isLimitOrder
     expirationTime
     deltaCollateral

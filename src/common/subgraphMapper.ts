@@ -9,10 +9,10 @@ import {
 } from '../interfaces/subgraphTypes';
 
 ////////////////////////////////////////////////////////////////
-//////////////////////    ACCOUNT   ////////////////////////////
+//////////////////////    Wallet   ////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSubgraphResponseToAccountInterface = (response: any): Wallet | undefined => {
+export const mapSubgraphResponseToWalletInterface = (response: any): Wallet | undefined => {
   if (response === null) return undefined;
   try {
     return {
@@ -63,7 +63,17 @@ export const mapSingleMarketToInterface = (response: any): Market | undefined =>
     throw error;
   }
 };
-
+export const mapWalletsArrayToInterface = (response: any): Wallet[] | undefined => {
+  if (response === null) return undefined;
+  try {
+    return response.accounts.map((account: Wallet) => {
+      return mapSubgraphResponseToWalletInterface(account);
+    });
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
 export const mapMarketsArrayToInterface = (response: any): Market[] | undefined => {
   if (response === null) return undefined;
   try {
@@ -82,11 +92,13 @@ export const mapMarketsArrayToInterface = (response: any): Market[] | undefined 
 
 export const mapSingleOrderToInterface = (response: any): Order | undefined => {
   if (response === null) return undefined;
+  console.log("response",response)
+  console.log("response",response.id)
   try {
     return {
       id: response.id,
       market:  mapSingleMarketToInterface(response.market),
-      user:  mapSubgraphResponseToAccountInterface(response.user),
+      user:  mapSubgraphResponseToWalletInterface(response.user),
       isLimitOrder: response.isLimitOrder,
       deadline: response.expirationTime,
       deltaCollateral: response.deltaCollateral,
@@ -101,7 +113,7 @@ export const mapSingleOrderToInterface = (response: any): Order | undefined => {
       settledTimestamp: response.settledTimestamp,
       settledTimestampISO: response.settledTimestampISO,
       executionPrice: response.executionPrice,
-      settledBy: response.settledBy ? mapSubgraphResponseToAccountInterface(response.settledBy) : undefined,
+      settledBy: response.settledBy ? mapSubgraphResponseToWalletInterface(response.settledBy) : undefined,
       positionId: response.position ? response.position.id : undefined,
     };
   } catch (error) {
@@ -132,7 +144,7 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
     return {
       id: response.id,
       market: response.market ? mapSingleMarketToInterface(response.market) : undefined,
-      user: response.user ? mapSubgraphResponseToAccountInterface(response.user) : undefined,
+      user: response.user ? mapSubgraphResponseToWalletInterface(response.user) : undefined,
       isLong: response.isLong,
       positionCollateral: response.positionCollateral,
       positionSize: response.positionSize,

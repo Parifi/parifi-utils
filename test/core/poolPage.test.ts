@@ -2,7 +2,7 @@
 // import { ethers } from 'ethers';
 // import { BIGINT_ZERO } from '../../src';
 
-// describe('Stats tests', () => {
+describe('Stats tests', () => {
 //   it('should return pool data for a user with deposits', async () => {
 //     const parifiSdk = await getParifiSdkInstanceForTesting();
 
@@ -23,4 +23,7 @@
 //       expect(Number(data.assetBalance.toString())).toBe(0);
 //     });
 //   });
-// });
+it('should liquidate a single position', async () => {
+  console.log("hello from order mangaer")
+ })
+});

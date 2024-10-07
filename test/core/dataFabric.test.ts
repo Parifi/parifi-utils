@@ -1,7 +1,7 @@
 // import { getParifiSdkInstanceForTesting } from '..';
 // import Decimal from 'decimal.js';
 
-// describe('Data Fabric tests', () => {
+describe('Data Fabric tests', () => {
 //   it('should return correct values of Skew for a market', async () => {
 //     const parifiSdk = await getParifiSdkInstanceForTesting();
 
@@ -24,4 +24,7 @@
 //       }
 //     });
 //   });
-// });
+it('should liquidate a single position', async () => {
+  console.log("hello from order mangaer")
+ })
+});

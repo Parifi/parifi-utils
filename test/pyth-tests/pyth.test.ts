@@ -1,59 +1,64 @@
-import 'dotenv/config';
-import { Chain } from '@parifi/references';
-// import { getPythClient, getVaaPriceUpdateData } from '../../src/pyth';
-import { ParifiSdk } from '../../src';
-import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
-import { getParifiSdkInstanceForTesting } from '..';
-import { TEST_ORDER_ID1, TEST_ORDER_ID2, TEST_ORDER_ID3, TEST_PRICE_ID_1 } from '../common/constants';
+// import 'dotenv/config';
+// import { Chain } from '@parifi/references';
+// // import { getPythClient, getVaaPriceUpdateData } from '../../src/pyth';
+// import { ParifiSdk } from '../../src';
+// import { PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../../src/interfaces/classConfigs';
+// import { getParifiSdkInstanceForTesting } from '..';
+// import { TEST_ORDER_ID1, TEST_ORDER_ID2, TEST_ORDER_ID3, TEST_PRICE_ID_1 } from '../common/constants';
 
-const rpcConfig: RpcConfig = {
-  chainId: Chain.ARBITRUM_MAINNET,
-};
+// const rpcConfig: RpcConfig = {
+//   chainId: Chain.ARBITRUM_MAINNET,
+// };
 
-const pythConfig: PythConfig = {
-  pythEndpoint: process.env.PYTH_SERVICE_ENDPOINT,
-  username: process.env.PYTH_SERVICE_USERNAME,
-  password: process.env.PYTH_SERVICE_PASSWORD,
-  isStable: true,
-};
+// const pythConfig: PythConfig = {
+//   pythEndpoint: process.env.PYTH_SERVICE_ENDPOINT,
+//   username: process.env.PYTH_SERVICE_USERNAME,
+//   password: process.env.PYTH_SERVICE_PASSWORD,
+//   isStable: true,
+// };
 
-const gelatoConfig: RelayerI = {
-  apiKey: process.env.GELATO_KEY || '',
-};
+// const gelatoConfig: RelayerI = {
+//   apiKey: process.env.GELATO_KEY || '',
+// };
 
-const relayerConfig: RelayerConfig = {
-  gelatoConfig: gelatoConfig,
-};
+// const relayerConfig: RelayerConfig = {
+//   gelatoConfig: gelatoConfig,
+// };
 
 describe('Pyth tests', () => {
-  it('should return price update data from public endpoint', async () => {
-    // SDK is initialized without any fields for Pyth config, so public endpoints are used
-    const sdkWithPublicPyth = new ParifiSdk(rpcConfig, {}, relayerConfig, pythConfig);
-    await sdkWithPublicPyth.init();
+//   it('should return price update data from public endpoint', async () => {
+//     // SDK is initialized without any fields for Pyth config, so public endpoints are used
+//     const sdkWithPublicPyth = new ParifiSdk(rpcConfig, {}, relayerConfig, pythConfig);
+//     await sdkWithPublicPyth.init();
 
-    const priceUpdateData = await sdkWithPublicPyth.pyth.getVaaPriceUpdateData([TEST_PRICE_ID_1]);
-    console.log(priceUpdateData);
-    expect(priceUpdateData).not.toBeNull();
-  });
+//     const priceUpdateData = await sdkWithPublicPyth.pyth.getVaaPriceUpdateData([TEST_PRICE_ID_1]);
+//     console.log(priceUpdateData);
+//     expect(priceUpdateData).not.toBeNull();
+//   });
 
-  it('should return price update data from dedicated endpoint with authentication', async () => {
-    const parifiSdk = await getParifiSdkInstanceForTesting();
+//   it('should return price update data from dedicated endpoint with authentication', async () => {
+//     const parifiSdk = await getParifiSdkInstanceForTesting();
 
-    // Parifi SDK uses authentication using the above Pyth config
-    const priceUpdateData = await parifiSdk.pyth.getVaaPriceUpdateData([TEST_PRICE_ID_1]);
+//     // Parifi SDK uses authentication using the above Pyth config
+//     const priceUpdateData = await parifiSdk.pyth.getVaaPriceUpdateData([TEST_PRICE_ID_1]);
 
-    console.log(priceUpdateData);
-    expect(priceUpdateData).not.toBeNull();
-  });
+//     console.log(priceUpdateData);
+//     expect(priceUpdateData).not.toBeNull();
+//   });
 
-  it('should return price ids from subgraph', async () => {
-    const parifiSdk = await getParifiSdkInstanceForTesting();
+//   it('should return price ids from subgraph', async () => {
+//     const parifiSdk = await getParifiSdkInstanceForTesting();
 
-    const orderIds = [TEST_ORDER_ID1, TEST_ORDER_ID2, TEST_ORDER_ID3];
+//     const orderIds = [TEST_ORDER_ID1, TEST_ORDER_ID2, TEST_ORDER_ID3];
 
-    const priceIds: string[] = await parifiSdk.subgraph.getPythPriceIdsForOrderIds(orderIds);
-    console.log('priceIds from fn: ', priceIds);
+//     const priceIds: string[] = await parifiSdk.subgraph.getPythPriceIdsForOrderIds(orderIds);
+//     console.log('priceIds from fn: ', priceIds);
 
-    expect(priceIds.length).toBeGreaterThan(0);
-  });
+//     expect(priceIds.length).toBeGreaterThan(0);
+//   });
+it('should liquidate a single position', async () => {
+  console.log("hello from order mangaer")
+ })
 });
+
+

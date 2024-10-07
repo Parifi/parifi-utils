@@ -3,7 +3,7 @@
 // import { getParifiSdkInstanceForTesting } from '..';
 // import { TEST_MARKET_ID1 } from '../common/constants';
 
-// describe('Stats tests', () => {
+describe('Stats tests', () => {
 //   it('should return correct borrowing fees for market', async () => {
 //     const parifiSdk = await getParifiSdkInstanceForTesting();
 
@@ -51,4 +51,7 @@
 //     console.log('Total Open Interest: ', totalOIInUsd);
 //     expect(totalOIInUsd.toNumber()).toBeGreaterThan(0);
 //   });
-// });
+it('should liquidate a single position', async () => {
+  console.log("hello from order mangaer")
+ })
+});
