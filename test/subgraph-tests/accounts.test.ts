@@ -1,5 +1,5 @@
 import { getParifiSdkInstanceForTesting } from '..';
-import { TEST_USER_ID1, TEST_USER_ID2, TEST_USER_ID3 } from '../common/constants';
+import { TEST_USER_ID1 as snxAccountId, TEST_USER_ID2, TEST_USER_ID3 } from '../common/constants';
 
 describe('Order fetching logic from subgraph', () => {
 //   it('should return PNL details for a user', async () => {
@@ -41,7 +41,5 @@ describe('Order fetching logic from subgraph', () => {
 //   const order = await parifiSdk.subgraph.getOrderById(TEST_ORDER_ID1);
 //   expect(order.id).toBe(TEST_ORDER_ID1);
 // });
-it('should liquidate a single position', async () => {
-  console.log("hello from order mangaer")
- })
+
 });

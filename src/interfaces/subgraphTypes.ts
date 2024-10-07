@@ -146,6 +146,12 @@ export interface Market {
 
   /** Fee charged for market taker transactions */
   takerFee: string;
+
+  maxMarketValue:string,
+
+  maxOpenInterest:string,
+
+  interestRate:string
 }
 
 
@@ -164,12 +170,11 @@ export interface Order {
   /** True if it is a limit order */
   isLimitOrder: boolean;
   /** Acceptable price */
+  deadline:string
   expectedPrice: string;
   expectedPriceTime?: string;
   /** Settlement time */
   settlementTime?: string;
-  /** Timestamp after which order cannot be executed */
-  deadline: string;
   /** Tracking code */
   trackingCode?: string;
   /** Delta collateral amount  */

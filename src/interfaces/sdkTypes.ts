@@ -69,6 +69,9 @@ export type Market = {
   skewScale: string;
   makerFee: string;
   takerFee: string;
+  maxMarketValue:string,
+  maxOpenInterest:string,
+  interestRate:string
 };
 export type Wallet = {
   id: string;

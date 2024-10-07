@@ -3,10 +3,9 @@ import { TEST_ORDER_ID1 } from '../common/constants';
 
 describe('Order fetching logic from subgraph', () => {
   it('should return correct order details', async () => {
-    // const parifiSdk = await getParifiSdkInstanceForTesting();
-    // const order = await parifiSdk.subgraph.getOrderById(TEST_ORDER_ID1);
-    // expect(order.id).toBe(TEST_ORDER_ID1);
-    console.log("HELLOW FROM ME")
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+    const order = await parifiSdk.subgraph.getOrderById(TEST_ORDER_ID1);
+    expect(order.id).toBe(TEST_ORDER_ID1);
   });
 
   // it('should settle order using Pimlico', async () => {

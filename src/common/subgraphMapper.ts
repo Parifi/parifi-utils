@@ -1,12 +1,4 @@
-import {
-  Market,
-  Order,
-  Position,
-  PriceFeedSnapshot,
-  PythData,
-  Token,
-  Wallet,
-} from '../interfaces/subgraphTypes';
+import { Market, Order, Position, PriceFeedSnapshot, PythData, Token, Wallet } from '../interfaces/subgraphTypes';
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    Wallet   ////////////////////////////
@@ -20,7 +12,7 @@ export const mapSubgraphResponseToWalletInterface = (response: any): Wallet | un
       totalOrdersCount: response.totalOrdersCount,
       totalPositionsCount: response.totalPositionsCount,
       totalRealizedPnlPositions: response.totalRealizedPnlPositions,
-      openPositionCount:response.openPositionCount,
+      openPositionCount: response.openPositionCount,
       countProfitablePositions: response.countProfitablePositions,
       countLossPositions: response.countLossPositions,
       countLiquidatedPositions: response.countLiquidatedPositions,
@@ -35,7 +27,6 @@ export const mapSubgraphResponseToWalletInterface = (response: any): Wallet | un
   }
 };
 
-
 ////////////////////////////////////////////////////////////////
 //////////////////////    MARKET    ////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -46,17 +37,19 @@ export const mapSingleMarketToInterface = (response: any): Market | undefined =>
     return {
       id: response.id,
       name: response.marketName,
-      symbol : response.marketSymbol,
+      symbol: response.marketSymbol,
       feedId: response.feedId,
-      size:response.size,
+      size: response.size,
       currentFundingRate: response.currentFundingRate,
       currentFundingVelocity: response.currentFundingVelocity,
-      maxFundingVelocity:response.maxFundingVelocity,
-      skewScale:response.skewScale,
-      makerFee:response.makerFee,
-      takerFee:response.takerFee,
-      skew:response.skew
-
+      maxFundingVelocity: response.maxFundingVelocity,
+      skewScale: response.skewScale,
+      makerFee: response.makerFee,
+      takerFee: response.takerFee,
+      skew: response.skew,
+      maxMarketValue: response.maxMarketValue,
+      maxOpenInterest: response.maxOpenInterest,
+      interestRate: response.interestRate,
     };
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -92,13 +85,13 @@ export const mapMarketsArrayToInterface = (response: any): Market[] | undefined 
 
 export const mapSingleOrderToInterface = (response: any): Order | undefined => {
   if (response === null) return undefined;
-  console.log("response",response)
-  console.log("response",response.id)
+  console.log('response', response);
+  console.log('response', response.id);
   try {
     return {
       id: response.id,
-      market:  mapSingleMarketToInterface(response.market),
-      user:  mapSubgraphResponseToWalletInterface(response.user),
+      market: mapSingleMarketToInterface(response.market),
+      user: mapSubgraphResponseToWalletInterface(response.user),
       isLimitOrder: response.isLimitOrder,
       deadline: response.expirationTime,
       deltaCollateral: response.deltaCollateral,
@@ -242,4 +235,3 @@ export const mapSubgraphResponseToPythDataInterface = (response: any): PythData 
     throw error;
   }
 };
-
