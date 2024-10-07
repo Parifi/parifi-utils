@@ -1,35 +1,26 @@
 import {
-  Account,
   Market,
   Order,
   Position,
   PriceFeedSnapshot,
   PythData,
-  Referral,
   Token,
-  Vault,
-  VaultCooldown,
-  VaultPosition,
+  Wallet,
 } from '../interfaces/subgraphTypes';
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    ACCOUNT   ////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSubgraphResponseToAccountInterface = (response: any): Account | undefined => {
+export const mapSubgraphResponseToAccountInterface = (response: any): Wallet | undefined => {
   if (response === null) return undefined;
   try {
     return {
       id: response.id,
       totalOrdersCount: response.totalOrdersCount,
-      openPositionsCount: response.openPositionsCount,
       totalPositionsCount: response.totalPositionsCount,
-      totalReferralsCount: response.totalReferralsCount,
-      totalReferralRewardsInUsd: response.totalReferralRewardsInUsd,
-      unclaimedReferralRewardsWeth: response.unclaimedReferralRewardsWeth,
-      unclaimedReferralRewardsUsdc: response.unclaimedReferralRewardsUsdc,
       totalRealizedPnlPositions: response.totalRealizedPnlPositions,
-      totalRealizedPnlVaults: response.totalRealizedPnlVaults,
+      openPositionCount:response.openPositionCount,
       countProfitablePositions: response.countProfitablePositions,
       countLossPositions: response.countLossPositions,
       countLiquidatedPositions: response.countLiquidatedPositions,
@@ -37,8 +28,6 @@ export const mapSubgraphResponseToAccountInterface = (response: any): Account | 
       totalVolumeInUsdLongs: response.totalVolumeInUsdLongs,
       totalVolumeInUsdShorts: response.totalVolumeInUsdShorts,
       totalAccruedBorrowingFeesInUsd: response.totalAccruedBorrowingFeesInUsd,
-      totalStaked: response.totalStaked,
-      esPRFBalance: response.esPRFBalance,
     };
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -46,17 +35,6 @@ export const mapSubgraphResponseToAccountInterface = (response: any): Account | 
   }
 };
 
-export const mapAccountsArrayToInterface = (response: any): Account[] | undefined => {
-  if (response === null) return undefined;
-  try {
-    return response.accounts.map((account: Account) => {
-      return mapSubgraphResponseToAccountInterface(account);
-    });
-  } catch (error) {
-    console.log('Error while mapping data', error);
-    throw error;
-  }
-};
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    MARKET    ////////////////////////////
@@ -67,53 +45,18 @@ export const mapSingleMarketToInterface = (response: any): Market | undefined =>
   try {
     return {
       id: response.id,
-      name: response.name,
-      vaultAddress: response.vaultAddress,
-      depositToken: response.depositToken ? mapSubgraphResponseToTokenInterface(response.depositToken) : undefined,
-      isLive: response.isLive,
-      marketDecimals: response.marketDecimals,
-      liquidationThreshold: response.liquidationThreshold,
-      minCollateral: response.minCollateral,
-      maxLeverage: response.maxLeverage,
-      openingFee: response.openingFee,
-      closingFee: response.closingFee,
-      liquidationFee: response.liquidationFee,
-      maxPriceDeviation: response.maxPriceDeviation,
-      createdTimestamp: response.createdTimestamp,
-      lastUpdated: response.lastUpdated,
-      maxOpenInterest: response.maxOpenInterest,
-      totalLongs: response.totalLongs,
-      avgPriceLongs: response.avgPriceLongs,
-      pnlLongs: response.pnlLongs,
-      totalShorts: response.totalShorts,
-      avgPriceShorts: response.avgPriceShorts,
-      pnlShorts: response.pnlShorts,
-      netPnl: response.netPnl,
-      netPnlDec: response.netPnlDec,
-      totalOI: response.totalOI,
-      totalOIAssets: response.totalOIAssets,
-      accumulatedOILongs: response.accumulatedOILongs,
-      accumulatedOIShorts: response.accumulatedOIShorts,
-      closeOnlyMode: response.closeOnlyMode,
-      feeLastUpdatedTimestamp: response.feeLastUpdatedTimestamp,
-      priceDeviationLongs: response.priceDeviationLongs,
-      priceDeviationShorts: response.priceDeviationShorts,
-      utilizationLongs: response.utilizationLongs,
-      utilizationShorts: response.utilizationShorts,
-      marketSkew: response.marketSkew,
-      baseFeeCumulativeLongs: response.baseFeeCumulativeLongs,
-      baseFeeCumulativeShorts: response.baseFeeCumulativeShorts,
-      dynamicFeeCumulativeLongs: response.dynamicFeeCumulativeLongs,
-      dynamicFeeCumulativeShorts: response.dynamicFeeCumulativeShorts,
-      deviationCoeff: response.deviationCoeff,
-      deviationConst: response.deviationConst,
-      baseCoeff: response.baseCoeff,
-      baseConst: response.baseConst,
-      maxDynamicBorrowFee: response.maxDynamicBorrowFee,
-      dynamicCoeff: response.dynamicCoeff,
-      transactionHash: response.transactionHash,
-      senderAddress: response.senderAddress,
-      pyth: response.pyth ? mapSubgraphResponseToPythDataInterface(response.pyth) : undefined,
+      name: response.marketName,
+      symbol : response.marketSymbol,
+      feedId: response.feedId,
+      size:response.size,
+      currentFundingRate: response.currentFundingRate,
+      currentFundingVelocity: response.currentFundingVelocity,
+      maxFundingVelocity:response.maxFundingVelocity,
+      skewScale:response.skewScale,
+      makerFee:response.makerFee,
+      takerFee:response.takerFee,
+      skew:response.skew
+
     };
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -142,21 +85,15 @@ export const mapSingleOrderToInterface = (response: any): Order | undefined => {
   try {
     return {
       id: response.id,
-      market: response.market ? mapSingleMarketToInterface(response.market) : undefined,
-      user: response.user ? mapSubgraphResponseToAccountInterface(response.user) : undefined,
-      orderType: response.orderType,
-      isLong: response.isLong,
+      market:  mapSingleMarketToInterface(response.market),
+      user:  mapSubgraphResponseToAccountInterface(response.user),
       isLimitOrder: response.isLimitOrder,
-      triggerAbove: response.triggerAbove,
-      deadline: response.deadline,
-      deadlineISO: response.deadlineISO,
+      deadline: response.expirationTime,
       deltaCollateral: response.deltaCollateral,
       deltaSize: response.deltaSize,
       deltaSizeUsd: response.deltaSizeUsd,
       expectedPrice: response.expectedPrice,
-      maxSlippage: response.maxSlippage,
-      partnerAddress: response.partnerAddress,
-      executionFee: response.executionFee,
+      executionFee: response.collectedFees,
       txHash: response.txHash,
       createdTimestamp: response.createdTimestamp,
       status: response.status,
@@ -165,7 +102,6 @@ export const mapSingleOrderToInterface = (response: any): Order | undefined => {
       settledTimestampISO: response.settledTimestampISO,
       executionPrice: response.executionPrice,
       settledBy: response.settledBy ? mapSubgraphResponseToAccountInterface(response.settledBy) : undefined,
-      cancellationTxHash: response.cancellationTxHash,
       positionId: response.position ? response.position.id : undefined,
     };
   } catch (error) {
@@ -202,7 +138,6 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
       positionSize: response.positionSize,
       avgPrice: response.avgPrice,
       avgPriceDec: response.avgPriceDec,
-      lastCumulativeFee: response.lastCumulativeFee,
       status: response.status,
       txHash: response.txHash,
       liquidationTxHash: response.liquidationTxHash,
@@ -210,17 +145,11 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
       realizedPnl: response.realizedPnl,
       realizedPnlCollateral: response.realizedPnlCollateral,
       realizedFee: response.realizedFee,
-      realizedFeeCollateral: response.realizedFeeCollateral,
       netRealizedPnl: response.netRealizedPnl,
       createdTimestamp: response.createdTimestamp,
       lastRefresh: response.lastRefresh,
       lastRefreshISO: response.lastRefreshISO,
-      netUnrealizedPnlInCollateral: response.netUnrealizedPnlInCollateral,
-      netUnrealizedPnlInUsd: response.netUnrealizedPnlInUsd,
-      liquidationNetPnlInCollateral: response.liquidationNetPnlInCollateral,
-      accruedBorrowingFeesInCollateral: response.accruedBorrowingFeesInCollateral,
       canBeLiquidated: response.canBeLiquidated,
-      lossToCollateralRatioPercent: response.lossToCollateralRatioPercent,
     };
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -302,164 +231,3 @@ export const mapSubgraphResponseToPythDataInterface = (response: any): PythData 
   }
 };
 
-////////////////////////////////////////////////////////////////
-//////////////////////    VAULTS    ////////////////////////////
-////////////////////////////////////////////////////////////////
-
-export const mapSingleVaultToInterface = (response: any): Vault | undefined => {
-  if (response === null) return undefined;
-
-  try {
-    return {
-      id: response.id,
-      vaultName: response.vaultName,
-      vaultSymbol: response.vaultSymbol,
-      vaultDecimals: response.vaultDecimals,
-      depositToken: response.depositToken ? mapSubgraphResponseToTokenInterface(response.depositToken) : undefined,
-      isPaused: response.isPaused,
-      feeManagerAddress: response.feeManagerAddress,
-      totalAssets: response.totalAssets,
-      totalShares: response.totalShares,
-      assetsPerShare: response.assetsPerShare,
-      assetsPerShareDec: response.assetsPerShareDec,
-      sharesPerAsset: response.sharesPerAsset,
-      sharesPerAssetDec: response.sharesPerAssetDec,
-      withdrawalFee: response.withdrawalFee,
-      profitFromTraderLosses: response.profitFromTraderLosses,
-      lossFromTraderProfits: response.lossFromTraderProfits,
-      cooldownPeriod: response.cooldownPeriod,
-      withdrawalWindow: response.withdrawalWindow,
-      daysPassed: response.daysPassed,
-      cumulativeAPRs: response.cumulativeAPRs,
-      allTimeApr: response.allTimeApr,
-    };
-  } catch (error) {
-    console.log('Error while mapping data', error);
-    throw error;
-  }
-};
-
-export const mapVaultsArrayToInterface = (response: any): Vault[] | undefined => {
-  if (response === null) return undefined;
-
-  try {
-    return response.vaults.map((vault: Vault) => {
-      return mapSingleVaultToInterface(vault);
-    });
-  } catch (error) {
-    console.log('Error while mapping data', error);
-    throw error;
-  }
-};
-
-export const mapVaultPositionToInterface = (response: any): VaultPosition | undefined => {
-  if (response === null) return undefined;
-
-  try {
-    return {
-      id: response.id,
-      vault: response.vault ? mapSingleVaultToInterface(response.vault) : undefined,
-      user: response.user ? mapSubgraphResponseToAccountInterface(response.user) : undefined,
-      sharesBalance: response.sharesBalance,
-      totalMinted: response.totalMinted,
-      totalRedeemed: response.totalRedeemed,
-      totalDeposited: response.totalDeposited,
-      totalWithdrawn: response.totalWithdrawn,
-      avgMintPrice: response.avgMintPrice,
-      avgMintPriceDec: response.avgMintPriceDec,
-      realizedPNL: response.realizedPNL,
-      realizedPNLInUsd: response.realizedPNLInUsd,
-      unrealizedPNL: response.unrealizedPNL,
-      timestamp: response.timestamp,
-      cooldownInitiatedTimestamp: response.cooldownInitiatedTimestamp,
-      cooldownEnd: response.cooldownEnd,
-      withdrawalEnds: response.withdrawalEnds,
-    };
-  } catch (error) {
-    console.log('Error while mapping data', error);
-    throw error;
-  }
-};
-
-export const mapVaultPositionsArrayToInterface = (response: any): VaultPosition[] | undefined => {
-  if (response === null) return undefined;
-
-  try {
-    return response.vaultPositions.map((vaultPosition: VaultPosition) => {
-      return mapVaultPositionToInterface(vaultPosition);
-    });
-  } catch (error) {
-    console.log('Error while mapping data', error);
-    throw error;
-  }
-};
-
-export const mapVaultCooldownToInterface = (response: any): VaultCooldown | undefined => {
-  if (response === null) return undefined;
-
-  try {
-    return {
-      id: response.Id,
-      vault: response.vault ? mapSingleVaultToInterface(response.vault) : undefined,
-      user: response.user ? mapSubgraphResponseToAccountInterface(response.user) : undefined,
-      amountAssets: response.amountAssets,
-      cooldownEnd: response.cooldownEnd,
-      withdrawalEnds: response.withdrawalEnds,
-      timestamp: response.timestamp,
-    };
-  } catch (error) {
-    console.log('Error while mapping data', error);
-    throw error;
-  }
-};
-
-export const mapVaultCooldownArrayToInterface = (response: any): VaultCooldown[] | undefined => {
-  if (response === null) return undefined;
-
-  try {
-    return response.vaultCooldowns.map((cooldown: VaultCooldown) => {
-      return mapVaultCooldownToInterface(cooldown);
-    });
-  } catch (error) {
-    console.log('Error while mapping data', error);
-    throw error;
-  }
-};
-
-////////////////////////////////////////////////////////////////
-//////////////////////    OTHERS     ///////////////////////////
-////////////////////////////////////////////////////////////////
-
-export const mapReferralDataToInterface = (response: any): Referral | undefined => {
-  if (response === null) return undefined;
-
-  try {
-    return {
-      id: response.id,
-      partner: response.partner ? mapSubgraphResponseToAccountInterface(response.partner) : undefined,
-      referredUser: response.partner ? mapSubgraphResponseToAccountInterface(response.partner) : undefined,
-      sizeInUsd: response.sizeInUsd,
-      timestamp: response.timestamp,
-      txHash: response.txHash,
-      rewardToken: response.rewardToken ? mapSubgraphResponseToTokenInterface(response.rewardToken) : undefined,
-      referralRewardsInUsd: response.referralRewardsInUsd,
-      referralRewardsInToken: response.referralRewardsInToken,
-    };
-  } catch (error) {
-    console.log('Error while mapping data', error);
-    throw error;
-  }
-};
-
-export const mapReferralsArrayToInterface = (response: any): Referral[] | undefined => {
-  if (response === null) return undefined;
-
-  try {
-    return response.referrals.map((referral: Referral) => {
-      return mapReferralDataToInterface(referral);
-    });
-  } catch (error) {
-    console.log('Error while mapping data', error);
-    throw error;
-  }
-};

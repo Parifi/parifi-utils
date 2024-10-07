@@ -28,28 +28,6 @@ describe('Order fetching logic from subgraph', () => {
     expect(portfolioData.length).not.toBe(0);
   });
 
-  it('should return referral earnings', async () => {
-    const parifiSdk = await getParifiSdkInstanceForTesting();
-
-    // Use addresses with a non-zero referral rewards
-    const userAddresses = [TEST_USER_ID1, '0x58d24685a6982cbee9d43f3e915b4a6ea12bb3c6', TEST_USER_ID3];
-
-    const referralRewards = await parifiSdk.subgraph.getReferralRewardsInUsd(userAddresses);
-    expect(referralRewards.length).not.toBe(0);
-  });
-
-  it('should return top accounts referral earnings sorted by referral earnings', async () => {
-    const parifiSdk = await getParifiSdkInstanceForTesting();
-
-    const referralRewards = await parifiSdk.subgraph.getTopAccountsByReferralRewards();
-    expect(referralRewards.length).not.toBe(0);
-    // If we have two accounts with referral rewards, 1st account should have equal or more than the second account
-    if (referralRewards.length > 1) {
-      expect(referralRewards[0].totalReferralRewardsInUsd.toNumber()).toBeGreaterThanOrEqual(
-        referralRewards[1].totalReferralRewardsInUsd.toNumber(),
-      );
-    }
-  });
 
   it('should return leaderboard user data', async () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();

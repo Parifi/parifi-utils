@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js';
+import { OrderStatus, PositionStatus, PythData, SnxAccountType } from './subgraphTypes';
 
 /// Interface to return portfolio total from the sdk
 export type UserPortfolioData = {
@@ -13,7 +14,6 @@ export interface NormalizedPrice {
   priceId: string;
   normalizedPrice: Decimal;
 }
-
 export interface UserVaultData {
   vaultId: string; // Address of the vault contract
   vaultSymbol: string; // Vault Symbol eg. pfUSDC, pfWETH
@@ -55,4 +55,105 @@ export interface LeaderboardUserData {
   totalVolumeInUsdShorts: Decimal;
   totalRealizedPnlPositions: Decimal;
   totalAccruedBorrowingFeesInUsd: Decimal;
-}
+} 
+export type Market = {
+  id: string;
+  marketName: string;
+  marketSymbol: string;
+  size: string;
+  skew:string;
+  currentFundingRate: string;
+  currentFundingVelocity: string;
+  feedId: string;
+  maxFundingVelocity: string;
+  skewScale: string;
+  makerFee: string;
+  takerFee: string;
+};
+export type Wallet = {
+  id: string;
+  positions?: Position[];
+  orders?: Order[];
+  totalOrdersCount: string;
+  totalPositionsCount: string;
+  openPositionCount: string;
+  countProfitablePositions: string;
+  countLossPositions: string;
+  countLiquidatedPositions: string;
+  totalRealizedPnlPositions: string;
+  totalVolumeInUsd: string;
+  totalVolumeInUsdLongs: string;
+  totalVolumeInUsdShorts: string;
+  totalAccruedBorrowingFeesInUsd?: string;
+};
+
+export type Order = {
+  id: string;
+  market?: Market;
+  user?: Wallet;
+  isLimitOrder: boolean;
+  expectedPrice: string;
+  expectedPriceTime?: string;
+  settlementTime?: string;
+  deadline: string;
+  trackingCode?: string;
+  deltaCollateral: string;
+  deltaSize: string;
+  deltaSizeUsd: string;
+  executionPrice: string;
+  executionFee: string;
+  referralFees?: string;
+  txHash: string;
+  createdTimestamp: string;
+  status: OrderStatus;
+  settledTxHash?: string;
+  settledTimestamp?: string;
+  settledTimestampISO: string;
+  settledBy?: Wallet;
+  positionId?: Position;
+};
+
+export type Position = {
+  id: string;
+  market: Market;
+  user: Wallet;
+  account: SnxAccount;
+  isLong: boolean;
+  positionCollateral: string;
+  positionSize: string;
+  avgPrice: string;
+  avgPriceDec: string;
+  orders?: Order[];
+  status: PositionStatus;
+  txHash: string;
+  liquidationTxHash?: string;
+  closingPrice: string;
+  realizedPnl: string;
+  realizedPnlCollateral: string;
+  realizedFee: string;
+  netRealizedPnl: string;
+  createdTimestamp: string;
+  lastRefresh: string;
+  lastRefreshISO: string;
+  accruedBorrowingFees: string;
+  canBeLiquidated: boolean;
+};
+export type Token = {
+  id?: string;
+  name?: string;
+  symbol?: string;
+  decimals?: string;
+  pyth?: PythData;
+  lastPriceUSD?: string;
+  lastPriceTimestamp?: string;
+};
+
+export type SnxAccount = {
+  id: string;
+  type: SnxAccountType;
+  accountId: string;
+  owner: Wallet;
+  totalOrdersCount: string;
+  totalPositionsCount: string;
+  orders: Order[];
+};

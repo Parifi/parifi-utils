@@ -146,8 +146,8 @@ export const getPythPriceIdsForPositionIds = async (
     const positions: Position[] = mapPositionsArrayToInterface(subgraphResponse) || [];
     if (positions.length != 0) {
       positions.map((position) => {
-        if (position.market?.pyth?.id) {
-          priceIds.push(position.market?.pyth?.id);
+        if (position.market?.feedId) {
+          priceIds.push(position.market?.feedId);
         }
       });
     }

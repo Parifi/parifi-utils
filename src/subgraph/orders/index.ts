@@ -1,16 +1,14 @@
 import { request } from 'graphql-request';
-import { Order, Referral } from '../../interfaces/subgraphTypes';
+import { Order } from '../../interfaces/subgraphTypes';
 import {
   fetchOrdersByIdQuery,
   fetchOrdersByUserQuery,
-  fetchPartnerRewards,
   fetchPendingOrdersQuery,
   fetchPositionIdsForOrderIds,
   fetchPriceIdsFromOrderIdsQuery,
 } from './subgraphQueries';
 import {
   mapOrdersArrayToInterface,
-  mapReferralsArrayToInterface,
   mapSingleOrderToInterface,
 } from '../../common/subgraphMapper';
 import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
@@ -81,8 +79,8 @@ export const getPythPriceIdsForOrderIds = async (subgraphEndpoint: string, order
     const orders: Order[] = mapOrdersArrayToInterface(subgraphResponse) || [];
     if (orders.length != 0) {
       orders.map((order) => {
-        if (order.market?.pyth?.id) {
-          priceIds.push(order.market?.pyth?.id);
+        if (order.market?.feedId) {
+          priceIds.push(order.market?.feedId);
         }
       });
     }
@@ -96,23 +94,7 @@ export const getPythPriceIdsForOrderIds = async (subgraphEndpoint: string, order
   }
 };
 
-// Returns the referral data of a partner
-export const getReferralDataForPartner = async (
-  subgraphEndpoint: string,
-  partnerAddress: string,
-  count: number = 20,
-  skip: number = 0,
-): Promise<Referral[]> => {
-  try {
-    const query = fetchPartnerRewards(partnerAddress.toLowerCase(), count, skip);
-    const subgraphResponse = await request(subgraphEndpoint, query);
-    if (!subgraphResponse) throw new Error('Error While Fechting Referral Data For Partner');
-    const referrals: Referral[] = mapReferralsArrayToInterface(subgraphResponse) ?? [];
-    return referrals;
-  } catch (error) {
-    throw error;
-  }
-};
+
 
 // Returns the position id related to the order id. If the order ID or position Id does not exists
 // EMPTY_BYTES32 (0x0000) is returned

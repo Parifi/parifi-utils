@@ -41,9 +41,9 @@ describe('Parifi Utils tests', () => {
 
     // Populate the price ids array to fetch price update data
     pendingOrders.forEach((order) => {
-      if (order.id && order.market?.pyth?.id) {
+      if (order.id && order.market?.feedId) {
         orderIds.push(order.id);
-        priceIds.push(order.market.pyth.id);
+        priceIds.push(order.market.feedId);
       }
     });
     const collateralPriceIds = parifiSdk.pyth.getPriceIdsForCollaterals();

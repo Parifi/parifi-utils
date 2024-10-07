@@ -1,34 +1,34 @@
 import Decimal from 'decimal.js';
 import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
-import { Market, Order, Position } from '../interfaces/subgraphTypes';
-import {
-  getAccruedBorrowFeesInMarket,
-  getBaseBorrowRatePerSecond,
-  getDynamicBorrowRatePerSecond,
-  getMarketSkew,
-  getMarketSkewUi,
-  getMarketUtilization,
-} from './data-fabric';
+import { Market,  Position } from '../interfaces/subgraphTypes';
+// import {
+//   getAccruedBorrowFeesInMarket,
+//   getBaseBorrowRatePerSecond,
+//   getDynamicBorrowRatePerSecond,
+//   getMarketSkew,
+//   getMarketSkewUi,
+//   getMarketUtilization,
+// } from './data-fabric';
 import { Contract, Signer } from 'ethers';
-import {
-  calculateCollateralFromSize,
-  calculatePositionLeverage,
-  calculateSizeFromCollateral,
-  canBeSettled,
-  canBeSettledPriceId,
-  checkIfOrderCanBeSettledId,
-  getLiquidationPrice,
-  getNetProfitOrLossInCollateral,
-  getOrderManagerInstance,
-  getExpectedPositionIdFromNonce,
-  getProfitOrLossInUsd,
-  getUserExpectedPositionId,
-  getUserPositionNonce,
-  isPositionLiquidatable,
-  liquidatePositionUsingGelato,
-  settleOrderUsingGelato,
-} from './order-manager';
-import { checkIfOrderCanBeSettled } from './order-manager/';
+// import {
+//   calculateCollateralFromSize,
+//   calculatePositionLeverage,
+//   calculateSizeFromCollateral,
+//   canBeSettled,
+//   canBeSettledPriceId,
+//   checkIfOrderCanBeSettledId,
+//   getLiquidationPrice,
+//   getNetProfitOrLossInCollateral,
+//   getOrderManagerInstance,
+//   getExpectedPositionIdFromNonce,
+//   getProfitOrLossInUsd,
+//   getUserExpectedPositionId,
+//   getUserPositionNonce,
+//   isPositionLiquidatable,
+//   liquidatePositionUsingGelato,
+//   settleOrderUsingGelato,
+// } from './order-manager';
+// import { checkIfOrderCanBeSettled } from './order-manager/';
 import {
   batchLiquidatePostionsUsingGelato,
   batchSettleOrdersUsingGelato,
@@ -39,17 +39,17 @@ import {
   getParifiUtilsInstance,
 } from './parifi-utils';
 import { convertCollateralAmountToUsd, convertMarketAmountToCollateral, convertMarketAmountToUsd } from './price-feed';
-import {
-  getMarketBorrowingRatePerHour,
-  getMarketOpenInterestInUsd,
-  getTotalOpenInterestInUsd,
-} from './pages/statsPage';
+// import {
+//   getMarketBorrowingRatePerHour,
+//   getMarketOpenInterestInUsd,
+//   getTotalOpenInterestInUsd,
+// } from './pages/statsPage';
 import { getPublicSubgraphEndpoint } from '../subgraph';
 import { getPythClient } from '../pyth/pyth';
-import { UserVaultData } from '../interfaces/sdkTypes';
-import { getPoolPageData } from './pages/poolPage';
+// import { UserVaultData } from '../interfaces/sdkTypes';
+// import { getPoolPageData } from './pages/poolPage';
 import { getPositionRefreshTxData } from './subgraph-helper';
-import { Chain } from '@parifi/references';
+// import { Chain } from '@parifi/references';
 
 export class Core {
   constructor(
@@ -63,73 +63,73 @@ export class Core {
   //////////////////////    DATA FABRIC    ///////////////////////
   ////////////////////////////////////////////////////////////////
 
-  getMarketUtilization = (market: Market, isLong: boolean): Decimal => {
-    return getMarketUtilization(market, isLong);
-  };
+  // getMarketUtilization = (market: Market, isLong: boolean): Decimal => {
+  //   return getMarketUtilization(market, isLong);
+  // };
 
-  getMarketSkew = (market: Market): Decimal => {
-    return getMarketSkew(market);
-  };
+  // getMarketSkew = (market: Market): Decimal => {
+  //   return getMarketSkew(market);
+  // };
 
-  getMarketSkewUi = (market: Market): { skewLongs: Decimal; skewShorts: Decimal } => {
-    return getMarketSkewUi(market);
-  };
+  // getMarketSkewUi = (market: Market): { skewLongs: Decimal; skewShorts: Decimal } => {
+  //   return getMarketSkewUi(market);
+  // };
 
-  getDynamicBorrowRatePerSecond = (market: Market): Decimal => {
-    return getDynamicBorrowRatePerSecond(market);
-  };
+  // getDynamicBorrowRatePerSecond = (market: Market): Decimal => {
+  //   return getDynamicBorrowRatePerSecond(market);
+  // };
 
-  getBaseBorrowRatePerSecond = (
-    market: Market,
-  ): { baseBorrowRatePerSecondLong: Decimal; baseBorrowRatePerSecondShort: Decimal } => {
-    return getBaseBorrowRatePerSecond(market);
-  };
+  // getBaseBorrowRatePerSecond = (
+  //   market: Market,
+  // ): { baseBorrowRatePerSecondLong: Decimal; baseBorrowRatePerSecondShort: Decimal } => {
+  //   return getBaseBorrowRatePerSecond(market);
+  // };
 
-  getAccruedBorrowFeesInMarket = (position: Position, market: Market): Decimal => {
-    return getAccruedBorrowFeesInMarket(position, market);
-  };
+  // getAccruedBorrowFeesInMarket = (position: Position, market: Market): Decimal => {
+  //   return getAccruedBorrowFeesInMarket(position, market);
+  // };
 
   ////////////////////////////////////////////////////////////////
   //////////////////////    ORDER MANAGER    /////////////////////
   ////////////////////////////////////////////////////////////////
 
-  calculateSizeFromCollateral(
-    amount: Decimal,
-    leverage: Decimal,
-    executionFeeInCollateral: Decimal,
-    openingFee: Decimal,
-    normalizedMarketPrice: Decimal,
-    normalizedCollateralPrice: Decimal,
-  ) {
-    return calculateSizeFromCollateral(
-      amount,
-      leverage,
-      executionFeeInCollateral,
-      openingFee,
-      normalizedMarketPrice,
-      normalizedCollateralPrice,
-    );
-  }
-  calculateCollateralFromSize(
-    collateralSize: Decimal,
-    leverage: Decimal,
-    normalizedMarketPrice: Decimal,
-    normalizedCollateralPrice: Decimal,
-  ): Decimal {
-    return calculateCollateralFromSize(collateralSize, leverage, normalizedMarketPrice, normalizedCollateralPrice);
-  }
+  // calculateSizeFromCollateral(
+  //   amount: Decimal,
+  //   leverage: Decimal,
+  //   executionFeeInCollateral: Decimal,
+  //   openingFee: Decimal,
+  //   normalizedMarketPrice: Decimal,
+  //   normalizedCollateralPrice: Decimal,
+  // ) {
+  //   return calculateSizeFromCollateral(
+  //     amount,
+  //     leverage,
+  //     executionFeeInCollateral,
+  //     openingFee,
+  //     normalizedMarketPrice,
+  //     normalizedCollateralPrice,
+  //   );
+  // }
+  // calculateCollateralFromSize(
+  //   collateralSize: Decimal,
+  //   leverage: Decimal,
+  //   normalizedMarketPrice: Decimal,
+  //   normalizedCollateralPrice: Decimal,
+  // ): Decimal {
+  //   return calculateCollateralFromSize(collateralSize, leverage, normalizedMarketPrice, normalizedCollateralPrice);
+  // }
 
-  getOrderManagerInstance = (): Contract => {
-    return getOrderManagerInstance(this.rpcConfig.chainId);
-  };
+  // getOrderManagerInstance = (): Contract => {
+  //   return getOrderManagerInstance(this.rpcConfig.chainId);
+  // };
 
-  getProfitOrLossInUsd = (
-    userPosition: Position,
-    normalizedMarketPrice: Decimal,
-    marketDecimals: Decimal,
-  ): { totalProfitOrLoss: Decimal; isProfit: boolean } => {
-    return getProfitOrLossInUsd(userPosition, normalizedMarketPrice, marketDecimals);
-  };
+  // getProfitOrLossInUsd = (
+  //   userPosition: Position,
+  //   normalizedMarketPrice: Decimal,
+  //   marketDecimals: Decimal,
+  // ): { totalProfitOrLoss: Decimal; isProfit: boolean } => {
+  //   return getProfitOrLossInUsd(userPosition, normalizedMarketPrice, marketDecimals);
+  // };
 
   getPnlWithoutFeesInCollateral = (
     position: Position,
@@ -149,142 +149,142 @@ export class Core {
     return this.getDeviatedMarketPriceInUsd(market, normalizedMarketPrice, isLong, isIncrease);
   };
 
-  isPositionLiquidatable = (
-    position: Position,
-    market: Market,
-    normalizedMarketPrice: Decimal,
-    normalizedCollateralPrice: Decimal,
-  ): { canBeLiquidated: boolean } => {
-    return isPositionLiquidatable(position, market, normalizedMarketPrice, normalizedCollateralPrice);
-  };
+  // isPositionLiquidatable = (
+  //   position: Position,
+  //   market: Market,
+  //   normalizedMarketPrice: Decimal,
+  //   normalizedCollateralPrice: Decimal,
+  // ): { canBeLiquidated: boolean } => {
+  //   return isPositionLiquidatable(position, market, normalizedMarketPrice, normalizedCollateralPrice);
+  // };
 
-  calculatePositionLeverage = (
-    position: Position,
-    market: Market,
-    normalizedMarketPrice: Decimal,
-    normalizedCollateralPrice: Decimal,
-  ): {
-    leverage: string;
-    formattedLeverage: number;
-  } => {
-    return calculatePositionLeverage(position, market, normalizedMarketPrice, normalizedCollateralPrice);
-  };
+  // calculatePositionLeverage = (
+  //   position: Position,
+  //   market: Market,
+  //   normalizedMarketPrice: Decimal,
+  //   normalizedCollateralPrice: Decimal,
+  // ): {
+  //   leverage: string;
+  //   formattedLeverage: number;
+  // } => {
+  //   return calculatePositionLeverage(position, market, normalizedMarketPrice, normalizedCollateralPrice);
+  // };
 
-  getNetProfitOrLossInCollateral = (
-    position: Position,
-    market: Market,
-    normalizedMarketPrice: Decimal,
-    normalizedCollateralPrice: Decimal,
-  ): { netPnlInCollateral: Decimal; isNetProfit: boolean } => {
-    return getNetProfitOrLossInCollateral(position, market, normalizedMarketPrice, normalizedCollateralPrice);
-  };
+  // getNetProfitOrLossInCollateral = (
+  //   position: Position,
+  //   market: Market,
+  //   normalizedMarketPrice: Decimal,
+  //   normalizedCollateralPrice: Decimal,
+  // ): { netPnlInCollateral: Decimal; isNetProfit: boolean } => {
+  //   return getNetProfitOrLossInCollateral(position, market, normalizedMarketPrice, normalizedCollateralPrice);
+  // };
 
-  canBeSettled = (
-    isLimitOrder: boolean,
-    triggerAbove: boolean,
-    isLong: boolean,
-    maxSlippage: Decimal,
-    expectedPrice: Decimal,
-    normalizedMarketPrice: Decimal,
-  ): boolean => {
-    return canBeSettled(isLimitOrder, triggerAbove, isLong, maxSlippage, expectedPrice, normalizedMarketPrice);
-  };
+  // canBeSettled = (
+  //   isLimitOrder: boolean,
+  //   triggerAbove: boolean,
+  //   isLong: boolean,
+  //   maxSlippage: Decimal,
+  //   expectedPrice: Decimal,
+  //   normalizedMarketPrice: Decimal,
+  // ): boolean => {
+  //   return canBeSettled(isLimitOrder, triggerAbove, isLong, maxSlippage, expectedPrice, normalizedMarketPrice);
+  // };
 
-  canBeSettledPriceId = async (
-    isLimitOrder: boolean,
-    triggerAbove: boolean,
-    isLong: boolean,
-    maxSlippage: Decimal,
-    expectedPrice: Decimal,
-    orderPriceId: string,
-  ): Promise<boolean> => {
-    const pythClient = await getPythClient(
-      this.pythConfig.pythEndpoint,
-      this.pythConfig.username,
-      this.pythConfig.password,
-      this.pythConfig.isStable,
-    );
+  // canBeSettledPriceId = async (
+  //   isLimitOrder: boolean,
+  //   triggerAbove: boolean,
+  //   isLong: boolean,
+  //   maxSlippage: Decimal,
+  //   expectedPrice: Decimal,
+  //   orderPriceId: string,
+  // ): Promise<boolean> => {
+  //   const pythClient = await getPythClient(
+  //     this.pythConfig.pythEndpoint,
+  //     this.pythConfig.username,
+  //     this.pythConfig.password,
+  //     this.pythConfig.isStable,
+  //   );
 
-    return await canBeSettledPriceId(
-      isLimitOrder,
-      triggerAbove,
-      isLong,
-      maxSlippage,
-      expectedPrice,
-      orderPriceId,
-      pythClient,
-    );
-  };
+  //   return await canBeSettledPriceId(
+  //     isLimitOrder,
+  //     triggerAbove,
+  //     isLong,
+  //     maxSlippage,
+  //     expectedPrice,
+  //     orderPriceId,
+  //     pythClient,
+  //   );
+  // };
 
-  checkIfOrderCanBeSettled = (order: Order, normalizedMarketPrice: Decimal): boolean => {
-    return checkIfOrderCanBeSettled(order, normalizedMarketPrice);
-  };
+  // checkIfOrderCanBeSettled = (order: Order, normalizedMarketPrice: Decimal): boolean => {
+  //   return checkIfOrderCanBeSettled(order, normalizedMarketPrice);
+  // };
 
-  checkIfOrderCanBeSettledId = async (orderId: string): Promise<boolean> => {
-    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
-    const pythClient = await getPythClient(
-      this.pythConfig.pythEndpoint,
-      this.pythConfig.username,
-      this.pythConfig.password,
-      this.pythConfig.isStable,
-    );
-    return await checkIfOrderCanBeSettledId(subgraphEndpoint, orderId, pythClient);
-  };
+  // checkIfOrderCanBeSettledId = async (orderId: string): Promise<boolean> => {
+  //   const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+  //   const pythClient = await getPythClient(
+  //     this.pythConfig.pythEndpoint,
+  //     this.pythConfig.username,
+  //     this.pythConfig.password,
+  //     this.pythConfig.isStable,
+  //   );
+  //   return await checkIfOrderCanBeSettledId(subgraphEndpoint, orderId, pythClient);
+  // };
 
-  liquidatePositionUsingGelato = async (positionId: string): Promise<{ gelatoTaskId: string }> => {
-    // Get all the variables from SDK config
-    const gelatoApiKey = this.relayerConfig.gelatoConfig?.apiKey ?? '';
-    const isStablePyth = this.pythConfig.isStable ?? true;
+  // liquidatePositionUsingGelato = async (positionId: string): Promise<{ gelatoTaskId: string }> => {
+  //   // Get all the variables from SDK config
+  //   const gelatoApiKey = this.relayerConfig.gelatoConfig?.apiKey ?? '';
+  //   const isStablePyth = this.pythConfig.isStable ?? true;
 
-    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
-    const pythClient = await getPythClient(
-      this.pythConfig.pythEndpoint,
-      this.pythConfig.username,
-      this.pythConfig.password,
-      this.pythConfig.isStable,
-    );
+  //   const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+  //   const pythClient = await getPythClient(
+  //     this.pythConfig.pythEndpoint,
+  //     this.pythConfig.username,
+  //     this.pythConfig.password,
+  //     this.pythConfig.isStable,
+  //   );
 
-    return liquidatePositionUsingGelato(
-      this.rpcConfig.chainId,
-      positionId,
-      gelatoApiKey,
-      subgraphEndpoint,
-      isStablePyth,
-      pythClient,
-    );
-  };
+  //   return liquidatePositionUsingGelato(
+  //     this.rpcConfig.chainId,
+  //     positionId,
+  //     gelatoApiKey,
+  //     subgraphEndpoint,
+  //     isStablePyth,
+  //     pythClient,
+  //   );
+  // };
 
-  settleOrderUsingGelato = async (orderId: string): Promise<{ gelatoTaskId: string }> => {
-    // Get all the variables from SDK config
-    const gelatoApiKey = this.relayerConfig.gelatoConfig?.apiKey ?? '';
-    const isStablePyth = this.pythConfig.isStable ?? true;
+  // settleOrderUsingGelato = async (orderId: string): Promise<{ gelatoTaskId: string }> => {
+  //   // Get all the variables from SDK config
+  //   const gelatoApiKey = this.relayerConfig.gelatoConfig?.apiKey ?? '';
+  //   const isStablePyth = this.pythConfig.isStable ?? true;
 
-    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
-    const pythClient = await getPythClient(
-      this.pythConfig.pythEndpoint,
-      this.pythConfig.username,
-      this.pythConfig.password,
-      this.pythConfig.isStable,
-    );
+  //   const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+  //   const pythClient = await getPythClient(
+  //     this.pythConfig.pythEndpoint,
+  //     this.pythConfig.username,
+  //     this.pythConfig.password,
+  //     this.pythConfig.isStable,
+  //   );
 
-    return settleOrderUsingGelato(
-      this.rpcConfig.chainId,
-      orderId,
-      gelatoApiKey,
-      subgraphEndpoint,
-      isStablePyth,
-      pythClient,
-    );
-  };
+  //   return settleOrderUsingGelato(
+  //     this.rpcConfig.chainId,
+  //     orderId,
+  //     gelatoApiKey,
+  //     subgraphEndpoint,
+  //     isStablePyth,
+  //     pythClient,
+  //   );
+  // };
 
-  getLiquidationPrice = (
-    position: Position,
-    market: Market,
-    normalizedMarketPrice: Decimal,
-    normalizedCollateralPrice: Decimal,
-  ): Decimal => {
-    return getLiquidationPrice(position, market, normalizedMarketPrice, normalizedCollateralPrice);
-  };
+  // getLiquidationPrice = (
+  //   position: Position,
+  //   market: Market,
+  //   normalizedMarketPrice: Decimal,
+  //   normalizedCollateralPrice: Decimal,
+  // ): Decimal => {
+  //   return getLiquidationPrice(position, market, normalizedMarketPrice, normalizedCollateralPrice);
+  // };
 
   ////////////////////////////////////////////////////////////////
   //////////////////////    PARIFI UTILS    //////////////////////
@@ -430,45 +430,45 @@ export class Core {
   //////////////////////    PAGES    /////////////////////////////
   ////////////////////////////////////////////////////////////////
 
-  getMarketBorrowingRatePerHour = (
-    market: Market,
-  ): { borrowingRatePerHourLong: Decimal; borrowingRatePerHourShorts: Decimal } => {
-    return getMarketBorrowingRatePerHour(market);
-  };
+  // getMarketBorrowingRatePerHour = (
+  //   market: Market,
+  // ): { borrowingRatePerHourLong: Decimal; borrowingRatePerHourShorts: Decimal } => {
+  //   return getMarketBorrowingRatePerHour(market);
+  // };
 
-  getMarketOpenInterestInUsd = (
-    market: Market,
-    normalizedMarketPrice: Decimal,
-  ): { openInterestInUsdLongs: Decimal; openInterestInUsdShorts: Decimal } => {
-    return getMarketOpenInterestInUsd(market, normalizedMarketPrice);
-  };
+  // getMarketOpenInterestInUsd = (
+  //   market: Market,
+  //   normalizedMarketPrice: Decimal,
+  // ): { openInterestInUsdLongs: Decimal; openInterestInUsdShorts: Decimal } => {
+  //   return getMarketOpenInterestInUsd(market, normalizedMarketPrice);
+  // };
 
-  getPoolPageData = async (userAddress: string): Promise<UserVaultData[]> => {
-    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getPoolPageData(subgraphEndpoint, userAddress);
-  };
+  // getPoolPageData = async (userAddress: string): Promise<UserVaultData[]> => {
+  //   const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+  //   return await getPoolPageData(subgraphEndpoint, userAddress);
+  // };
 
-  getTotalOpenInterestInUsd = async (): Promise<Decimal> => {
-    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
-    const pythClient = await getPythClient(
-      this.pythConfig.pythEndpoint,
-      this.pythConfig.username,
-      this.pythConfig.password,
-      this.pythConfig.isStable,
-    );
+  // getTotalOpenInterestInUsd = async (): Promise<Decimal> => {
+  //   const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(this.rpcConfig.chainId);
+  //   const pythClient = await getPythClient(
+  //     this.pythConfig.pythEndpoint,
+  //     this.pythConfig.username,
+  //     this.pythConfig.password,
+  //     this.pythConfig.isStable,
+  //   );
 
-    return await getTotalOpenInterestInUsd(subgraphEndpoint, pythClient);
-  };
+  //   return await getTotalOpenInterestInUsd(subgraphEndpoint, pythClient);
+  // };
 
-  getExpectedPositionIdFromNonce = (userAddress: string, positionNonce: BigInt, chain: Chain): string => {
-    return getExpectedPositionIdFromNonce(userAddress, positionNonce, chain);
-  };
+  // getExpectedPositionIdFromNonce = (userAddress: string, positionNonce: BigInt, chain: Chain): string => {
+  //   return getExpectedPositionIdFromNonce(userAddress, positionNonce, chain);
+  // };
 
-  getUserExpectedPositionId = async (userAddress: string, chain: Chain): Promise<string | null> => {
-    return await getUserExpectedPositionId(userAddress, chain);
-  };
+  // getUserExpectedPositionId = async (userAddress: string, chain: Chain): Promise<string | null> => {
+  //   return await getUserExpectedPositionId(userAddress, chain);
+  // };
 
-  getUserPositionNonce = async (userAddress: string, chain: Chain): Promise<BigInt | null> => {
-    return await getUserPositionNonce(userAddress, chain);
-  };
+  // getUserPositionNonce = async (userAddress: string, chain: Chain): Promise<BigInt | null> => {
+  //   return await getUserPositionNonce(userAddress, chain);
+  // };
 }

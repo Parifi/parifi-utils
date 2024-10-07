@@ -12,7 +12,7 @@ import {
   GAS_LIMIT_SETTLEMENT,
   getPriceIdsForCollaterals,
 } from '../../common';
-import { checkIfOrderCanBeSettled } from '../order-manager';
+// import { checkIfOrderCanBeSettled } from '../order-manager';
 import { InvalidValueError } from '../../error/invalid-value.error';
 
 // Returns an Order Manager contract instance without signer
@@ -42,8 +42,8 @@ export const batchSettlePendingOrdersUsingGelato = async (
 
   // Populate the price ids array to fetch price update data
   pendingOrders.forEach((order) => {
-    if (order.market?.pyth?.id) {
-      priceIds.push(order.market.pyth.id);
+    if (order.market?.feedId) {
+      priceIds.push(order.market.feedId);
     }
   });
 
@@ -59,12 +59,12 @@ export const batchSettlePendingOrdersUsingGelato = async (
 
   pendingOrders.forEach((order) => {
     if (order.id) {
-      if (!order.market?.pyth?.id) {
+      if (!order.market?.feedId) {
         throw new InvalidValueError('orderPriceId');
       }
       // Pyth returns price id without '0x' at the start, hence the price id from order
       // needs to be formatted
-      const orderPriceId = order.market?.pyth?.id;
+      const orderPriceId = order.market?.feedId;
       const formattedPriceId = orderPriceId.startsWith('0x') ? orderPriceId.substring(2) : orderPriceId;
 
       const assetPrice = pythLatestPrices.find((pythPrice) => pythPrice.id === formattedPriceId);
@@ -77,16 +77,16 @@ export const batchSettlePendingOrdersUsingGelato = async (
         assetPrice?.price.expo,
       );
 
-      if (checkIfOrderCanBeSettled(order, normalizedMarketPrice)) {
-        batchedOrders.push({
-          id: order.id,
-          priceUpdateData: priceUpdateData,
-        });
-        // We need these console logs for feedback to Tenderly actions and other scripts
-        // console.log('Order ID available for settlement:', order.id);
-      } else {
-        console.log('Order ID not available for settlement because of price mismatch:', order.id);
-      }
+      // if (checkIfOrderCanBeSettled(order, normalizedMarketPrice)) {
+      //   batchedOrders.push({
+      //     id: order.id,
+      //     priceUpdateData: priceUpdateData,
+      //   });
+      //   // We need these console logs for feedback to Tenderly actions and other scripts
+      //   // console.log('Order ID available for settlement:', order.id);
+      // } else {
+      //   console.log('Order ID not available for settlement because of price mismatch:', order.id);
+      // }
     }
   });
 

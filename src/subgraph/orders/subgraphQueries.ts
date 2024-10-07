@@ -13,33 +13,24 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10, 
   ) {
     id
     market {
-      id
-      pyth {
-        id
-        price
-        lastUpdatedTimestamp
-      }
+      id,symbol,marketName,marketSymbol,feedId 
     }
     user { id }
-    deadline
-    deadlineISO
+    expirationTime
     orderType
-    deltaSize
+    deltaSize 
     deltaCollateral
    	expectedPrice 
     executionPrice
     isLong
     isLimitOrder
-    triggerAbove
     status
     createdTimestamp
     txHash
-    maxSlippage
     partnerAddress
-    executionFee
+    collectedFees
     settledTxHash
     settledTimestamp
-    cancellationTxHash
     settledBy { id }
     position { id positionSize }
   }   
@@ -53,7 +44,7 @@ export const fetchPendingOrdersQuery = (
   gql`
   {
   orders(
-    where: {status: PENDING, deadline_gte: "${currentTimestamp}"}
+    where: {status: PENDING ,expirationTime_gt:"${currentTimestamp}"}
     first: ${count}
     skip: ${skip}
     orderBy: createdTimestamp
@@ -61,26 +52,18 @@ export const fetchPendingOrdersQuery = (
   ) {
     id
     market {
-      id
-      pyth {
-        id
-        price
-        lastUpdatedTimestamp
-      }
+      id,symbol,marketName,marketSymbol,feedId 
     }
     orderType
     isLong
     isLimitOrder
-    triggerAbove
-    deadline
-    deadlineISO
+    expirationTime
     deltaCollateral
     deltaSize
     deltaSizeUsd
    	expectedPrice 
-    maxSlippage
     partnerAddress
-    executionFee
+    collectedFees
     txHash
     createdTimestamp
     status
@@ -89,7 +72,6 @@ export const fetchPendingOrdersQuery = (
     settledTimestampISO
     executionPrice
     settledBy { id }
-    cancellationTxHash
     position { id }
   }
 }
@@ -104,35 +86,28 @@ export const fetchOrdersByIdQuery = (orderId: string) =>
       id
     }
     market {
-      id
-      pyth {
-        id
-        price
-        lastUpdatedTimestamp
-      }
+      id,symbol,marketName,marketSymbol,feedId 
     }
     orderType
     isLong
     isLimitOrder
-    triggerAbove
-    deadline
-    deadlineISO
+    expirationTime
     deltaCollateral
     deltaSize
+    collateralToken
     deltaSizeUsd
-   	expectedPrice 
-    maxSlippage
+    acceptablePrice 
     partnerAddress
-    executionFee
+    collectedFees
     txHash
     createdTimestamp
     status
     settledTxHash
     settledTimestamp
     settledTimestampISO
+    trackingCode
     executionPrice
     settledBy { id }
-    cancellationTxHash
     position { id }
   }
 }
@@ -148,10 +123,8 @@ export const fetchPriceIdsFromOrderIdsQuery = (orderIds: string[]) =>
     ) {
       id
       market {
-        pyth {
-          id
-        }
-      }
+      feedId 
+    }
     }
   }
 `;

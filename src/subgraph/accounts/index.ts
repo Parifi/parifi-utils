@@ -9,7 +9,6 @@ import {
 } from './subgraphQueries';
 import { DECIMAL_ZERO, PRICE_FEED_PRECISION } from '../../common';
 import { LeaderboardUserData, ReferralRewardsInUsd, UserPortfolioData } from '../../interfaces/sdkTypes';
-import { mapAccountsArrayToInterface } from '../../common/subgraphMapper';
 
 /// Returns the Realized PNL for positions and vaults for a user address
 export const getRealizedPnlForUser = async (
@@ -176,53 +175,6 @@ export const getPortfolioDataForUsers = async (
   }
 };
 
-// Returns the referral reward earned by wallet addresses in USD
-export const getReferralRewardsInUsd = async (
-  subgraphEndpoint: string,
-  userAddresses: string[],
-): Promise<ReferralRewardsInUsd[]> => {
-  const subgraphResponse = await request(subgraphEndpoint, fetchReferralRewardsInUsd(userAddresses));
-  if (!subgraphResponse) throw new Error('Error While Fetching Referral Rewards');
-  const accountsData = mapAccountsArrayToInterface(subgraphResponse);
-  const referralRewardsInUsd: ReferralRewardsInUsd[] = [];
-
-  if (accountsData) {
-    accountsData.forEach((account) => {
-      referralRewardsInUsd.push({
-        userAddress: account.id ?? '0x',
-        totalReferralRewardsInUsd: new Decimal(account.totalReferralRewardsInUsd ?? 0),
-        unclaimedReferralRewardsUsdc: BigInt(account.unclaimedReferralRewardsUsdc ?? 0),
-        unclaimedReferralRewardsWeth: BigInt(account.unclaimedReferralRewardsWeth ?? 0),
-      });
-    });
-  }
-  return referralRewardsInUsd;
-};
-
-// Returns the top addresses by referral rewards earned in USD
-export const getTopAccountsByReferralRewards = async (
-  subgraphEndpoint: string,
-  count: number = 20,
-  skip: number = 0,
-): Promise<ReferralRewardsInUsd[]> => {
-  const subgraphResponse = await request(subgraphEndpoint, fetchTopAccountsByReferralFees(count, skip));
-  if (!subgraphResponse) throw new Error('Error While Fetching Top Accounts By Referral Rewards');
-  const accountsData = mapAccountsArrayToInterface(subgraphResponse);
-
-  const referralRewardsInUsd: ReferralRewardsInUsd[] = [];
-
-  if (accountsData) {
-    accountsData.forEach((account) => {
-      referralRewardsInUsd.push({
-        userAddress: account.id ?? '0x',
-        totalReferralRewardsInUsd: new Decimal(account.totalReferralRewardsInUsd ?? 0),
-        unclaimedReferralRewardsUsdc: BigInt(account.unclaimedReferralRewardsUsdc ?? 0),
-        unclaimedReferralRewardsWeth: BigInt(account.unclaimedReferralRewardsWeth ?? 0),
-      });
-    });
-  }
-  return referralRewardsInUsd;
-};
 
 // Returns the leaderboard page details for a user address
 export const getLeaderboardUserData = async (
