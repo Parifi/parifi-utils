@@ -18,6 +18,9 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 1
             user {
             id
             }
+            account{
+              accountId
+            }
             positionSize
             positionCollateral
             avgPrice
@@ -64,6 +67,9 @@ export const fetchPositionsByUserQueryAndStatus = (
             user {
             id
             }
+            account{
+              accountId
+            }
             positionSize
             positionCollateral
             avgPrice
@@ -97,6 +103,9 @@ export const fetchPositionByIdQuery = (positionId: string) =>
             }
             user {
                 id
+            }
+            account{
+              accountId
             }
             isLong
             positionCollateral
@@ -196,6 +205,7 @@ export const fetchAllOrdersForPosition = (positionId: string) => gql`
     market {
       id,marketName,marketSymbol,feedId 
     }
+    
     orderType
     isLong
     isLimitOrder
@@ -243,6 +253,9 @@ export const fetchPositionHistoryQuery = (userAddress: string, count: number = 1
             }
             user {
             id
+            }
+            account{
+              accountId
             }
             positionSize
             positionCollateral

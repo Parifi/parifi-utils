@@ -9,7 +9,7 @@
 //   MAX_FEE,
 //   PRECISION_MULTIPLIER,
 // } from '../../common/constants';
-// import { getAccruedBorrowFeesInMarket, getMarketUtilization } from '../data-fabric';
+// import { getAccruedFeesInMarket } from '../data-fabric';
 // import { convertCollateralAmountToUsd, convertMarketAmountToCollateral, convertMarketAmountToUsd } from '../price-feed';
 // import { Chain } from '@parifi/references';
 // import { contracts as parifiContracts } from '@parifi/references';
@@ -27,6 +27,11 @@
 // import { InvalidValueError } from '../../error/invalid-value.error';
 // import { AbiCoder } from 'ethers';
 
+import Decimal from "decimal.js";
+import { Position } from "../../interfaces/sdkTypes";
+import { InvalidValueError } from "../../error/invalid-value.error";
+import { DECIMAL_10 } from "../../common";
+
 // // Returns an Order Manager contract instance without signer
 // export const getOrderManagerInstance = (chain: Chain): Contract => {
 //   try {
@@ -38,47 +43,47 @@
 
 // // Return the Profit or Loss for a position in USD
 // // `normalizedMarketPrice` is the price of market with 8 decimals
-// export const getProfitOrLossInUsd = (
-//   userPosition: Position,
-//   normalizedMarketPrice: Decimal,
-//   marketDecimals: Decimal,
-// ): { totalProfitOrLoss: Decimal; isProfit: boolean } => {
-//   let profitOrLoss: Decimal;
-//   let isProfit: boolean;
+export const getProfitOrLossInUsd = (
+  userPosition: Position,
+  normalizedMarketPrice: Decimal,
+  marketDecimals: Decimal,
+): { totalProfitOrLoss: Decimal; isProfit: boolean } => {
+  let profitOrLoss: Decimal;
+  let isProfit: boolean;
 
-//   if (!userPosition.avgPrice || !userPosition.positionSize) {
-//     throw new InvalidValueError('AvgPrice/PositionSize');
-//   }
+  if (!userPosition.avgPrice || !userPosition.positionSize) {
+    throw new InvalidValueError('AvgPrice/PositionSize');
+  }
 
-//   const positionAvgPrice = new Decimal(userPosition.avgPrice);
+  const positionAvgPrice = new Decimal(userPosition.avgPrice);
 
-//   if (userPosition.isLong) {
-//     if (normalizedMarketPrice.gt(positionAvgPrice)) {
-//       // User position is profitable
-//       profitOrLoss = normalizedMarketPrice.minus(positionAvgPrice);
-//       isProfit = true;
-//     } else {
-//       // User position is at loss
-//       profitOrLoss = positionAvgPrice.minus(normalizedMarketPrice);
-//       isProfit = false;
-//     }
-//   } else {
-//     if (normalizedMarketPrice.gt(positionAvgPrice)) {
-//       // User position is at loss
-//       profitOrLoss = normalizedMarketPrice.minus(positionAvgPrice);
-//       isProfit = false;
-//     } else {
-//       // User position is profitable
-//       profitOrLoss = positionAvgPrice.minus(normalizedMarketPrice);
-//       isProfit = true;
-//     }
-//   }
-//   const totalProfitOrLoss = new Decimal(userPosition.positionSize)
-//     .times(profitOrLoss)
-//     .dividedBy(DECIMAL_10.pow(marketDecimals));
+  if (userPosition.isLong) {
+    if (normalizedMarketPrice.gt(positionAvgPrice)) {
+      // User position is profitable
+      profitOrLoss = normalizedMarketPrice.minus(positionAvgPrice);
+      isProfit = true;
+    } else {
+      // User position is at loss
+      profitOrLoss = positionAvgPrice.minus(normalizedMarketPrice);
+      isProfit = false;
+    }
+  } else {
+    if (normalizedMarketPrice.gt(positionAvgPrice)) {
+      // User position is at loss
+      profitOrLoss = normalizedMarketPrice.minus(positionAvgPrice);
+      isProfit = false;
+    } else {
+      // User position is profitable
+      profitOrLoss = positionAvgPrice.minus(normalizedMarketPrice);
+      isProfit = true;
+    }
+  }
+  const totalProfitOrLoss = new Decimal(userPosition.positionSize)
+    .times(profitOrLoss)
+    .dividedBy(DECIMAL_10.pow(marketDecimals));
 
-//   return { totalProfitOrLoss, isProfit };
-// };
+  return { totalProfitOrLoss, isProfit };
+};
 
 // // Returns the Profit or Loss of a position in collateral with decimals
 // // Normalized price for market and token is the price with 8 decimals, which is used
@@ -170,7 +175,7 @@
 //     .mul(position.positionSize)
 //     .dividedBy(MAX_FEE);
 
-//   const accruedBorrowFeesInMarket = getAccruedBorrowFeesInMarket(position, market);
+//   const accruedBorrowFeesInMarket = getAccruedFeesInMarket(position, market);
 
 //   const totalFeesMarket = fixedClosingFeeDuringLiquidation.add(accruedBorrowFeesInMarket);
 //   const feesInCollateral = convertMarketAmountToCollateral(
@@ -281,7 +286,7 @@
 //   );
 
 //   // Calculate the fees accrued for this position
-//   const accruedBorrowFeesInMarket = getAccruedBorrowFeesInMarket(position, market);
+//   const accruedBorrowFeesInMarket = getAccruedFeesInMarket(position, market);
 
 //   const feesInCollateral = convertMarketAmountToCollateral(
 //     accruedBorrowFeesInMarket,
@@ -543,7 +548,7 @@
 //   const marketDecimals = new Decimal(market.marketDecimals);
 
 //   // Total fees for the position taking into account closing fee and liquidation fee
-//   const accruedBorrowFeesInMarket = getAccruedBorrowFeesInMarket(position, market);
+//   const accruedBorrowFeesInMarket = getAccruedFeesInMarket(position, market);
 //   const fixedFeesInMarket = new Decimal(position.positionSize)
 //     .times(new Decimal(market.openingFee).add(market.liquidationFee))
 //     .div(MAX_FEE);

@@ -139,6 +139,7 @@ export type Position = {
   lastRefreshISO: string;
   accruedBorrowingFees: string;
   canBeLiquidated: boolean;
+  accountId?:string
 }
 
 export type Token = {

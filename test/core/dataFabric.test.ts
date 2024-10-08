@@ -1,6 +1,8 @@
 // import { getParifiSdkInstanceForTesting } from '..';
 // import Decimal from 'decimal.js';
 
+import { getParifiSdkInstanceForTesting } from "..";
+
 describe('Data Fabric tests', () => {
 //   it('should return correct values of Skew for a market', async () => {
 //     const parifiSdk = await getParifiSdkInstanceForTesting();
@@ -24,7 +26,11 @@ describe('Data Fabric tests', () => {
 //       }
 //     });
 //   });
-it('should liquidate a single position', async () => {
-  console.log("hello from order mangaer")
+it('should return accuredFee for position', async () => {
+  const marketName  = 'Bitcoin' 
+  const accountId = 170141183460469231731687303715884105743n
+  const parifiSdk = await getParifiSdkInstanceForTesting();
+    const accuredFee =  await parifiSdk.core.getAccruedFeesInMarket(200,accountId);
+    console.log('accuredFee',accuredFee)
  })
 });

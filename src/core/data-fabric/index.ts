@@ -4,6 +4,9 @@
 // import { Market, Position } from '../../interfaces/subgraphTypes';
 // import { Decimal } from 'decimal.js';
 
+import { Chain } from "@parifi/references";
+import { SynthetixSdk } from "@parifi/synthetix-sdk-ts";
+
 // // Returns Market Utilization for a Market
 // export const getMarketUtilization = (market: Market, isLong: boolean): Decimal => {
 //   if (!market.totalLongs || !market.totalShorts || !market.maxOpenInterest) {
@@ -110,60 +113,45 @@
 // };
 
 // // Returns th accrued borrowing fees in market values
-// export const getAccruedBorrowFeesInMarket = (position: Position, market: Market): Decimal => {
-//   if (!market.totalLongs || !market.totalShorts) {
-//     throw new InvalidValueError('Total Longs/Shorts');
-//   }
-
-//   if (
-//     !market.baseFeeCumulativeLongs ||
-//     !market.baseFeeCumulativeShorts ||
-//     !market.dynamicFeeCumulativeLongs ||
-//     !market.dynamicFeeCumulativeShorts
-//   ) {
-//     throw new InvalidValueError('baseFee/dynamicFee');
-//   }
-
-//   if (!position.positionSize || !position.lastCumulativeFee || !market.feeLastUpdatedTimestamp) {
-//     throw new InvalidValueError('positionSize/lastCumulativeFee/feeLastUpdatedTimestamp');
-//   }
-
-//   const totalLongs = new Decimal(market.totalLongs);
-//   const totalShorts = new Decimal(market.totalShorts);
-
-//   const timeDelta = new Decimal(Math.floor(Date.now() / 1000)).minus(market.feeLastUpdatedTimestamp);
-
-//   // Get latest base borrow rate for Longs and Shorts
-//   const baseBorrowRate = getBaseBorrowRatePerSecond(market);
-//   const baseBorrowRatePerSecondLong = new Decimal(baseBorrowRate.baseBorrowRatePerSecondLong);
-//   const baseBorrowRatePerSecondShort = new Decimal(baseBorrowRate.baseBorrowRatePerSecondShort);
-
-//   const newBaseFeeCumulativeLongs = new Decimal(market.baseFeeCumulativeLongs).add(
-//     timeDelta.times(baseBorrowRatePerSecondLong),
-//   );
-//   const newBaseFeeCumulativeShorts = new Decimal(market.baseFeeCumulativeShorts).add(
-//     timeDelta.times(baseBorrowRatePerSecondShort),
-//   );
-
-//   // Get latest dynamic borrow rate for Longs and Shorts
-//   const dynamicBorrowRatePerSecond = new Decimal(getDynamicBorrowRatePerSecond(market));
-//   let newDynamicFeeCumulativeLongs = new Decimal(market.dynamicFeeCumulativeLongs);
-//   let newDynamicFeeCumulativeShorts = new Decimal(market.dynamicFeeCumulativeShorts);
-
-//   if (totalLongs.gt(totalShorts)) {
-//     newDynamicFeeCumulativeLongs = newDynamicFeeCumulativeLongs.add(timeDelta.times(dynamicBorrowRatePerSecond));
-//   } else {
-//     newDynamicFeeCumulativeShorts = newDynamicFeeCumulativeShorts.add(timeDelta.times(dynamicBorrowRatePerSecond));
-//   }
-
-//   const currentFeeCumulative = position.isLong
-//     ? newBaseFeeCumulativeLongs.add(newDynamicFeeCumulativeLongs)
-//     : newBaseFeeCumulativeShorts.add(newDynamicFeeCumulativeShorts);
-
-//   const accruedFeesCumulative = getDiff(currentFeeCumulative, new Decimal(position.lastCumulativeFee));
-
-//   return new Decimal(position.positionSize)
-//     .times(accruedFeesCumulative)
-//     .div(new Decimal(100).times(DECIMAL_10.pow(18)))
-//     .ceil();
-// };
+// Optimized function to get Pyth network URLs
+export const getPythNetworkUrl = (() => {
+    const benchmark = 'https://benchmarks.pyth.network';
+    const hermes = process.env.NEXT_PUBLIC_HERMES || 'https://hermes.pyth.network';
+    return { hermes, benchmark };
+  })();
+  
+  export const alchemyRpcPerChain = {
+    [Chain.ARBITRUM_MAINNET]: `https://arb-mainnet.g.alchemy.com/v2/pkGkXwClv6s-PfIbD2v6HvVOIjzncw2Q`,
+  };
+  
+  const config = {
+    rpcConfig: {
+      chainId: Chain.ARBITRUM_MAINNET,
+      rpcEndpoint: alchemyRpcPerChain[Chain.ARBITRUM_MAINNET],
+      preset: 'main',
+    },
+    pythConfig: {
+      pythEndpoint: getPythNetworkUrl.hermes,
+    },
+    partnerConfig: {},
+    accountConfig: {
+      address: '0xC517B4aBBC2190468B6F6277E3886b70b23eF739',
+    },
+  };
+  
+  let synthetixSdk: SynthetixSdk | null = null;
+  
+  export const getSynthetixSdk = async (): Promise<SynthetixSdk> => {
+    if (!synthetixSdk) {
+      synthetixSdk = new SynthetixSdk(config);
+      await synthetixSdk.init();
+    }
+    return synthetixSdk;
+  };
+  
+  export const getAccruedFeesInMarket = async (marketIdOrName: string | number, accountId: bigint): Promise<any> => {
+    const sdk = await getSynthetixSdk();
+    const position = await sdk.perps.getOpenPosition(marketIdOrName, accountId);
+    return position.accruedFunding;
+  };
+  

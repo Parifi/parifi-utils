@@ -147,6 +147,7 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
       avgPrice: response.avgPrice,
       avgPriceDec: response.avgPriceDec,
       status: response.status,
+      accountId:response.account.accountId,
       txHash: response.txHash,
       liquidationTxHash: response.liquidationTxHash,
       closingPrice: response.closingPrice,

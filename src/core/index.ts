@@ -1,16 +1,15 @@
 import Decimal from 'decimal.js';
 import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
-import { Market,  Position } from '../interfaces/subgraphTypes';
-// import {
-//   getAccruedBorrowFeesInMarket,
+import {
+  getAccruedFeesInMarket,
 //   getBaseBorrowRatePerSecond,
 //   getDynamicBorrowRatePerSecond,
 //   getMarketSkew,
 //   getMarketSkewUi,
 //   getMarketUtilization,
-// } from './data-fabric';
+} from './data-fabric';
 import { Contract, Signer } from 'ethers';
-// import {
+import {
 //   calculateCollateralFromSize,
 //   calculatePositionLeverage,
 //   calculateSizeFromCollateral,
@@ -21,13 +20,13 @@ import { Contract, Signer } from 'ethers';
 //   getNetProfitOrLossInCollateral,
 //   getOrderManagerInstance,
 //   getExpectedPositionIdFromNonce,
-//   getProfitOrLossInUsd,
+  getProfitOrLossInUsd,
 //   getUserExpectedPositionId,
 //   getUserPositionNonce,
 //   isPositionLiquidatable,
 //   liquidatePositionUsingGelato,
 //   settleOrderUsingGelato,
-// } from './order-manager';
+} from './order-manager';
 // import { checkIfOrderCanBeSettled } from './order-manager/';
 import {
   batchLiquidatePostionsUsingGelato,
@@ -49,6 +48,7 @@ import { getPythClient } from '../pyth/pyth';
 // import { UserVaultData } from '../interfaces/sdkTypes';
 // import { getPoolPageData } from './pages/poolPage';
 import { getPositionRefreshTxData } from './subgraph-helper';
+import { Market, Position } from '../interfaces/sdkTypes';
 // import { Chain } from '@parifi/references';
 
 export class Core {
@@ -85,9 +85,9 @@ export class Core {
   //   return getBaseBorrowRatePerSecond(market);
   // };
 
-  // getAccruedBorrowFeesInMarket = (position: Position, market: Market): Decimal => {
-  //   return getAccruedBorrowFeesInMarket(position, market);
-  // };
+  getAccruedFeesInMarket = async(marketIdOrName:string | number,accountId:bigint): Promise<Decimal> => {
+    return await getAccruedFeesInMarket(marketIdOrName,accountId);
+  };
 
   ////////////////////////////////////////////////////////////////
   //////////////////////    ORDER MANAGER    /////////////////////
@@ -123,13 +123,13 @@ export class Core {
   //   return getOrderManagerInstance(this.rpcConfig.chainId);
   // };
 
-  // getProfitOrLossInUsd = (
-  //   userPosition: Position,
-  //   normalizedMarketPrice: Decimal,
-  //   marketDecimals: Decimal,
-  // ): { totalProfitOrLoss: Decimal; isProfit: boolean } => {
-  //   return getProfitOrLossInUsd(userPosition, normalizedMarketPrice, marketDecimals);
-  // };
+  getProfitOrLossInUsd = (
+    userPosition: Position,
+    normalizedMarketPrice: Decimal,
+    marketDecimals: Decimal,
+  ): { totalProfitOrLoss: Decimal; isProfit: boolean } => {
+    return getProfitOrLossInUsd(userPosition, normalizedMarketPrice, marketDecimals);
+  };
 
   getPnlWithoutFeesInCollateral = (
     position: Position,
