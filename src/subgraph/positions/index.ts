@@ -1,5 +1,4 @@
 import { request } from 'graphql-request';
-import { Order, Position } from '../../interfaces/subgraphTypes';
 import {
   fetchAllOrdersForPosition,
   fetchAllPositionsForCollateralData,
@@ -20,6 +19,7 @@ import {
 import { NotFoundError } from '../../error/not-found.error';
 import { DECIMAL_ZERO, EMPTY_BYTES32, PRICE_FEED_PRECISION, getUniqueValuesFromArray } from '../../common';
 import Decimal from 'decimal.js';
+import { Order, Position } from '../../interfaces/sdkTypes';
 
 /// Position Ids interface to format subgraph response to string array
 interface PositionIdsSubgraphResponse {

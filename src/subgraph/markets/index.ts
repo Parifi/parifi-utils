@@ -1,8 +1,8 @@
 import { request } from 'graphql-request';
-import { Market } from '../../interfaces/subgraphTypes';
 import { fetchAllMarketsDataQuery, fetchMarketByIdQuery } from './subgraphQueries';
 import { mapMarketsArrayToInterface, mapSingleMarketToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
+import { Market } from '../../interfaces/sdkTypes';
 
 export const getAllMarketsFromSubgraph = async (subgraphEndpoint: string): Promise<Market[]> => {
   try {

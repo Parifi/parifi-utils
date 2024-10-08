@@ -114,14 +114,13 @@ export type Order = {
   settledTimestampISO: string;
   settledBy?: Wallet;
   positionId?: Position;
-  formatteddeltaSize?:string
+  formattedDeltaSize?:string
 };
 
 export type Position = {
   id: string;
-  market: Market;
-  user: Wallet;
-  account: SnxAccount;
+  market?: Market;
+  user?: Wallet;
   isLong: boolean;
   positionCollateral: string;
   positionSize: string;

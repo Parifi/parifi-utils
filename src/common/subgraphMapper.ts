@@ -1,5 +1,6 @@
 import { formatEther } from 'ethers';
-import { Market, Order, Position, PriceFeedSnapshot, PythData, Token, Wallet } from '../interfaces/subgraphTypes';
+import {  PriceFeedSnapshot, PythData, Token } from '../interfaces/subgraphTypes';
+import { Market, Order, Position, Wallet } from '../interfaces/sdkTypes';
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    Wallet   ////////////////////////////
@@ -32,13 +33,13 @@ export const mapSubgraphResponseToWalletInterface = (response: any): Wallet | un
 //////////////////////    MARKET    ////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSingleMarketToInterface = (response: any): Market | undefined => {
+export const mapSingleMarketToInterface = (response: any):  Market| undefined => {
   if (response === null) return undefined;
   try {
     return {
       id: response.id,
-      name: response.marketName,
-      symbol: response.marketSymbol,
+      marketName: response.marketName,
+      marketSymbol: response.marketSymbol,
       feedId: response.feedId,
       size: response.size,
       currentFundingRate: response.currentFundingRate,
@@ -157,6 +158,7 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
       lastRefresh: response.lastRefresh,
       lastRefreshISO: response.lastRefreshISO,
       canBeLiquidated: response.canBeLiquidated,
+      accruedBorrowingFees:response.accruedBorrowingFees,
     };
   } catch (error) {
     console.log('Error while mapping data', error);

@@ -1,5 +1,4 @@
 import { request } from 'graphql-request';
-import { Order } from '../../interfaces/subgraphTypes';
 import {
   fetchOrdersByIdQuery,
   fetchOrdersByUserQuery,
@@ -13,6 +12,7 @@ import {
 } from '../../common/subgraphMapper';
 import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
 import { NotFoundError } from '../../error/not-found.error';
+import { Order } from '../../interfaces/sdkTypes';
 
 // Get all order by a user address
 export const getAllOrdersByUserAddress = async (

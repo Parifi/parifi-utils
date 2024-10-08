@@ -21,7 +21,6 @@ import {
   getTotalUnrealizedPnlInUsd,
 } from './positions';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
-import { Market, Order, Position } from '../interfaces/subgraphTypes';
 import { Chain } from '@parifi/references';
 import request, { GraphQLClient } from 'graphql-request';
 import { getPublicSubgraphEndpoint } from './common';
@@ -33,7 +32,7 @@ import {
   getPortfolioDataForUsers,
   getRealizedPnlForUser,
 } from './accounts';
-import { LeaderboardUserData, ReferralRewardsInUsd, UserPortfolioData } from '../interfaces/sdkTypes';
+import { LeaderboardUserData, Market, Order, Position, ReferralRewardsInUsd, UserPortfolioData } from '../interfaces/sdkTypes';
 import { getExecutionFee } from './protocol';
 
 export * from './common';
