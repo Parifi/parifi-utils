@@ -130,9 +130,8 @@ export type Position = {
   status: PositionStatus;
   txHash: string;
   liquidationTxHash?: string;
-  closingPrice: string;
+  closingPrice?: string;
   realizedPnl: string;
-  realizedPnlCollateral: string;
   realizedFee: string;
   netRealizedPnl: string;
   createdTimestamp: string;
@@ -140,7 +139,8 @@ export type Position = {
   lastRefreshISO: string;
   accruedBorrowingFees: string;
   canBeLiquidated: boolean;
-};
+}
+
 export type Token = {
   id?: string;
   name?: string;

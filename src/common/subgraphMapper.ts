@@ -151,7 +151,6 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
       liquidationTxHash: response.liquidationTxHash,
       closingPrice: response.closingPrice,
       realizedPnl: response.realizedPnl,
-      realizedPnlCollateral: response.realizedPnlCollateral,
       realizedFee: response.realizedFee,
       netRealizedPnl: response.netRealizedPnl,
       createdTimestamp: response.createdTimestamp,

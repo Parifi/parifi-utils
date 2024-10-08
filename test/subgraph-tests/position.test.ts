@@ -1,4 +1,5 @@
-// import { getParifiSdkInstanceForTesting } from '..';
+import { getParifiSdkInstanceForTesting } from '..';
+import { TEST_POSITION_ID1, TEST_POSITION_ID2, TEST_USER_ID2 } from '../common/constants';
 // import { PositionStatus } from '../../src';
 // import {
 //   TEST_POSITION_ID1,
@@ -11,36 +12,35 @@
 // } from '../common/constants';
 
 describe('Order fetching logic from subgraph', () => {
-//   it('should return correct position details', async () => {
-//     const parifiSdk = await getParifiSdkInstanceForTesting();
-//     const positionId = TEST_POSITION_ID1;
+  it('should return correct position details', async () => {
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+    const positionId = TEST_POSITION_ID1;
 
-//     const position = await parifiSdk.subgraph.getPositionById(positionId);
-//     console.log(positionId);
-//     expect(position.id).toBe(positionId);
-//   });
+    const position = await parifiSdk.subgraph.getPositionById(positionId);
+    console.log(positionId);
+    expect(position.id).toBe(positionId);
+    expect(position.status).toBe('OPEN');
+  });
 
-//   it('should return position details by status: OPEN', async () => {
-//     const parifiSdk = await getParifiSdkInstanceForTesting();
+  // it('should return position details by status: OPEN', async () => {
+  //   const parifiSdk = await getParifiSdkInstanceForTesting();
 
-//     const userAddress = TEST_USER_ID2;
-//     const positions = await parifiSdk.subgraph.getOpenPositionsByUserAddress(userAddress);
-//     console.log(positions.length);
-//     if (positions.length > 0) {
-//       expect(positions[0].status).toBe('OPEN');
-//     }
-//   });
+  //   const userAddress = TEST_POSITION_ID1;
+  //   const positions = await parifiSdk.subgraph.getOpenPositionsByUserAddress(userAddress);
+  //   console.log(positions.length);
+  //   if (positions.length > 0) {
+  //     expect(positions[0].status).toBe('OPEN');
+  //   }
+  // });
 
-//   it('should return position details by status: CLOSED', async () => {
-//     const parifiSdk = await getParifiSdkInstanceForTesting();
+  it('should return position details by status: CLOSED', async () => {
+    const parifiSdk = await getParifiSdkInstanceForTesting();
 
-//     const userAddress = TEST_USER_ID2;
-//     const positions = await parifiSdk.subgraph.getClosedPositionsByUserAddress(userAddress);
-//     console.log(positions.length);
-//     if (positions.length > 0) {
-//       expect(positions[0].status).toBe('CLOSED');
-//     }
-//   });
+    const positionId = TEST_POSITION_ID2;
+    const positions = await parifiSdk.subgraph.getPositionById(positionId);
+      expect(positions.status).toBe('CLOSED');
+    }
+  );
 
 //   it('should return position details by status: LIQUIDATED', async () => {
 //     const parifiSdk = await getParifiSdkInstanceForTesting();
@@ -135,7 +135,4 @@ describe('Order fetching logic from subgraph', () => {
 //       expect(position.status).not.toBe(PositionStatus.OPEN);
 //     });
 //   });
-it('should liquidate a single position', async () => {
-  console.log("hello from order mangaer")
- })
 });

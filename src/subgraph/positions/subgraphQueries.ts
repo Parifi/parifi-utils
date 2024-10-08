@@ -13,7 +13,7 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 1
         ) {
             id
             market {
-            id
+              id,marketName,marketSymbol,feedId 
             }
             user {
             id
@@ -24,25 +24,17 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 1
             avgPriceDec
             isLong
             createdTimestamp
-            lastCumulativeFee
             status
             txHash
             liquidationTxHash
             closingPrice
             realizedPnl
-            realizedPnlCollateral
             realizedFee
-            realizedFeeCollateral
             netRealizedPnl
             createdTimestamp
             lastRefresh
             lastRefreshISO
-            netUnrealizedPnlInCollateral
-            netUnrealizedPnlInUsd
-            liquidationNetPnlInCollateral
-            accruedBorrowingFeesInCollateral
             canBeLiquidated
-            lossToCollateralRatioPercent
         }
     }`;
 
@@ -67,7 +59,7 @@ export const fetchPositionsByUserQueryAndStatus = (
         ) {
             id
             market {
-            id
+              id,marketName,marketSymbol,feedId 
             }
             user {
             id
@@ -78,25 +70,18 @@ export const fetchPositionsByUserQueryAndStatus = (
             avgPriceDec
             isLong
             createdTimestamp
-            lastCumulativeFee
             status
             txHash
             liquidationTxHash
             closingPrice
             realizedPnl
-            realizedPnlCollateral
             realizedFee
-            realizedFeeCollateral
             netRealizedPnl
             createdTimestamp
             lastRefresh
             lastRefreshISO
-            netUnrealizedPnlInCollateral
-            netUnrealizedPnlInUsd
-            liquidationNetPnlInCollateral
-            accruedBorrowingFeesInCollateral
             canBeLiquidated
-            lossToCollateralRatioPercent
+            
         }
     }`;
 
@@ -108,7 +93,7 @@ export const fetchPositionByIdQuery = (positionId: string) =>
         ) {
             id
             market {
-                id
+              id,marketName,marketSymbol,feedId 
             }
             user {
                 id
@@ -118,25 +103,18 @@ export const fetchPositionByIdQuery = (positionId: string) =>
             positionSize
             avgPrice
             avgPriceDec
-            lastCumulativeFee
             status
             txHash
             liquidationTxHash
             closingPrice
             realizedPnl
-            realizedPnlCollateral
             realizedFee
-            realizedFeeCollateral
             netRealizedPnl
             createdTimestamp
             lastRefresh
             lastRefreshISO
-            netUnrealizedPnlInCollateral
-            netUnrealizedPnlInUsd
-            liquidationNetPnlInCollateral
-            accruedBorrowingFeesInCollateral
             canBeLiquidated
-            lossToCollateralRatioPercent            
+                        
         }
     }`;
 
@@ -150,9 +128,7 @@ export const fetchPriceIdsFromPositionIdsQuery = (positionIds: string[]) =>
     ) {
       id
       market {
-        pyth {
-          id
-        }
+        id,marketName,marketSymbol,feedId 
       }
     }
   }
@@ -186,12 +162,7 @@ export const fetchAllPositionsForCollateralData = (userAddress: string) => gql`
       id
       positionCollateral
       market {
-        depositToken {
-          decimals
-          pyth {
-            price
-          }
-        }
+        id,marketName,marketSymbol,feedId 
       }
     }
   }
@@ -207,7 +178,7 @@ export const fetchAllPositionsUnrealizedPnl = (userAddress: string) => gql`
       where: { user: "${userAddress.toLowerCase()}", status: OPEN }
     ) {
       id
-      netUnrealizedPnlInUsd
+      
     }
   }
 `;
@@ -223,7 +194,7 @@ export const fetchAllOrdersForPosition = (positionId: string) => gql`
       id
     }
     market {
-      id
+      id,marketName,marketSymbol,feedId 
     }
     orderType
     isLong
@@ -268,7 +239,7 @@ export const fetchPositionHistoryQuery = (userAddress: string, count: number = 1
         ) {
             id
             market {
-            id
+              id,marketName,marketSymbol,feedId 
             }
             user {
             id
@@ -279,24 +250,24 @@ export const fetchPositionHistoryQuery = (userAddress: string, count: number = 1
             avgPriceDec
             isLong
             createdTimestamp
-            lastCumulativeFee
+            
             status
             txHash
             liquidationTxHash
             closingPrice
             realizedPnl
-            realizedPnlCollateral
+            
             realizedFee
-            realizedFeeCollateral
+            
             netRealizedPnl
             createdTimestamp
             lastRefresh
             lastRefreshISO
-            netUnrealizedPnlInCollateral
-            netUnrealizedPnlInUsd
-            liquidationNetPnlInCollateral
-            accruedBorrowingFeesInCollateral
+            
+            
+            
+            
             canBeLiquidated
-            lossToCollateralRatioPercent
+            
         }
     }`;

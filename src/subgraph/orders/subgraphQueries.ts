@@ -13,7 +13,7 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10, 
   ) {
     id
     market {
-      id,symbol,marketName,marketSymbol,feedId 
+      id,marketName,marketSymbol,feedId 
     }
     user { id }
     expirationTime
@@ -52,7 +52,7 @@ export const fetchPendingOrdersQuery = (
   ) {
     id
     market {
-      id,symbol,marketName,marketSymbol,feedId 
+      id,marketName,marketSymbol,feedId 
     }
     orderType
     isLong
@@ -121,7 +121,7 @@ export const fetchPriceIdsFromOrderIdsQuery = (orderIds: string[]) =>
     ) {
       id
       market {
-      feedId 
+        id,marketName,marketSymbol,feedId 
     }
     }
   }
