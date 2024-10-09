@@ -1,5 +1,6 @@
 import Decimal from 'decimal.js';
 import { OrderStatus, PositionStatus, PythData, SnxAccountType } from './subgraphTypes';
+import { S } from '@parifi/synthetix-sdk-ts/dist/index-BTlMb-Ja';
 
 /// Interface to return portfolio total from the sdk
 export type UserPortfolioData = {
@@ -55,13 +56,13 @@ export interface LeaderboardUserData {
   totalVolumeInUsdShorts: Decimal;
   totalRealizedPnlPositions: Decimal;
   totalAccruedBorrowingFeesInUsd: Decimal;
-} 
+}
 export type Market = {
   id: string;
   marketName: string;
   marketSymbol: string;
   size: string;
-  skew:string;
+  skew: string;
   currentFundingRate: string;
   currentFundingVelocity: string;
   feedId: string;
@@ -69,9 +70,9 @@ export type Market = {
   skewScale: string;
   makerFee: string;
   takerFee: string;
-  maxMarketValue:string,
-  maxOpenInterest:string,
-  interestRate:string
+  maxMarketValue: string;
+  maxOpenInterest: string;
+  interestRate: string;
 };
 export type Wallet = {
   id: string;
@@ -114,7 +115,21 @@ export type Order = {
   settledTimestampISO: string;
   settledBy?: Wallet;
   positionId?: Position;
-  formattedDeltaSize?:string
+  formattedDeltaSize?: string;
+  formattedExecutionPrice?: string;
+  snxAccount?: SnxAccount;
+  depositCollateral?: DepositCollateral;
+};
+
+export type DepositCollateral = {
+  id: string;
+  depositedAmount: string;
+  collateralName: string;
+  collateralSymbol: string;
+  collateralDecimals: string;
+  collateralAddress: string;
+  snxAccountId: string;
+  formattedDepositedAmount: string;
 };
 
 export type Position = {
@@ -139,8 +154,8 @@ export type Position = {
   lastRefreshISO: string;
   accruedBorrowingFees: string;
   canBeLiquidated: boolean;
-  accountId?:string
-}
+  accountId?: string;
+};
 
 export type Token = {
   id?: string;

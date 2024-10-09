@@ -1,5 +1,6 @@
 import { request } from 'graphql-request';
 import {
+  fectchCollateralForOrderUsingAccountId,
   fetchOrdersByIdQuery,
   fetchOrdersByUserQuery,
   fetchPendingOrdersQuery,
@@ -7,10 +8,12 @@ import {
   fetchPriceIdsFromOrderIdsQuery,
 } from './subgraphQueries';
 import {
+  mapDespositCollateralArrayToInterface,
   mapOrdersArrayToInterface,
+  mapSingleDepoistCollateral,
   mapSingleOrderToInterface,
 } from '../../common/subgraphMapper';
-import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
+import { aggregateDepositsBySnxAccountId, EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
 import { NotFoundError } from '../../error/not-found.error';
 import { Order } from '../../interfaces/sdkTypes';
 
@@ -23,8 +26,20 @@ export const getAllOrdersByUserAddress = async (
 ): Promise<Order[]> => {
   try {
     const subgraphResponse: any = await request(subgraphEndpoint, fetchOrdersByUserQuery(userAddress, count, skip));
+    if (!subgraphResponse) throw new Error('Error While Fechting All Order By user Address');
+    const accountIdArray = subgraphResponse?.orders?.map((order: Order) => {
+      return order?.snxAccount?.id;
+    });
+    const collateralSubgraphResponse: any = await request(
+      subgraphEndpoint,
+      fectchCollateralForOrderUsingAccountId(accountIdArray),
+    );
+    const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
+    const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
+    console.log(uniqueAccountIdCollateralMapping);
+
     if (!subgraphResponse) throw new Error('While While Fechting All Order By user Address');
-    const orders = mapOrdersArrayToInterface(subgraphResponse);
+    const orders = mapOrdersArrayToInterface(subgraphResponse, uniqueAccountIdCollateralMapping);
     if (!orders) throw new NotFoundError('Orders not found');
     return orders;
   } catch (error) {
@@ -41,8 +56,20 @@ export const getAllPendingOrders = async (
 ): Promise<Order[]> => {
   try {
     const subgraphResponse: any = await request(subgraphEndpoint, fetchPendingOrdersQuery(timestamp, count, skip));
-    if (!subgraphResponse) throw new Error('Error While Fechting All PendingOrders');
-    const orders = mapOrdersArrayToInterface(subgraphResponse);
+    if (!subgraphResponse) throw new Error('Error While Fechting All Order By user Address');
+    const accountIdArray = subgraphResponse?.orders?.map((order: Order) => {
+      return order?.snxAccount?.id;
+    });
+    const collateralSubgraphResponse: any = await request(
+      subgraphEndpoint,
+      fectchCollateralForOrderUsingAccountId(accountIdArray),
+    );
+    const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
+    const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
+    console.log(uniqueAccountIdCollateralMapping);
+
+    if (!subgraphResponse) throw new Error('While While Fechting All Order By user Address');
+    const orders = mapOrdersArrayToInterface(subgraphResponse, uniqueAccountIdCollateralMapping);
     if (orders) {
       return orders;
     }
@@ -55,10 +82,22 @@ export const getAllPendingOrders = async (
 // Get order from subgraph by order ID
 export const getOrderById = async (subgraphEndpoint: string, orderId: string): Promise<Order> => {
   try {
-    const formattedOrderId = orderId
+    const formattedOrderId = orderId;
     let subgraphResponse: any = await request(subgraphEndpoint, fetchOrdersByIdQuery(formattedOrderId));
     if (!subgraphResponse) throw new Error('Error While Fechting Order By Id');
-    const order = mapSingleOrderToInterface(subgraphResponse.order);
+    const accountIdArray = subgraphResponse?.orders?.map((order: Order) => {
+      return order?.snxAccount?.id;
+    });
+    const collateralSubgraphResponse: any = await request(
+      subgraphEndpoint,
+      fectchCollateralForOrderUsingAccountId(accountIdArray),
+    );
+    const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
+    const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
+    console.log(uniqueAccountIdCollateralMapping);
+
+    if (!subgraphResponse) throw new Error('While While Fechting All Order By user Address');
+    const order = mapSingleOrderToInterface(subgraphResponse.order, uniqueAccountIdCollateralMapping[0]);
     if (order && order.id === orderId) {
       return order;
     }
@@ -76,7 +115,7 @@ export const getPythPriceIdsForOrderIds = async (subgraphEndpoint: string, order
     if (!subgraphResponse) throw new Error('Error While Fechting Pyth Price Ids For Order Ids');
     const priceIds: string[] = [];
 
-    const orders: Order[] = mapOrdersArrayToInterface(subgraphResponse) || [];
+    const orders: Order[] = mapOrdersArrayToInterface(subgraphResponse, []) || [];
     if (orders.length != 0) {
       orders.map((order) => {
         if (order.market?.feedId) {
@@ -93,8 +132,6 @@ export const getPythPriceIdsForOrderIds = async (subgraphEndpoint: string, order
     throw error;
   }
 };
-
-
 
 // Returns the position id related to the order id. If the order ID or position Id does not exists
 // EMPTY_BYTES32 (0x0000) is returned

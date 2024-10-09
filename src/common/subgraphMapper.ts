@@ -1,6 +1,6 @@
-import { formatEther } from 'ethers';
-import {  PriceFeedSnapshot, PythData, Token } from '../interfaces/subgraphTypes';
-import { Market, Order, Position, Wallet } from '../interfaces/sdkTypes';
+import { formatEther, formatUnits } from 'ethers';
+import { PriceFeedSnapshot, PythData, Token } from '../interfaces/subgraphTypes';
+import { DepositCollateral, Market, Order, Position, Wallet } from '../interfaces/sdkTypes';
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    Wallet   ////////////////////////////
@@ -33,7 +33,7 @@ export const mapSubgraphResponseToWalletInterface = (response: any): Wallet | un
 //////////////////////    MARKET    ////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSingleMarketToInterface = (response: any):  Market| undefined => {
+export const mapSingleMarketToInterface = (response: any): Market | undefined => {
   if (response === null) return undefined;
   try {
     return {
@@ -85,32 +85,35 @@ export const mapMarketsArrayToInterface = (response: any): Market[] | undefined 
 //////////////////////    ORDERS    ////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSingleOrderToInterface = (response: any): Order | undefined => {
-  if (response === null) return undefined;
-  console.log('response', response);
-  console.log('response', response.id);
+export const mapSingleOrderToInterface = (
+  orderResponse: any,
+  depositCollateral?: DepositCollateral | undefined,
+): Order | undefined => {
+  if (orderResponse === null) return undefined;
   try {
     return {
-      id: response.id,
-      market: mapSingleMarketToInterface(response.market),
-      user: mapSubgraphResponseToWalletInterface(response.user),
-      isLimitOrder: response.isLimitOrder,
-      deadline: response.expirationTime,
-      deltaCollateral: response.deltaCollateral,
-      deltaSize: response.deltaSize,
-      deltaSizeUsd: response.deltaSizeUsd,
-      expectedPrice: response.expectedPrice,
-      executionFee: response.collectedFees,
-      txHash: response.txHash,
-      createdTimestamp: response.createdTimestamp,
-      status: response.status,
-      settledTxHash: response.settledTxHash,
-      settledTimestamp: response.settledTimestamp,
-      settledTimestampISO: response.settledTimestampISO,
-      executionPrice: response.executionPrice,
-      settledBy: response.settledBy ? mapSubgraphResponseToWalletInterface(response.settledBy) : undefined,
-      positionId: response.position ? response.position.id : undefined,
-      formattedDeltaSize:formatEther(response.deltaSize)
+      id: orderResponse.id,
+      market: mapSingleMarketToInterface(orderResponse.market),
+      user: mapSubgraphResponseToWalletInterface(orderResponse.user),
+      isLimitOrder: orderResponse.isLimitOrder,
+      deadline: orderResponse.expirationTime,
+      deltaCollateral: orderResponse.deltaCollateral,
+      deltaSize: orderResponse.deltaSize,
+      deltaSizeUsd: orderResponse.deltaSizeUsd,
+      expectedPrice: orderResponse.expectedPrice,
+      executionFee: orderResponse.collectedFees,
+      txHash: orderResponse.txHash,
+      createdTimestamp: orderResponse.createdTimestamp,
+      status: orderResponse.status,
+      settledTxHash: orderResponse.settledTxHash,
+      settledTimestamp: orderResponse.settledTimestamp,
+      settledTimestampISO: orderResponse.settledTimestampISO,
+      executionPrice: orderResponse.executionPrice,
+      formattedExecutionPrice: formatEther(orderResponse.executionPrice),
+      settledBy: orderResponse.settledBy ? mapSubgraphResponseToWalletInterface(orderResponse.settledBy) : undefined,
+      positionId: orderResponse.position ? orderResponse.position.id : undefined,
+      formattedDeltaSize: formatEther(orderResponse.deltaSize),
+      depositCollateral: depositCollateral,
     };
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -118,11 +121,29 @@ export const mapSingleOrderToInterface = (response: any): Order | undefined => {
   }
 };
 
-export const mapOrdersArrayToInterface = (response: any): Order[] | undefined => {
+export const mapOrdersArrayToInterface = (
+  response: any,
+  collateralDepositResponse: DepositCollateral[],
+): Order[] | undefined => {
   if (response === null) return undefined;
   try {
     return response.orders.map((order: Order) => {
-      return mapSingleOrderToInterface(order);
+      const depositedCollateral = collateralDepositResponse.find(
+        (collateral: DepositCollateral) => collateral.snxAccountId === order?.snxAccount?.id,
+      );
+      return mapSingleOrderToInterface(order, depositedCollateral);
+    });
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
+
+export const mapDespositCollateralArrayToInterface = (response: any): DepositCollateral[] | undefined => {
+  if (response === null) return undefined;
+  try {
+    return response.collateralDeposits.map((depositedCollateral: DepositCollateral) => {
+      return mapSingleDepoistCollateral(depositedCollateral);
     });
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -147,7 +168,7 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
       avgPrice: response.avgPrice,
       avgPriceDec: response.avgPriceDec,
       status: response.status,
-      accountId:response.account.accountId,
+      accountId: response.account.accountId,
       txHash: response.txHash,
       liquidationTxHash: response.liquidationTxHash,
       closingPrice: response.closingPrice,
@@ -158,7 +179,7 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
       lastRefresh: response.lastRefresh,
       lastRefreshISO: response.lastRefreshISO,
       canBeLiquidated: response.canBeLiquidated,
-      accruedBorrowingFees:response.accruedBorrowingFees,
+      accruedBorrowingFees: response.accruedBorrowingFees,
     };
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -233,6 +254,31 @@ export const mapSubgraphResponseToPythDataInterface = (response: any): PythData 
       tokenAddress: response.tokenAddress,
       price: response.price,
       lastUpdatedTimestamp: response.lastUpdatedTimestamp,
+    };
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
+
+export const mapSingleDepoistCollateral = (collateralDepositsResponse: any): DepositCollateral | undefined => {
+  if (collateralDepositsResponse === null) return undefined;
+  try {
+    return {
+      id: collateralDepositsResponse.id,
+      depositedAmount: collateralDepositsResponse.depositedAmount,
+      collateralName: collateralDepositsResponse.collateralName,
+      collateralSymbol: collateralDepositsResponse.collateralSymbol,
+      collateralDecimals:
+        collateralDepositsResponse.collateralDecimals !== '0' ? collateralDepositsResponse.collateralDecimals : '18',
+      collateralAddress: collateralDepositsResponse.collateralAddress,
+      formattedDepositedAmount: formatUnits(
+        collateralDepositsResponse.depositedAmount,
+        collateralDepositsResponse.collateralDecimals !== '0'
+          ? Number(collateralDepositsResponse.collateralDecimals)
+          : 18, // Ensuring `collateralDecimals` is a number
+      ),
+      snxAccountId: collateralDepositsResponse?.snxAccount?.id,
     };
   } catch (error) {
     console.log('Error while mapping data', error);

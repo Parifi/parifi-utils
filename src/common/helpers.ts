@@ -5,6 +5,7 @@ import {
   PYTH_USDC_USD_PRICE_ID_BETA,
   PYTH_USDC_USD_PRICE_ID_STABLE,
 } from './constants';
+import { DepositCollateral } from '../interfaces/sdkTypes';
 
 export const getDiff = (a: Decimal, b: Decimal): Decimal => {
   return a.gt(b) ? a.minus(b) : b.minus(a);
@@ -66,4 +67,48 @@ export const addPythPriceIdsForCollateralTokens = (isStable: boolean = true, pri
   const collateralPriceIds = getPriceIdsForCollaterals(isStable);
   priceIds.concat(collateralPriceIds);
   return getUniqueValuesFromArray(priceIds);
+};
+
+export const aggregateDepositsBySnxAccountId = (data: DepositCollateral[] | undefined): DepositCollateral[] => {
+  if (!data) return [];
+  // Use reduce to group by snxAccountId and sum the deposited amounts
+  const aggregated = data.reduce<Record<string, DepositCollateral>>((acc, item) => {
+    const {
+      id,
+      snxAccountId,
+      formattedDepositedAmount,
+      collateralAddress,
+      collateralDecimals,
+      collateralName,
+      collateralSymbol,
+      depositedAmount,
+    } = item;
+
+    // If snxAccountId is already in the accumulator, add to its depositedAmount
+    if (acc[snxAccountId]) {
+      acc[snxAccountId].formattedDepositedAmount = (
+        parseFloat(acc[snxAccountId].formattedDepositedAmount) + parseFloat(formattedDepositedAmount)
+      ).toString();
+      acc[snxAccountId].depositedAmount = (
+        parseFloat(acc[snxAccountId].depositedAmount) + parseFloat(depositedAmount)
+      ).toString();
+    } else {
+      // If snxAccountId is not in the accumulator, initialize it
+      acc[snxAccountId] = {
+        id,
+        snxAccountId,
+        collateralDecimals,
+        collateralAddress,
+        collateralName,
+        collateralSymbol,
+        depositedAmount,
+        formattedDepositedAmount: formattedDepositedAmount,
+      };
+    }
+
+    return acc;
+  }, {});
+
+  // Convert the object back to an array
+  return Object.values(aggregated);
 };

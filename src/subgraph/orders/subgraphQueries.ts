@@ -13,16 +13,18 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10, 
   ) {
     id
     market {
-      id,marketName,marketSymbol,feedId 
+      id
+      marketName
+      marketSymbol
+      feedId
     }
-    user { id }
+    user {
+      id
+    }
     expirationTime
-    orderType
-    deltaSize 
+    deltaSize
     deltaCollateral
-   	expectedPrice 
     executionPrice
-    isLong
     isLimitOrder
     status
     createdTimestamp
@@ -31,9 +33,18 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10, 
     collectedFees
     settledTxHash
     settledTimestamp
-    settledBy { id }
-    position { id positionSize }
-  }   
+    deltaSizeUsd
+    settledBy {
+      id
+    }
+    position {
+      id
+      positionSize
+    }
+    snxAccount {
+      id
+    }
+  }  
 }`;
 
 export const fetchPendingOrdersQuery = (
@@ -158,6 +169,24 @@ export const fetchPositionIdsForOrderIds = (orderIds: string[]) => gql`
   ) {
     id
     position { id }
+  }
+}
+`;
+
+export const fectchCollateralForOrderUsingAccountId = (accountId: string[]) => gql`
+{
+    collateralDeposits(where:{
+    snxAccount_in: [${accountId.map((id) => `"${id}"`).join(', ')}]
+  }) {
+    id
+    depositedAmount
+    collateralName
+    collateralSymbol
+    collateralDecimals
+    collateralAddress
+    snxAccount {
+      id
+    }
   }
 }
 `;

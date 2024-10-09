@@ -32,7 +32,14 @@ import {
   getPortfolioDataForUsers,
   getRealizedPnlForUser,
 } from './accounts';
-import { LeaderboardUserData, Market, Order, Position, ReferralRewardsInUsd, UserPortfolioData } from '../interfaces/sdkTypes';
+import {
+  LeaderboardUserData,
+  Market,
+  Order,
+  Position,
+  ReferralRewardsInUsd,
+  UserPortfolioData,
+} from '../interfaces/sdkTypes';
 import { getExecutionFee } from './protocol';
 
 export * from './common';
@@ -103,8 +110,6 @@ export class Subgraph {
     return await getPortfolioDataForUsers(subgraphEndpoint, userAddresses);
   }
 
-
-
   public async getLeaderboardUserData(userAddresses: string[]): Promise<LeaderboardUserData[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getLeaderboardUserData(subgraphEndpoint, userAddresses);
@@ -127,10 +132,10 @@ export class Subgraph {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getOrderById(subgraphEndpoint, orderId);
   }
- public async getUserByAddress(userAddress:string):Promise<any>{
-  const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  return await getAccountByAddress(subgraphEndpoint, userAddress);
- }
+  public async getUserByAddress(userAddress: string): Promise<any> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getAccountByAddress(subgraphEndpoint, userAddress);
+  }
   public async getPythPriceIdsForOrderIds(orderIds: string[]): Promise<string[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getPythPriceIdsForOrderIds(subgraphEndpoint, orderIds);
