@@ -69,46 +69,17 @@ export const addPythPriceIdsForCollateralTokens = (isStable: boolean = true, pri
   return getUniqueValuesFromArray(priceIds);
 };
 
-export const aggregateDepositsBySnxAccountId = (data: DepositCollateral[] | undefined): DepositCollateral[] => {
-  if (!data) return [];
-  // Use reduce to group by snxAccountId and sum the deposited amounts
-  const aggregated = data.reduce<Record<string, DepositCollateral>>((acc, item) => {
-    const {
-      id,
-      snxAccountId,
-      formattedDepositedAmount,
-      collateralAddress,
-      collateralDecimals,
-      collateralName,
-      collateralSymbol,
-      depositedAmount,
-    } = item;
+export const aggregateDepositsBySnxAccountId = (
+  data: DepositCollateral[] | undefined,
+): Record<string, DepositCollateral[]> => {
+  if (!data) return {};
 
-    // If snxAccountId is already in the accumulator, add to its depositedAmount
-    if (acc[snxAccountId]) {
-      acc[snxAccountId].formattedDepositedAmount = (
-        parseFloat(acc[snxAccountId].formattedDepositedAmount) + parseFloat(formattedDepositedAmount)
-      ).toString();
-      acc[snxAccountId].depositedAmount = (
-        parseFloat(acc[snxAccountId].depositedAmount) + parseFloat(depositedAmount)
-      ).toString();
-    } else {
-      // If snxAccountId is not in the accumulator, initialize it
-      acc[snxAccountId] = {
-        id,
-        snxAccountId,
-        collateralDecimals,
-        collateralAddress,
-        collateralName,
-        collateralSymbol,
-        depositedAmount,
-        formattedDepositedAmount: formattedDepositedAmount,
-      };
+  return data.reduce((acc: Record<string, DepositCollateral[]>, item: DepositCollateral) => {
+    const key = item.snxAccountId;
+    if (!acc[key]) {
+      acc[key] = []; // Initialize an empty array if it doesn't exist
     }
-
+    acc[key].push(item); // Push the current item to the array
     return acc;
-  }, {});
-
-  // Convert the object back to an array
-  return Object.values(aggregated);
+  }, {}); // Start with an empty object
 };

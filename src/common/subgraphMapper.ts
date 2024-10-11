@@ -87,7 +87,7 @@ export const mapMarketsArrayToInterface = (response: any): Market[] | undefined 
 
 export const mapSingleOrderToInterface = (
   orderResponse: any,
-  depositCollateral?: DepositCollateral | undefined,
+  depositCollateral?: DepositCollateral[] | undefined,
 ): Order | undefined => {
   if (orderResponse === null) return undefined;
   try {
@@ -100,7 +100,6 @@ export const mapSingleOrderToInterface = (
       deltaCollateral: orderResponse.deltaCollateral,
       deltaSize: orderResponse.deltaSize,
       deltaSizeUsd: orderResponse.deltaSizeUsd,
-      expectedPrice: orderResponse.expectedPrice,
       executionFee: orderResponse.collectedFees,
       txHash: orderResponse.txHash,
       createdTimestamp: orderResponse.createdTimestamp,
@@ -110,10 +109,13 @@ export const mapSingleOrderToInterface = (
       settledTimestampISO: orderResponse.settledTimestampISO,
       executionPrice: orderResponse.executionPrice,
       formattedExecutionPrice: formatEther(orderResponse.executionPrice),
+      expectedPrice: orderResponse.acceptablePrice,
+      formateedExpectedPrice: formatEther(orderResponse.acceptablePrice),
       settledBy: orderResponse.settledBy ? mapSubgraphResponseToWalletInterface(orderResponse.settledBy) : undefined,
       positionId: orderResponse.position ? orderResponse.position.id : undefined,
       formattedDeltaSize: formatEther(orderResponse.deltaSize),
       depositCollateral: depositCollateral,
+      snxAccount: orderResponse.snxAccount.id,
     };
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -123,14 +125,12 @@ export const mapSingleOrderToInterface = (
 
 export const mapOrdersArrayToInterface = (
   response: any,
-  collateralDepositResponse: DepositCollateral[],
+  collateralDepositResponse: Record<string, DepositCollateral[]>,
 ): Order[] | undefined => {
   if (response === null) return undefined;
   try {
     return response.orders.map((order: Order) => {
-      const depositedCollateral = collateralDepositResponse.find(
-        (collateral: DepositCollateral) => collateral.snxAccountId === order?.snxAccount?.id,
-      );
+      const depositedCollateral = collateralDepositResponse[order?.snxAccount?.id || ''];
       return mapSingleOrderToInterface(order, depositedCollateral);
     });
   } catch (error) {
@@ -155,7 +155,10 @@ export const mapDespositCollateralArrayToInterface = (response: any): DepositCol
 //////////////////////    POSITION    //////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSinglePositionToInterface = (response: any): Position | undefined => {
+export const mapSinglePositionToInterface = (
+  response: any,
+  depositCollateral?: DepositCollateral[] | undefined,
+): Position | undefined => {
   if (response === null) return undefined;
   try {
     return {
@@ -166,12 +169,13 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
       positionCollateral: response.positionCollateral,
       positionSize: response.positionSize,
       avgPrice: response.avgPrice,
-      avgPriceDec: response.avgPriceDec,
+      formattedAvgPrice: response.avgPriceDec,
       status: response.status,
-      accountId: response.account.accountId,
+      snxAccount: response.snxAccount.id,
       txHash: response.txHash,
       liquidationTxHash: response.liquidationTxHash,
       closingPrice: response.closingPrice,
+      formattedClosingPrice: formatEther(response.closingPrice),
       realizedPnl: response.realizedPnl,
       realizedFee: response.realizedFee,
       netRealizedPnl: response.netRealizedPnl,
@@ -180,6 +184,7 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
       lastRefreshISO: response.lastRefreshISO,
       canBeLiquidated: response.canBeLiquidated,
       accruedBorrowingFees: response.accruedBorrowingFees,
+      depositCollateral: depositCollateral,
     };
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -187,12 +192,16 @@ export const mapSinglePositionToInterface = (response: any): Position | undefine
   }
 };
 
-export const mapPositionsArrayToInterface = (response: any): Position[] | undefined => {
+export const mapPositionsArrayToInterface = (
+  response: any,
+  collateralDepositResponse: Record<string, DepositCollateral[]>,
+): Position[] | undefined => {
   if (response === null) return undefined;
 
   try {
-    return response.positions.map((position: Position) => {
-      return mapSinglePositionToInterface(position);
+    return response.positions.map((position: any) => {
+      const depositedCollateral = collateralDepositResponse[position?.snxAccount?.id || ''];
+      return mapSinglePositionToInterface(position, depositedCollateral);
     });
   } catch (error) {
     console.log('Error while mapping data', error);

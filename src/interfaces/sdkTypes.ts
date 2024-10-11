@@ -117,8 +117,9 @@ export type Order = {
   positionId?: Position;
   formattedDeltaSize?: string;
   formattedExecutionPrice?: string;
+  formateedExpectedPrice?: string;
   snxAccount?: SnxAccount;
-  depositCollateral?: DepositCollateral;
+  depositCollateral?: DepositCollateral[];
 };
 
 export type DepositCollateral = {
@@ -140,12 +141,13 @@ export type Position = {
   positionCollateral: string;
   positionSize: string;
   avgPrice: string;
-  avgPriceDec: string;
+  formattedAvgPrice: string;
   orders?: Order[];
   status: PositionStatus;
   txHash: string;
   liquidationTxHash?: string;
   closingPrice?: string;
+  formattedClosingPrice?: string;
   realizedPnl: string;
   realizedFee: string;
   netRealizedPnl: string;
@@ -154,7 +156,8 @@ export type Position = {
   lastRefreshISO: string;
   accruedBorrowingFees: string;
   canBeLiquidated: boolean;
-  accountId?: string;
+  snxAccount?: SnxAccount;
+  depositCollateral?: DepositCollateral[];
 };
 
 export type Token = {

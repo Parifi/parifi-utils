@@ -18,8 +18,8 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 1
             user {
             id
             }
-            account{
-              accountId
+            snxAccount{
+              id
             }
             positionSize
             positionCollateral
@@ -67,8 +67,8 @@ export const fetchPositionsByUserQueryAndStatus = (
             user {
             id
             }
-            account{
-              accountId
+            snxAccount{
+              id
             }
             positionSize
             positionCollateral
@@ -104,8 +104,8 @@ export const fetchPositionByIdQuery = (positionId: string) =>
             user {
                 id
             }
-            account{
-              accountId
+            snxAccount{
+              id
             }
             isLong
             positionCollateral
@@ -254,8 +254,8 @@ export const fetchPositionHistoryQuery = (userAddress: string, count: number = 1
             user {
             id
             }
-            account{
-              accountId
+            snxAccount{
+              id
             }
             positionSize
             positionCollateral
@@ -269,17 +269,11 @@ export const fetchPositionHistoryQuery = (userAddress: string, count: number = 1
             liquidationTxHash
             closingPrice
             realizedPnl
-            
             realizedFee
-            
             netRealizedPnl
             createdTimestamp
             lastRefresh
             lastRefreshISO
-            
-            
-            
-            
             canBeLiquidated
             
         }

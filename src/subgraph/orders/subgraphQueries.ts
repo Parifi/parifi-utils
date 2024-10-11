@@ -34,6 +34,7 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10, 
     settledTxHash
     settledTimestamp
     deltaSizeUsd
+    acceptablePrice
     settledBy {
       id
     }
@@ -63,61 +64,81 @@ export const fetchPendingOrdersQuery = (
   ) {
     id
     market {
-      id,marketName,marketSymbol,feedId 
+      id
+      marketName
+      marketSymbol
+      feedId
     }
-    orderType
-    isLong
-    isLimitOrder
+    user {
+      id
+    }
     expirationTime
-    deltaCollateral
     deltaSize
-    deltaSizeUsd
-   	expectedPrice 
+    deltaCollateral
+    executionPrice
+    isLimitOrder
+    status
+    createdTimestamp
+    txHash
     partnerAddress
     collectedFees
-    txHash
-    createdTimestamp
-    status
     settledTxHash
     settledTimestamp
-    settledTimestampISO
-    executionPrice
-    settledBy { id }
-    position { id }
+    deltaSizeUsd
+    acceptablePrice
+    settledBy {
+      id
+    }
+    position {
+      id
+      positionSize
+    }
+    snxAccount {
+      id
+    }
   }
-}
+  }
+
 `;
 
 export const fetchOrdersByIdQuery = (orderId: string) =>
   gql`
   {
     order(id: "${orderId}") {
-    id
+   id
+    market {
+      id
+      marketName
+      marketSymbol
+      feedId
+    }
     user {
       id
     }
-    market {
-      id,marketSymbol,marketName,marketSymbol,feedId 
-    }
-    isLimitOrder
     expirationTime
-    deltaCollateral
     deltaSize
-    collateralToken
-    deltaSizeUsd
-    acceptablePrice 
+    deltaCollateral
+    executionPrice
+    isLimitOrder
+    status
+    createdTimestamp
+    txHash
     partnerAddress
     collectedFees
-    txHash
-    createdTimestamp
-    status
     settledTxHash
     settledTimestamp
-    settledTimestampISO
-    trackingCode
-    executionPrice
-    settledBy { id }
-    position { id }
+    deltaSizeUsd
+    acceptablePrice
+    settledBy {
+      id
+    }
+    position {
+      id
+      positionSize
+    }
+    snxAccount {
+      id
+    }
   }
 }
 `;
