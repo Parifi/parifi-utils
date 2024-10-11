@@ -29,9 +29,7 @@
 
 import Decimal from "decimal.js";
 import { Position } from "../../interfaces/sdkTypes";
-import { InvalidValueError } from "../../error/invalid-value.error";
-import { DECIMAL_10 } from "../../common";
-
+import { formatEther } from 'ethers';
 // // Returns an Order Manager contract instance without signer
 // export const getOrderManagerInstance = (chain: Chain): Contract => {
 //   try {
@@ -43,46 +41,73 @@ import { DECIMAL_10 } from "../../common";
 
 // // Return the Profit or Loss for a position in USD
 // // `normalizedMarketPrice` is the price of market with 8 decimals
+
 export const getProfitOrLossInUsd = (
-  userPosition: Position,
-  normalizedMarketPrice: Decimal,
-  marketDecimals: Decimal,
+  positionData: Position, 
+  normalizedMarketPrice: Decimal, 
+  marketDecimals: number = 18 
 ): { totalProfitOrLoss: Decimal; isProfit: boolean } => {
+
   let profitOrLoss: Decimal;
   let isProfit: boolean;
 
-  if (!userPosition.avgPrice || !userPosition.positionSize) {
-    throw new InvalidValueError('AvgPrice/PositionSize');
-  }
+  const { avgPrice, positionSize, isLong } = positionData;
 
-  const positionAvgPrice = new Decimal(userPosition.avgPrice);
+  const positionAvgPrice = new Decimal(avgPrice).div(Decimal.pow(10, marketDecimals));
+  const positionSizeDecimal = new Decimal(positionSize).abs().div(Decimal.pow(10, marketDecimals));
 
-  if (userPosition.isLong) {
+  if (isLong) {
+    // If long, profit when market price > avg price
     if (normalizedMarketPrice.gt(positionAvgPrice)) {
-      // User position is profitable
       profitOrLoss = normalizedMarketPrice.minus(positionAvgPrice);
       isProfit = true;
     } else {
-      // User position is at loss
       profitOrLoss = positionAvgPrice.minus(normalizedMarketPrice);
       isProfit = false;
     }
   } else {
+    // If short, profit when market price < avg price
     if (normalizedMarketPrice.gt(positionAvgPrice)) {
-      // User position is at loss
       profitOrLoss = normalizedMarketPrice.minus(positionAvgPrice);
       isProfit = false;
     } else {
-      // User position is profitable
       profitOrLoss = positionAvgPrice.minus(normalizedMarketPrice);
       isProfit = true;
     }
   }
-  const totalProfitOrLoss = new Decimal(userPosition.positionSize)
-    .times(profitOrLoss)
-    .dividedBy(DECIMAL_10.pow(marketDecimals));
+
+  // Calculate total profit or loss (PnL)
+  const totalProfitOrLoss = positionSizeDecimal.times(profitOrLoss);
 
   return { totalProfitOrLoss, isProfit };
+};
+
+
+
+export const calculatePositionLeverage = (
+  position: Position, 
+  collateralPrice: number
+): { positionLeverage: Decimal } => {
+  if (!position || !position.depositCollateral?.[0]) {
+    return { positionLeverage: new Decimal(0) };
+  }
+
+  // Calculate collateral in USDC
+  const collateralUsed = position.depositCollateral[0].formattedDepositedAmount || 0;
+  const collateralInUSDC = new Decimal(collateralUsed).times(collateralPrice);
+
+  // Calculate position size in USDC
+  const positionSize = new Decimal(formatEther(BigInt(position.positionSize || 0)));
+  const avgPrice = new Decimal(formatEther(BigInt(position.avgPrice || 0)));
+  const positionSizeInUSDC = positionSize.times(avgPrice);
+
+  // Calculate leverage only if collateralInUSDC is greater than zero
+  if (collateralInUSDC.gt(0)) {
+    const calculatedLeverage = positionSizeInUSDC.div(collateralInUSDC);
+    return { positionLeverage: calculatedLeverage };
+  }
+
+  return { positionLeverage: new Decimal(0) };
 };
 
 // // Returns the Profit or Loss of a position in collateral with decimals

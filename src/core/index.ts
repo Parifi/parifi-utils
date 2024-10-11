@@ -10,6 +10,7 @@ import {
 } from './data-fabric';
 import { Contract, Signer } from 'ethers';
 import {
+  calculatePositionLeverage,
 //   calculateCollateralFromSize,
 //   calculatePositionLeverage,
 //   calculateSizeFromCollateral,
@@ -126,11 +127,15 @@ export class Core {
   getProfitOrLossInUsd = (
     userPosition: Position,
     normalizedMarketPrice: Decimal,
-    marketDecimals: Decimal,
+    marketDecimals: number,
   ): { totalProfitOrLoss: Decimal; isProfit: boolean } => {
     return getProfitOrLossInUsd(userPosition, normalizedMarketPrice, marketDecimals);
   };
-
+  calculatePositionLeverage = (
+    position:Position , collateralInUsd:number
+  ): { positionLeverage: Decimal } => {
+    return calculatePositionLeverage(position,collateralInUsd);
+  };
   getPnlWithoutFeesInCollateral = (
     position: Position,
     market: Market,
@@ -148,6 +153,7 @@ export class Core {
   ): Decimal => {
     return this.getDeviatedMarketPriceInUsd(market, normalizedMarketPrice, isLong, isIncrease);
   };
+  
 
   // isPositionLiquidatable = (
   //   position: Position,

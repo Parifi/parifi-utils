@@ -20,13 +20,11 @@ describe('Order fetching logic from subgraph', () => {
     // console.log(positionId);
     // expect(position.id).toBe(positionId);
     // expect(position.status).toBe('OPEN');
-    const orderData = await parifiSdk.subgraph.getAllPositionsByUserAddress(
-      '0x0000000000000000000000000000000000000000',
+    const orderData = await parifiSdk.subgraph.getOpenPositionsByUserAddress(
+      '0x59b331ec59802598925cf386d221e736b35112ae',
       100,
       0,
     );
-
-    console.log(orderData);
   });
 
   // it('should return position details by status: OPEN', async () => {

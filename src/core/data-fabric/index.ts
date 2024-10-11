@@ -122,12 +122,13 @@ export const getPythNetworkUrl = (() => {
   
   export const alchemyRpcPerChain = {
     [Chain.ARBITRUM_MAINNET]: `https://arb-mainnet.g.alchemy.com/v2/pkGkXwClv6s-PfIbD2v6HvVOIjzncw2Q`,
+    [Chain.ARBITRUM_SEPOLIA]:`https://arb-sepolia.g.alchemy.com/v2/pkGkXwClv6s-PfIbD2v6HvVOIjzncw2Q`
   };
   
   const config = {
     rpcConfig: {
-      chainId: Chain.ARBITRUM_MAINNET,
-      rpcEndpoint: alchemyRpcPerChain[Chain.ARBITRUM_MAINNET],
+      chainId: Chain.ARBITRUM_SEPOLIA,
+      rpcEndpoint: alchemyRpcPerChain[Chain.ARBITRUM_SEPOLIA],
       preset: 'main',
     },
     pythConfig: {

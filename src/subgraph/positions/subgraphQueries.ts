@@ -87,7 +87,6 @@ export const fetchPositionsByUserQueryAndStatus = (
             lastRefresh
             lastRefreshISO
             canBeLiquidated
-            
         }
     }`;
 
@@ -123,7 +122,6 @@ export const fetchPositionByIdQuery = (positionId: string) =>
             lastRefresh
             lastRefreshISO
             canBeLiquidated
-                        
         }
     }`;
 
@@ -275,6 +273,6 @@ export const fetchPositionHistoryQuery = (userAddress: string, count: number = 1
             lastRefresh
             lastRefreshISO
             canBeLiquidated
-            
+            accruedBorrowingFees
         }
     }`;
