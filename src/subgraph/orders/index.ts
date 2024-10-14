@@ -86,12 +86,9 @@ export const getOrderById = async (subgraphEndpoint: string, orderId: string): P
     const formattedOrderId = orderId;
     let subgraphResponse: any = await request(subgraphEndpoint, fetchOrdersByIdQuery(formattedOrderId));
     if (!subgraphResponse) throw new Error('Error While Fechting Order By Id');
-    const accountIdArray = subgraphResponse?.orders?.map((order: Order) => {
-      return order?.snxAccount?.id;
-    });
     const collateralSubgraphResponse: any = await request(
       subgraphEndpoint,
-      fectchCollateralForOrderUsingAccountId(accountIdArray),
+      fectchCollateralForOrderUsingAccountId(subgraphResponse?.order?.snxAccount?.id || ''),
     );
     const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
     const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);

@@ -26,8 +26,8 @@ import {
   getUniqueValuesFromArray,
 } from '../../common';
 import Decimal from 'decimal.js';
-import { Order, Position } from '../../interfaces/sdkTypes';
 import { fectchCollateralForOrderUsingAccountId } from '../orders/subgraphQueries';
+import { Position,Order } from '../../interfaces/sdkTypes';
 
 /// Position Ids interface to format subgraph response to string array
 interface PositionIdsSubgraphResponse {
@@ -107,7 +107,6 @@ export const getClosedPositionsByUserAddress = async (
     const query = fetchPositionsByUserQueryAndStatus(userAddress, 'CLOSED', count, skip);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
     if (!subgraphResponse) throw Error(`Error fetching Closed Positions By UserAddress`);
-    console.log(subgraphResponse);
     const accountIdArray = subgraphResponse?.positions?.map((position: Position) => {
       return position?.snxAccount?.id;
     });

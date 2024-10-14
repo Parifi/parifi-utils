@@ -70,11 +70,14 @@ export const addPythPriceIdsForCollateralTokens = (isStable: boolean = true, pri
 };
 
 export const aggregateDepositsBySnxAccountId = (
-  data: DepositCollateral[] | undefined,
+  data: DepositCollateral[] | DepositCollateral | undefined,
 ): Record<string, DepositCollateral[]> => {
   if (!data) return {};
 
-  return data.reduce((acc: Record<string, DepositCollateral[]>, item: DepositCollateral) => {
+  // Ensure we are working with an array
+  const depositsArray = Array.isArray(data) ? data : [data];
+
+  return depositsArray.reduce((acc: Record<string, DepositCollateral[]>, item: DepositCollateral) => {
     const key = item.snxAccountId;
     if (!acc[key]) {
       acc[key] = []; // Initialize an empty array if it doesn't exist

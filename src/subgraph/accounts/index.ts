@@ -5,11 +5,9 @@ import {
   fetchLeaderboardUserData,
   fetchPortfolioData,
   fetchRealizedPnlData,
-  fetchReferralRewardsInUsd,
-  fetchTopAccountsByReferralFees,
 } from './subgraphQueries';
 import { DECIMAL_ZERO, PRICE_FEED_PRECISION } from '../../common';
-import { LeaderboardUserData, ReferralRewardsInUsd, UserPortfolioData } from '../../interfaces/sdkTypes';
+import { LeaderboardUserData, UserPortfolioData } from '../../interfaces/sdkTypes';
 
 /// Returns the Realized PNL for positions and vaults for a user address
 export const getRealizedPnlForUser = async (

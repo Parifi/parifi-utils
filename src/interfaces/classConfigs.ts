@@ -21,7 +21,6 @@ export interface SubgraphConfig {
 export interface RelayerConfig {
   gelatoConfig?: RelayerI;
   parifiRealyerConfig?: RelayerI;
-  pimlicoConfig?: RelayerI;
 }
 
 // Common relayer config to configure relayers 

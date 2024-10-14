@@ -130,6 +130,7 @@ export class Subgraph {
 
   public async getOrderById(orderId: string): Promise<Order> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    
     return await getOrderById(subgraphEndpoint, orderId);
   }
   public async getUserByAddress(userAddress: string): Promise<any> {

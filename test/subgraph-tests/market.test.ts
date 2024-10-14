@@ -7,5 +7,7 @@ describe('Market fetching logic from subgraph', () => {
     const marketId = TEST_MARKET_ID1;
     const market = await parifiSdk.subgraph.getMarketById(marketId);
     expect(market.id).toBe(marketId);
+    expect(market.marketName).toBe("Ethereum")
+    expect(market.marketSymbol).toBe("ETH")
   });
 });
