@@ -59,10 +59,3 @@ export const calculatePositionLeverage = (
 
   return { positionLeverage: new Decimal(0) };
 };
-
-/**
- * 
- * approved fee sdk remove function  : call directly on inte
- * 
- * 
- */
