@@ -150,6 +150,7 @@ export type Position = {
   formattedClosingPrice?: string;
   realizedPnl: string;
   realizedFee: string;
+  formattedRealizedFee: string;
   netRealizedPnl: string;
   createdTimestamp: string;
   lastRefresh: string;
