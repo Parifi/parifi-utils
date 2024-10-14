@@ -169,7 +169,7 @@ export const mapSinglePositionToInterface = (
       positionCollateral: response.positionCollateral,
       positionSize: response.positionSize,
       avgPrice: response.avgPrice,
-      formattedAvgPrice: response.avgPriceDec,
+      formattedAvgPrice: formatEther(response.avgPrice),
       status: response.status,
       snxAccount: response.snxAccount.id,
       txHash: response.txHash,

@@ -27,8 +27,8 @@
 // import { InvalidValueError } from '../../error/invalid-value.error';
 // import { AbiCoder } from 'ethers';
 
-import Decimal from "decimal.js";
-import { Position } from "../../interfaces/sdkTypes";
+import Decimal from 'decimal.js';
+import { Position } from '../../interfaces/sdkTypes';
 import { formatEther } from 'ethers';
 // // Returns an Order Manager contract instance without signer
 // export const getOrderManagerInstance = (chain: Chain): Contract => {
@@ -43,11 +43,10 @@ import { formatEther } from 'ethers';
 // // `normalizedMarketPrice` is the price of market with 8 decimals
 
 export const getProfitOrLossInUsd = (
-  positionData: Position, 
-  normalizedMarketPrice: Decimal, 
-  marketDecimals: number = 18 
+  positionData: Position,
+  normalizedMarketPrice: Decimal,
+  marketDecimals: number = 18,
 ): { totalProfitOrLoss: Decimal; isProfit: boolean } => {
-
   let profitOrLoss: Decimal;
   let isProfit: boolean;
 
@@ -55,7 +54,7 @@ export const getProfitOrLossInUsd = (
 
   const positionAvgPrice = new Decimal(avgPrice).div(Decimal.pow(10, marketDecimals));
   const positionSizeDecimal = new Decimal(positionSize).abs().div(Decimal.pow(10, marketDecimals));
-
+  // remove isProfit var
   if (isLong) {
     // If long, profit when market price > avg price
     if (normalizedMarketPrice.gt(positionAvgPrice)) {
@@ -82,11 +81,10 @@ export const getProfitOrLossInUsd = (
   return { totalProfitOrLoss, isProfit };
 };
 
-
-
 export const calculatePositionLeverage = (
-  position: Position, 
-  collateralPrice: number
+  position: Position,
+  collateralPrice: number,
+  marketPrice: number,
 ): { positionLeverage: Decimal } => {
   if (!position || !position.depositCollateral?.[0]) {
     return { positionLeverage: new Decimal(0) };
@@ -98,8 +96,8 @@ export const calculatePositionLeverage = (
 
   // Calculate position size in USDC
   const positionSize = new Decimal(formatEther(BigInt(position.positionSize || 0)));
-  const avgPrice = new Decimal(formatEther(BigInt(position.avgPrice || 0)));
-  const positionSizeInUSDC = positionSize.times(avgPrice);
+  const avgPrice = new Decimal(formatEther(BigInt(marketPrice || 0)));
+  const positionSizeInUSDC = positionSize.times(marketPrice);
 
   // Calculate leverage only if collateralInUSDC is greater than zero
   if (collateralInUSDC.gt(0)) {

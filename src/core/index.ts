@@ -2,31 +2,31 @@ import Decimal from 'decimal.js';
 import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
 import {
   getAccruedFeesInMarket,
-//   getBaseBorrowRatePerSecond,
-//   getDynamicBorrowRatePerSecond,
-//   getMarketSkew,
-//   getMarketSkewUi,
-//   getMarketUtilization,
+  //   getBaseBorrowRatePerSecond,
+  //   getDynamicBorrowRatePerSecond,
+  //   getMarketSkew,
+  //   getMarketSkewUi,
+  //   getMarketUtilization,
 } from './data-fabric';
 import { Contract, Signer } from 'ethers';
 import {
   calculatePositionLeverage,
-//   calculateCollateralFromSize,
-//   calculatePositionLeverage,
-//   calculateSizeFromCollateral,
-//   canBeSettled,
-//   canBeSettledPriceId,
-//   checkIfOrderCanBeSettledId,
-//   getLiquidationPrice,
-//   getNetProfitOrLossInCollateral,
-//   getOrderManagerInstance,
-//   getExpectedPositionIdFromNonce,
+  //   calculateCollateralFromSize,
+  //   calculatePositionLeverage,
+  //   calculateSizeFromCollateral,
+  //   canBeSettled,
+  //   canBeSettledPriceId,
+  //   checkIfOrderCanBeSettledId,
+  //   getLiquidationPrice,
+  //   getNetProfitOrLossInCollateral,
+  //   getOrderManagerInstance,
+  //   getExpectedPositionIdFromNonce,
   getProfitOrLossInUsd,
-//   getUserExpectedPositionId,
-//   getUserPositionNonce,
-//   isPositionLiquidatable,
-//   liquidatePositionUsingGelato,
-//   settleOrderUsingGelato,
+  //   getUserExpectedPositionId,
+  //   getUserPositionNonce,
+  //   isPositionLiquidatable,
+  //   liquidatePositionUsingGelato,
+  //   settleOrderUsingGelato,
 } from './order-manager';
 // import { checkIfOrderCanBeSettled } from './order-manager/';
 import {
@@ -86,8 +86,8 @@ export class Core {
   //   return getBaseBorrowRatePerSecond(market);
   // };
 
-  getAccruedFeesInMarket = async(marketIdOrName:string | number,accountId:bigint): Promise<Decimal> => {
-    return await getAccruedFeesInMarket(marketIdOrName,accountId);
+  getAccruedFeesInMarket = async (marketIdOrName: string | number, accountId: bigint): Promise<Decimal> => {
+    return await getAccruedFeesInMarket(marketIdOrName, accountId);
   };
 
   ////////////////////////////////////////////////////////////////
@@ -132,9 +132,11 @@ export class Core {
     return getProfitOrLossInUsd(userPosition, normalizedMarketPrice, marketDecimals);
   };
   calculatePositionLeverage = (
-    position:Position , collateralInUsd:number
+    position: Position,
+    collateralPrice: number,
+    marketPrice: number,
   ): { positionLeverage: Decimal } => {
-    return calculatePositionLeverage(position,collateralInUsd);
+    return calculatePositionLeverage(position, collateralPrice, marketPrice);
   };
   getPnlWithoutFeesInCollateral = (
     position: Position,
@@ -153,7 +155,6 @@ export class Core {
   ): Decimal => {
     return this.getDeviatedMarketPriceInUsd(market, normalizedMarketPrice, isLong, isIncrease);
   };
-  
 
   // isPositionLiquidatable = (
   //   position: Position,
