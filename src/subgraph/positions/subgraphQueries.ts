@@ -20,6 +20,7 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 1
             }
             snxAccount{
               id
+              accountId
             }
             positionSize
             positionCollateral
@@ -69,6 +70,7 @@ export const fetchPositionsByUserQueryAndStatus = (
             }
             snxAccount{
               id
+              accountId
             }
             positionSize
             positionCollateral
@@ -105,6 +107,7 @@ export const fetchPositionByIdQuery = (positionId: string) =>
             }
             snxAccount{
               id
+              accountId
             }
             isLong
             positionCollateral
@@ -190,50 +193,6 @@ export const fetchAllPositionsUnrealizedPnl = (userAddress: string) => gql`
   }
 `;
 
-// Fetches the order ids related to a specific position id
-export const fetchAllOrdersForPosition = (positionId: string) => gql`
-{
-  orders(
-    where: {position: "${positionId}"}
-  ) {
-    id
-    user {
-      id
-    }
-    market {
-      id,marketName,marketSymbol,feedId 
-    }
-    
-    orderType
-    isLong
-    isLimitOrder
-    triggerAbove
-    deadline
-    deadlineISO
-    deltaCollateral
-    deltaSize
-    deltaSizeUsd
-    expectedPrice
-    maxSlippage
-    partnerAddress
-    executionFee
-    txHash
-    createdTimestamp
-    status
-    settledTxHash
-    settledTimestamp
-    settledTimestampISO
-    executionPrice
-    settledBy {
-      id
-    }
-    cancellationTxHash
-    position {
-      id
-    }
-  }
-}`;
-
 // Fetches all positions by a user (Both open and closed)
 export const fetchPositionHistoryQuery = (userAddress: string, count: number = 100, skip: number = 0) =>
   gql`
@@ -254,6 +213,7 @@ export const fetchPositionHistoryQuery = (userAddress: string, count: number = 1
             }
             snxAccount{
               id
+              accountId
             }
             positionSize
             positionCollateral

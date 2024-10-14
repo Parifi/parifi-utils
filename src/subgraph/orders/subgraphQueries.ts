@@ -138,6 +138,7 @@ export const fetchOrdersByIdQuery = (orderId: string) =>
     }
     snxAccount {
       id
+      accountId
     }
   }
 }
@@ -207,6 +208,7 @@ export const fectchCollateralForOrderUsingAccountId = (accountId: string | strin
     collateralAddress
     snxAccount {
       id
+      accountId
     }
   }
 }

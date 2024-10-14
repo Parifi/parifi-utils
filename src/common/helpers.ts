@@ -78,7 +78,7 @@ export const aggregateDepositsBySnxAccountId = (
   const depositsArray = Array.isArray(data) ? data : [data];
 
   return depositsArray.reduce((acc: Record<string, DepositCollateral[]>, item: DepositCollateral) => {
-    const key = item.snxAccountId;
+    const key = item.snxAccount.id;
     if (!acc[key]) {
       acc[key] = []; // Initialize an empty array if it doesn't exist
     }

@@ -1,6 +1,5 @@
 import Decimal from 'decimal.js';
 import { OrderStatus, PositionStatus, PythData, SnxAccountType } from './subgraphTypes';
-import { S } from '@parifi/synthetix-sdk-ts/dist/index-BTlMb-Ja';
 
 /// Interface to return portfolio total from the sdk
 export type UserPortfolioData = {
@@ -118,7 +117,10 @@ export type Order = {
   formattedDeltaSize?: string;
   formattedExecutionPrice?: string;
   formateedExpectedPrice?: string;
-  snxAccount?: SnxAccount;
+  snxAccount?: {
+    id?: string;
+    accountId?: string;
+  };
   depositCollateral?: DepositCollateral[];
 };
 
@@ -129,7 +131,10 @@ export type DepositCollateral = {
   collateralSymbol: string;
   collateralDecimals: string;
   collateralAddress: string;
-  snxAccountId: string;
+  snxAccount: {
+    id: string;
+    accountId: string;
+  };
   formattedDepositedAmount: string;
 };
 
@@ -157,7 +162,10 @@ export type Position = {
   lastRefreshISO: string;
   accruedBorrowingFees: string;
   canBeLiquidated: boolean;
-  snxAccount?: SnxAccount;
+  snxAccount?: {
+    id?: string;
+    accountId?: string;
+  };
   depositCollateral?: DepositCollateral[];
 };
 

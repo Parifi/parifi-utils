@@ -115,7 +115,10 @@ export const mapSingleOrderToInterface = (
       positionId: orderResponse.position ? orderResponse.position.id : undefined,
       formattedDeltaSize: formatEther(orderResponse.deltaSize),
       depositCollateral: depositCollateral,
-      snxAccount: orderResponse.snxAccount.id,
+      snxAccount: {
+        id: orderResponse.snxAccount.id,
+        accountId: orderResponse.snxAccount.accountId,
+      },
     };
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -171,7 +174,6 @@ export const mapSinglePositionToInterface = (
       avgPrice: response.avgPrice,
       formattedAvgPrice: formatEther(response.avgPrice),
       status: response.status,
-      snxAccount: response.snxAccount.id,
       txHash: response.txHash,
       liquidationTxHash: response.liquidationTxHash,
       closingPrice: response.closingPrice,
@@ -186,6 +188,10 @@ export const mapSinglePositionToInterface = (
       accruedBorrowingFees: response.accruedBorrowingFees,
       depositCollateral: depositCollateral,
       formattedRealizedFee: formatEther(response.realizedFee),
+      snxAccount: {
+        id: response.snxAccount.id,
+        accountId: response.snxAccount.accountId,
+      },
     };
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -288,7 +294,10 @@ export const mapSingleDepoistCollateral = (collateralDepositsResponse: any): Dep
           ? Number(collateralDepositsResponse.collateralDecimals)
           : 18, // Ensuring `collateralDecimals` is a number
       ),
-      snxAccountId: collateralDepositsResponse?.snxAccount?.id,
+      snxAccount: {
+        id: collateralDepositsResponse?.snxAccount?.id,
+        accountId: collateralDepositsResponse?.snxAccount?.accountId,
+      },
     };
   } catch (error) {
     console.log('Error while mapping data', error);

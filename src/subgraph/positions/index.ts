@@ -1,6 +1,5 @@
 import { request } from 'graphql-request';
 import {
-  fetchAllOrdersForPosition,
   fetchAllPositionsForCollateralData,
   fetchAllPositionsUnrealizedPnl,
   fetchPositionByIdQuery,
@@ -27,7 +26,7 @@ import {
 } from '../../common';
 import Decimal from 'decimal.js';
 import { fectchCollateralForOrderUsingAccountId } from '../orders/subgraphQueries';
-import { Position,Order } from '../../interfaces/sdkTypes';
+import { Position, Order } from '../../interfaces/sdkTypes';
 
 /// Position Ids interface to format subgraph response to string array
 interface PositionIdsSubgraphResponse {
@@ -291,38 +290,6 @@ export const getTotalUnrealizedPnlInUsd = async (subgraphEndpoint: string, userA
       totalNetUnrealizedPnlInUsd = totalNetUnrealizedPnlInUsd.add(unrealizedPnlInUsd);
     });
     return totalNetUnrealizedPnlInUsd;
-  } catch (error) {
-    throw error;
-  }
-};
-
-// Returns all orders associated with a position ID
-export const getAllOrdersForPosition = async (subgraphEndpoint: string, positionId: string): Promise<Order[]> => {
-  try {
-    interface PositionRelatedOrders {
-      orders: Order[];
-    }
-
-    const subgraphResponse: PositionRelatedOrders = await request(
-      subgraphEndpoint,
-      fetchAllOrdersForPosition(positionId),
-    );
-
-    if (!subgraphResponse) throw new Error('Error fetching orders for positionId');
-    if (subgraphResponse.orders.length == 0) {
-      return [];
-    }
-
-    // Store the final orders array
-    const orders: Order[] = [];
-
-    subgraphResponse.orders.forEach((order) => {
-      const formattedOrder = mapSingleOrderToInterface(order);
-      if (formattedOrder != undefined) {
-        orders.push(order);
-      }
-    });
-    return orders;
   } catch (error) {
     throw error;
   }
