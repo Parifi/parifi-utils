@@ -96,8 +96,8 @@ export const calculatePositionLeverage = (
 
   // Calculate position size in USDC
   const positionSize = new Decimal(formatEther(BigInt(position.positionSize || 0)));
-  const avgPrice = new Decimal(formatEther(BigInt(marketPrice || 0)));
-  const positionSizeInUSDC = positionSize.times(marketPrice);
+  const marketPriceDecimal = new Decimal(formatEther(BigInt(marketPrice || 0)));
+  const positionSizeInUSDC = positionSize.times(marketPriceDecimal);
 
   // Calculate leverage only if collateralInUSDC is greater than zero
   if (collateralInUSDC.gt(0)) {
