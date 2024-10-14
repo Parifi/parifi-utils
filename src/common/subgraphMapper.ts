@@ -185,6 +185,7 @@ export const mapSinglePositionToInterface = (
       canBeLiquidated: response.canBeLiquidated,
       accruedBorrowingFees: response.accruedBorrowingFees,
       depositCollateral: depositCollateral,
+      formattedRealizedFee: formatEther(response.realizedFee),
     };
   } catch (error) {
     console.log('Error while mapping data', error);

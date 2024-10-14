@@ -1,4 +1,5 @@
 import { getParifiSdkInstanceForTesting } from '..';
+import { ParifiSdk } from '../../src';
 import { TEST_POSITION_ID1, TEST_POSITION_ID2, TEST_USER_ID2 } from '../common/constants';
 // import { PositionStatus } from '../../src';
 // import {
@@ -25,6 +26,14 @@ describe('Order fetching logic from subgraph', () => {
       100,
       0,
     );
+
+    const positionData = await parifiSdk.subgraph.getPositionsHistory(
+      '0x2f42d303b34c29e1f3feb9ce5d5355f1e101f99d',
+      100,
+      0,
+    );
+
+    console.log(positionData);
   });
 
   // it('should return position details by status: OPEN', async () => {

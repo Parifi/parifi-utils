@@ -261,7 +261,6 @@ export const fetchPositionHistoryQuery = (userAddress: string, count: number = 1
             avgPriceDec
             isLong
             createdTimestamp
-            
             status
             txHash
             liquidationTxHash
