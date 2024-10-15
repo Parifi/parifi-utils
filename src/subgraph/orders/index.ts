@@ -1,20 +1,20 @@
 import { request } from 'graphql-request';
-import { Order, Referral } from '../../interfaces/subgraphTypes';
 import {
+  fetchCollateralForOrderUsingAccountId,
   fetchOrdersByIdQuery,
   fetchOrdersByUserQuery,
-  fetchPartnerRewards,
   fetchPendingOrdersQuery,
   fetchPositionIdsForOrderIds,
   fetchPriceIdsFromOrderIdsQuery,
 } from './subgraphQueries';
 import {
+  mapDespositCollateralArrayToInterface,
   mapOrdersArrayToInterface,
-  mapReferralsArrayToInterface,
   mapSingleOrderToInterface,
 } from '../../common/subgraphMapper';
-import { EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
+import { aggregateDepositsBySnxAccountId, EMPTY_BYTES32, getUniqueValuesFromArray } from '../../common';
 import { NotFoundError } from '../../error/not-found.error';
+import { Order } from '../../interfaces/sdkTypes';
 
 // Get all order by a user address
 export const getAllOrdersByUserAddress = async (
@@ -25,8 +25,21 @@ export const getAllOrdersByUserAddress = async (
 ): Promise<Order[]> => {
   try {
     const subgraphResponse: any = await request(subgraphEndpoint, fetchOrdersByUserQuery(userAddress, count, skip));
+    if (!subgraphResponse) throw new Error('Error While Fechting All Order By user Address');
+    const accountIdArray = subgraphResponse?.orders?.map((order: Order) => {
+      return order?.snxAccount?.id;
+    });
+    const collateralSubgraphResponse: any = await request(
+      subgraphEndpoint,
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
+    );
+    const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
+    // console.log(collateralDeposit);
+    const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
+    // console.log(uniqueAccountIdCollateralMapping);
+
     if (!subgraphResponse) throw new Error('While While Fechting All Order By user Address');
-    const orders = mapOrdersArrayToInterface(subgraphResponse);
+    const orders = mapOrdersArrayToInterface(subgraphResponse, uniqueAccountIdCollateralMapping);
     if (!orders) throw new NotFoundError('Orders not found');
     return orders;
   } catch (error) {
@@ -43,8 +56,21 @@ export const getAllPendingOrders = async (
 ): Promise<Order[]> => {
   try {
     const subgraphResponse: any = await request(subgraphEndpoint, fetchPendingOrdersQuery(timestamp, count, skip));
-    if (!subgraphResponse) throw new Error('Error While Fechting All PendingOrders');
-    const orders = mapOrdersArrayToInterface(subgraphResponse);
+
+    if (!subgraphResponse) throw new Error('Error While Fechting All Order By user Address');
+    const accountIdArray = subgraphResponse?.orders?.map((order: Order) => {
+      return order?.snxAccount?.id;
+    });
+    const collateralSubgraphResponse: any = await request(
+      subgraphEndpoint,
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
+    );
+    const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
+    const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
+    // console.log(uniqueAccountIdCollateralMapping);
+
+    if (!subgraphResponse) throw new Error('While While Fechting All Order By user Address');
+    const orders = mapOrdersArrayToInterface(subgraphResponse, uniqueAccountIdCollateralMapping);
     if (orders) {
       return orders;
     }
@@ -57,10 +83,21 @@ export const getAllPendingOrders = async (
 // Get order from subgraph by order ID
 export const getOrderById = async (subgraphEndpoint: string, orderId: string): Promise<Order> => {
   try {
-    const formattedOrderId = orderId.toLowerCase();
+    const formattedOrderId = orderId;
     let subgraphResponse: any = await request(subgraphEndpoint, fetchOrdersByIdQuery(formattedOrderId));
     if (!subgraphResponse) throw new Error('Error While Fechting Order By Id');
-    const order = mapSingleOrderToInterface(subgraphResponse.order);
+    const collateralSubgraphResponse: any = await request(
+      subgraphEndpoint,
+      fetchCollateralForOrderUsingAccountId(subgraphResponse?.order?.snxAccount?.id || ''),
+    );
+    const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
+    const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
+
+    if (!subgraphResponse) throw new Error('While While Fechting All Order By user Address');
+    const order = mapSingleOrderToInterface(
+      subgraphResponse.order,
+      uniqueAccountIdCollateralMapping[subgraphResponse.order.snxAccount.id],
+    );
     if (order && order.id === orderId) {
       return order;
     }
@@ -78,11 +115,11 @@ export const getPythPriceIdsForOrderIds = async (subgraphEndpoint: string, order
     if (!subgraphResponse) throw new Error('Error While Fechting Pyth Price Ids For Order Ids');
     const priceIds: string[] = [];
 
-    const orders: Order[] = mapOrdersArrayToInterface(subgraphResponse) || [];
+    const orders: Order[] = mapOrdersArrayToInterface(subgraphResponse, {}) || [];
     if (orders.length != 0) {
       orders.map((order) => {
-        if (order.market?.pyth?.id) {
-          priceIds.push(order.market?.pyth?.id);
+        if (order.market?.feedId) {
+          priceIds.push(order.market?.feedId);
         }
       });
     }
@@ -92,24 +129,6 @@ export const getPythPriceIdsForOrderIds = async (subgraphEndpoint: string, order
     return uniquePriceIds.filter((id) => id !== EMPTY_BYTES32);
   } catch (error) {
     console.log('Error mapping price ids');
-    throw error;
-  }
-};
-
-// Returns the referral data of a partner
-export const getReferralDataForPartner = async (
-  subgraphEndpoint: string,
-  partnerAddress: string,
-  count: number = 20,
-  skip: number = 0,
-): Promise<Referral[]> => {
-  try {
-    const query = fetchPartnerRewards(partnerAddress.toLowerCase(), count, skip);
-    const subgraphResponse = await request(subgraphEndpoint, query);
-    if (!subgraphResponse) throw new Error('Error While Fechting Referral Data For Partner');
-    const referrals: Referral[] = mapReferralsArrayToInterface(subgraphResponse) ?? [];
-    return referrals;
-  } catch (error) {
     throw error;
   }
 };

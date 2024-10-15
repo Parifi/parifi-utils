@@ -104,6 +104,14 @@ export const fetchTopAccountsByReferralFees = (count: number = 20, skip: number 
     unclaimedReferralRewardsWeth
   }
 }`;
+export const fetchAccountByWalletAddress = (walletAddress: string) =>
+ gql`
+  {
+    wallet(id: "${walletAddress}") {
+      id
+    }
+  }
+`;
 
 // Fetch account specific data for a user address for Leaderboard view
 export const fetchLeaderboardUserData = (userAddresses: string[]) => gql`

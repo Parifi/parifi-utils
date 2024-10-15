@@ -2,8 +2,8 @@ import { Contract, ethers } from 'ethers';
 import { Chain, contracts } from '@parifi/references';
 import { contracts as parifiContracts } from '@parifi/references';
 
-import { SUBGRAPH_HELPER_ADDRESS } from '../../common';
-import { getPositionsToRefresh } from '../../subgraph';
+// import { SUBGRAPH_HELPER_ADDRESS } from '../../common';
+// import { getPositionsToRefresh } from '../../subgraph';
 
 const subgraphHelperAbi = [
   {
@@ -44,14 +44,14 @@ export const getSubgraphHelperInstance = (chain: Chain): Contract => {
   }
 };
 
-// Returns tx data to refresh positions on subgraph using the Subgraph Helper contract
-export const getPositionRefreshTxData = async (
-  chainId: Chain,
-  subgraphEndpoint: string,
-): Promise<{ txData: string }> => {
-  const positionsCount = 25;
-  const positionsToRefresh = await getPositionsToRefresh(subgraphEndpoint, positionsCount);
-  const subgraphHelper = getSubgraphHelperInstance(chainId);
-  const { data: txData } = await subgraphHelper.triggerPositionUpdate.populateTransaction(positionsToRefresh);
-  return { txData };
-};
+// // Returns tx data to refresh positions on subgraph using the Subgraph Helper contract
+// export const getPositionRefreshTxData = async (
+//   chainId: Chain,
+//   subgraphEndpoint: string,
+// ): Promise<{ txData: string }> => {
+//   const positionsCount = 25;
+//   const positionsToRefresh = await getPositionsToRefresh(subgraphEndpoint, positionsCount);
+//   const subgraphHelper = getSubgraphHelperInstance(chainId);
+//   const { data: txData } = await subgraphHelper.triggerPositionUpdate.populateTransaction(positionsToRefresh);
+//   return { txData };
+// };

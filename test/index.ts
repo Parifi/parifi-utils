@@ -1,6 +1,7 @@
 import { Chain } from '@parifi/references';
 import { ParifiSdk, PythConfig, RelayerConfig, RelayerI, RpcConfig, SubgraphConfig } from '../src';
-
+import * as dotenv from 'dotenv';
+dotenv.config();
 export const getParifiSdkInstanceForTesting = async (): Promise<ParifiSdk> => {
   const chain = Chain.ARBITRUM_MAINNET;
   const rpcConfig: RpcConfig = {
@@ -23,16 +24,10 @@ export const getParifiSdkInstanceForTesting = async (): Promise<ParifiSdk> => {
     apiKey: process.env.GELATO_KEY || '',
   };
 
-  const pimlicoConfig: RelayerI = {
-    apiKey: process.env.PIMLICO_API_KEY,
-    password: process.env.PRIVATE_KEY,
-  };
 
   const relayerConfig: RelayerConfig = {
     gelatoConfig: gelatoConfig,
-    pimlicoConfig: pimlicoConfig,
   };
-
   const parifiSdk = new ParifiSdk(rpcConfig, subgraphConfig, relayerConfig, pythConfig);
   await parifiSdk.init();
   return parifiSdk;

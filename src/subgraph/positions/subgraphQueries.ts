@@ -13,10 +13,14 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 1
         ) {
             id
             market {
-            id
+              id,marketName,marketSymbol,feedId 
             }
             user {
             id
+            }
+            snxAccount{
+              id
+              accountId
             }
             positionSize
             positionCollateral
@@ -24,25 +28,17 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 1
             avgPriceDec
             isLong
             createdTimestamp
-            lastCumulativeFee
             status
             txHash
             liquidationTxHash
             closingPrice
             realizedPnl
-            realizedPnlCollateral
             realizedFee
-            realizedFeeCollateral
             netRealizedPnl
             createdTimestamp
             lastRefresh
             lastRefreshISO
-            netUnrealizedPnlInCollateral
-            netUnrealizedPnlInUsd
-            liquidationNetPnlInCollateral
-            accruedBorrowingFeesInCollateral
             canBeLiquidated
-            lossToCollateralRatioPercent
         }
     }`;
 
@@ -67,10 +63,14 @@ export const fetchPositionsByUserQueryAndStatus = (
         ) {
             id
             market {
-            id
+              id,marketName,marketSymbol,feedId 
             }
             user {
             id
+            }
+            snxAccount{
+              id
+              accountId
             }
             positionSize
             positionCollateral
@@ -78,25 +78,17 @@ export const fetchPositionsByUserQueryAndStatus = (
             avgPriceDec
             isLong
             createdTimestamp
-            lastCumulativeFee
             status
             txHash
             liquidationTxHash
             closingPrice
             realizedPnl
-            realizedPnlCollateral
             realizedFee
-            realizedFeeCollateral
             netRealizedPnl
             createdTimestamp
             lastRefresh
             lastRefreshISO
-            netUnrealizedPnlInCollateral
-            netUnrealizedPnlInUsd
-            liquidationNetPnlInCollateral
-            accruedBorrowingFeesInCollateral
             canBeLiquidated
-            lossToCollateralRatioPercent
         }
     }`;
 
@@ -108,35 +100,31 @@ export const fetchPositionByIdQuery = (positionId: string) =>
         ) {
             id
             market {
-                id
+              id,marketName,marketSymbol,feedId 
             }
             user {
                 id
+            }
+            snxAccount{
+              id
+              accountId
             }
             isLong
             positionCollateral
             positionSize
             avgPrice
             avgPriceDec
-            lastCumulativeFee
             status
             txHash
             liquidationTxHash
             closingPrice
             realizedPnl
-            realizedPnlCollateral
             realizedFee
-            realizedFeeCollateral
             netRealizedPnl
             createdTimestamp
             lastRefresh
             lastRefreshISO
-            netUnrealizedPnlInCollateral
-            netUnrealizedPnlInUsd
-            liquidationNetPnlInCollateral
-            accruedBorrowingFeesInCollateral
             canBeLiquidated
-            lossToCollateralRatioPercent            
         }
     }`;
 
@@ -150,9 +138,7 @@ export const fetchPriceIdsFromPositionIdsQuery = (positionIds: string[]) =>
     ) {
       id
       market {
-        pyth {
-          id
-        }
+        id,marketName,marketSymbol,feedId 
       }
     }
   }
@@ -186,12 +172,7 @@ export const fetchAllPositionsForCollateralData = (userAddress: string) => gql`
       id
       positionCollateral
       market {
-        depositToken {
-          decimals
-          pyth {
-            price
-          }
-        }
+        id,marketName,marketSymbol,feedId 
       }
     }
   }
@@ -207,53 +188,10 @@ export const fetchAllPositionsUnrealizedPnl = (userAddress: string) => gql`
       where: { user: "${userAddress.toLowerCase()}", status: OPEN }
     ) {
       id
-      netUnrealizedPnlInUsd
+      
     }
   }
 `;
-
-// Fetches the order ids related to a specific position id
-export const fetchAllOrdersForPosition = (positionId: string) => gql`
-{
-  orders(
-    where: {position: "${positionId}"}
-  ) {
-    id
-    user {
-      id
-    }
-    market {
-      id
-    }
-    orderType
-    isLong
-    isLimitOrder
-    triggerAbove
-    deadline
-    deadlineISO
-    deltaCollateral
-    deltaSize
-    deltaSizeUsd
-    expectedPrice
-    maxSlippage
-    partnerAddress
-    executionFee
-    txHash
-    createdTimestamp
-    status
-    settledTxHash
-    settledTimestamp
-    settledTimestampISO
-    executionPrice
-    settledBy {
-      id
-    }
-    cancellationTxHash
-    position {
-      id
-    }
-  }
-}`;
 
 // Fetches all positions by a user (Both open and closed)
 export const fetchPositionHistoryQuery = (userAddress: string, count: number = 100, skip: number = 0) =>
@@ -268,10 +206,14 @@ export const fetchPositionHistoryQuery = (userAddress: string, count: number = 1
         ) {
             id
             market {
-            id
+              id,marketName,marketSymbol,feedId 
             }
             user {
             id
+            }
+            snxAccount{
+              id
+              accountId
             }
             positionSize
             positionCollateral
@@ -279,24 +221,17 @@ export const fetchPositionHistoryQuery = (userAddress: string, count: number = 1
             avgPriceDec
             isLong
             createdTimestamp
-            lastCumulativeFee
             status
             txHash
             liquidationTxHash
             closingPrice
             realizedPnl
-            realizedPnlCollateral
             realizedFee
-            realizedFeeCollateral
             netRealizedPnl
             createdTimestamp
             lastRefresh
             lastRefreshISO
-            netUnrealizedPnlInCollateral
-            netUnrealizedPnlInUsd
-            liquidationNetPnlInCollateral
-            accruedBorrowingFeesInCollateral
             canBeLiquidated
-            lossToCollateralRatioPercent
+            accruedBorrowingFees
         }
     }`;

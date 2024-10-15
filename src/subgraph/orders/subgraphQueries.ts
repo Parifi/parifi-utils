@@ -14,35 +14,38 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 10, 
     id
     market {
       id
-      pyth {
-        id
-        price
-        lastUpdatedTimestamp
-      }
+      marketName
+      marketSymbol
+      feedId
     }
-    user { id }
-    deadline
-    deadlineISO
-    orderType
+    user {
+      id
+    }
+    expirationTime
     deltaSize
     deltaCollateral
-   	expectedPrice 
     executionPrice
-    isLong
     isLimitOrder
-    triggerAbove
     status
     createdTimestamp
     txHash
-    maxSlippage
     partnerAddress
-    executionFee
+    collectedFees
     settledTxHash
     settledTimestamp
-    cancellationTxHash
-    settledBy { id }
-    position { id positionSize }
-  }   
+    deltaSizeUsd
+    acceptablePrice
+    settledBy {
+      id
+    }
+    position {
+      id
+      positionSize
+    }
+    snxAccount {
+      id
+    }
+  }  
 }`;
 
 export const fetchPendingOrdersQuery = (
@@ -53,7 +56,7 @@ export const fetchPendingOrdersQuery = (
   gql`
   {
   orders(
-    where: {status: PENDING, deadline_gte: "${currentTimestamp}"}
+    where: {status: PENDING ,expirationTime_gt:"${currentTimestamp}"}
     first: ${count}
     skip: ${skip}
     orderBy: createdTimestamp
@@ -62,78 +65,81 @@ export const fetchPendingOrdersQuery = (
     id
     market {
       id
-      pyth {
-        id
-        price
-        lastUpdatedTimestamp
-      }
+      marketName
+      marketSymbol
+      feedId
     }
-    orderType
-    isLong
-    isLimitOrder
-    triggerAbove
-    deadline
-    deadlineISO
-    deltaCollateral
+    user {
+      id
+    }
+    expirationTime
     deltaSize
-    deltaSizeUsd
-   	expectedPrice 
-    maxSlippage
-    partnerAddress
-    executionFee
-    txHash
-    createdTimestamp
+    deltaCollateral
+    executionPrice
+    isLimitOrder
     status
+    createdTimestamp
+    txHash
+    partnerAddress
+    collectedFees
     settledTxHash
     settledTimestamp
-    settledTimestampISO
-    executionPrice
-    settledBy { id }
-    cancellationTxHash
-    position { id }
+    deltaSizeUsd
+    acceptablePrice
+    settledBy {
+      id
+    }
+    position {
+      id
+      positionSize
+    }
+    snxAccount {
+      id
+    }
   }
-}
+  }
+
 `;
 
 export const fetchOrdersByIdQuery = (orderId: string) =>
   gql`
   {
-    order(id: "${orderId.toLowerCase()}") {
-    id
+    order(id: "${orderId}") {
+   id
+    market {
+      id
+      marketName
+      marketSymbol
+      feedId
+    }
     user {
       id
     }
-    market {
-      id
-      pyth {
-        id
-        price
-        lastUpdatedTimestamp
-      }
-    }
-    orderType
-    isLong
-    isLimitOrder
-    triggerAbove
-    deadline
-    deadlineISO
-    deltaCollateral
+    expirationTime
     deltaSize
-    deltaSizeUsd
-   	expectedPrice 
-    maxSlippage
-    partnerAddress
-    executionFee
-    txHash
-    createdTimestamp
+    deltaCollateral
+    executionPrice
+    isLimitOrder
     status
+    createdTimestamp
+    txHash
+    partnerAddress
+    collectedFees
     settledTxHash
     settledTimestamp
-    settledTimestampISO
-    executionPrice
-    settledBy { id }
-    cancellationTxHash
-    position { id }
+    deltaSizeUsd
+    acceptablePrice
+    settledBy {
+      id
+    }
+    position {
+      id
+      positionSize
+    }
+    snxAccount {
+      id
+      accountId
+    }
   }
 }
 `;
@@ -148,10 +154,8 @@ export const fetchPriceIdsFromOrderIdsQuery = (orderIds: string[]) =>
     ) {
       id
       market {
-        pyth {
-          id
-        }
-      }
+        id,marketName,marketSymbol,feedId 
+    }
     }
   }
 `;
@@ -187,6 +191,25 @@ export const fetchPositionIdsForOrderIds = (orderIds: string[]) => gql`
   ) {
     id
     position { id }
+  }
+}
+`;
+
+export const fetchCollateralForOrderUsingAccountId = (accountId: string | string[]) => gql`
+{
+  collateralDeposits(where:{
+    snxAccount_in: [${(Array.isArray(accountId) ? accountId : [accountId]).map((id) => `"${id}"`).join(', ')}]
+  }) {
+    id
+    depositedAmount
+    collateralName
+    collateralSymbol
+    collateralDecimals
+    collateralAddress
+    snxAccount {
+      id
+      accountId
+    }
   }
 }
 `;

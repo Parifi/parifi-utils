@@ -4,11 +4,9 @@ import {
   getOrderById,
   getPositionIdsFromOrderIds,
   getPythPriceIdsForOrderIds,
-  getReferralDataForPartner,
 } from './orders';
 import { PythConfig, RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
 import {
-  getAllOrdersForPosition,
   getAllPositionsByUserAddress,
   getClosedPositionsByUserAddress,
   getLiquidatedPositionsByUserAddress,
@@ -22,29 +20,25 @@ import {
   getTotalUnrealizedPnlInUsd,
 } from './positions';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
-import { Market, Order, Position, Referral, Vault, VaultCooldown } from '../interfaces/subgraphTypes';
 import { Chain } from '@parifi/references';
 import request, { GraphQLClient } from 'graphql-request';
 import { getPublicSubgraphEndpoint } from './common';
-import {
-  getAllVaults,
-  getPoolVolume24h,
-  getTotalPoolsValue,
-  getUserTotalPoolsValue,
-  getUserVaultCoolDowns,
-  getUserVaultData,
-  getVaultApr,
-} from './vaults';
 import { Pyth } from '../pyth';
 import Decimal from 'decimal.js';
 import {
+  getAccountByAddress,
   getLeaderboardUserData,
   getPortfolioDataForUsers,
   getRealizedPnlForUser,
-  getReferralRewardsInUsd,
-  getTopAccountsByReferralRewards,
 } from './accounts';
-import { LeaderboardUserData, ReferralRewardsInUsd, UserPortfolioData } from '../interfaces/sdkTypes';
+import {
+  LeaderboardUserData,
+  Market,
+  Order,
+  Position,
+  ReferralRewardsInUsd,
+  UserPortfolioData,
+} from '../interfaces/sdkTypes';
 import { getExecutionFee } from './protocol';
 
 export * from './common';
@@ -115,16 +109,6 @@ export class Subgraph {
     return await getPortfolioDataForUsers(subgraphEndpoint, userAddresses);
   }
 
-  public async getReferralRewardsInUsd(userAddresses: string[]): Promise<ReferralRewardsInUsd[]> {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getReferralRewardsInUsd(subgraphEndpoint, userAddresses);
-  }
-
-  public async getTopAccountsByReferralRewards(count: number = 20, skip?: number): Promise<ReferralRewardsInUsd[]> {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getTopAccountsByReferralRewards(subgraphEndpoint, count, skip);
-  }
-
   public async getLeaderboardUserData(userAddresses: string[]): Promise<LeaderboardUserData[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getLeaderboardUserData(subgraphEndpoint, userAddresses);
@@ -145,9 +129,13 @@ export class Subgraph {
 
   public async getOrderById(orderId: string): Promise<Order> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+
     return await getOrderById(subgraphEndpoint, orderId);
   }
-
+  public async getUserByAddress(userAddress: string): Promise<any> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getAccountByAddress(subgraphEndpoint, userAddress);
+  }
   public async getPythPriceIdsForOrderIds(orderIds: string[]): Promise<string[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getPythPriceIdsForOrderIds(subgraphEndpoint, orderIds);
@@ -229,11 +217,6 @@ export class Subgraph {
     return await getTotalUnrealizedPnlInUsd(subgraphEndpoint, userAddress);
   }
 
-  public async getAllOrdersForPosition(positionId: string): Promise<Order[]> {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getAllOrdersForPosition(subgraphEndpoint, positionId);
-  }
-
   public async getPositionsHistory(userAddress: string, count: number = 100, skip: number = 0): Promise<Position[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getPositionsHistory(subgraphEndpoint, userAddress, count, skip);
@@ -250,56 +233,6 @@ export class Subgraph {
   public async getMarketById(marketId: string): Promise<Market> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return getMarketById(subgraphEndpoint, marketId);
-  }
-
-  ////////////////////////////////////////////////////////////////
-  //////////////////////    VAULTS    ////////////////////////////
-  ////////////////////////////////////////////////////////////////
-
-  public async getAllVaults(): Promise<Vault[]> {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return getAllVaults(subgraphEndpoint);
-  }
-
-  public async getUserVaultData(userAddress: string): Promise<Vault[]> {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return getUserVaultData(subgraphEndpoint, userAddress);
-  }
-
-  public async getTotalPoolsValue() {
-    await this.init();
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getTotalPoolsValue(subgraphEndpoint, this.pyth.pythClient);
-  }
-
-  public async getUserTotalPoolsValue(userAddress: string) {
-    await this.init();
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getUserTotalPoolsValue(subgraphEndpoint, userAddress, this.pyth.pythClient);
-  }
-
-  public async getVaultApr(vaultId: string): Promise<{ apr7Days: Decimal; apr30Days: Decimal; aprAllTime: Decimal }> {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getVaultApr(subgraphEndpoint, vaultId);
-  }
-
-  public async getUserVaultCoolDowns(userAddress: string): Promise<VaultCooldown[]> {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getUserVaultCoolDowns(subgraphEndpoint, userAddress);
-  }
-
-  public async getReferralDataForPartner(
-    partnerAddress: string,
-    count: number = 20,
-    skip: number = 0,
-  ): Promise<Referral[]> {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getReferralDataForPartner(subgraphEndpoint, partnerAddress, count, skip);
-  }
-
-  public async getPoolVolume24h(): Promise<{ [vaultId: string]: Decimal }> {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getPoolVolume24h(subgraphEndpoint);
   }
 
   ////////////////////////////////////////////////////////////////

@@ -1,7 +1,5 @@
 import { request } from 'graphql-request';
-import { Order, Position } from '../../interfaces/subgraphTypes';
 import {
-  fetchAllOrdersForPosition,
   fetchAllPositionsForCollateralData,
   fetchAllPositionsUnrealizedPnl,
   fetchPositionByIdQuery,
@@ -13,13 +11,22 @@ import {
   fetchPriceIdsFromPositionIdsQuery,
 } from './subgraphQueries';
 import {
+  mapDespositCollateralArrayToInterface,
   mapPositionsArrayToInterface,
   mapSingleOrderToInterface,
   mapSinglePositionToInterface,
 } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
-import { DECIMAL_ZERO, EMPTY_BYTES32, PRICE_FEED_PRECISION, getUniqueValuesFromArray } from '../../common';
+import {
+  DECIMAL_ZERO,
+  EMPTY_BYTES32,
+  PRICE_FEED_PRECISION,
+  aggregateDepositsBySnxAccountId,
+  getUniqueValuesFromArray,
+} from '../../common';
 import Decimal from 'decimal.js';
+import { fetchCollateralForOrderUsingAccountId } from '../orders/subgraphQueries';
+import { Position, Order } from '../../interfaces/sdkTypes';
 
 /// Position Ids interface to format subgraph response to string array
 interface PositionIdsSubgraphResponse {
@@ -39,7 +46,16 @@ export const getAllPositionsByUserAddress = async (
     const query = fetchPositionsByUserQuery(userAddress, count, skip);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
     if (!subgraphResponse) throw Error(`Error fetching All Positions By UserAddress`);
-    const positions = mapPositionsArrayToInterface(subgraphResponse);
+    const accountIdArray = subgraphResponse?.positions?.map((position: Position) => {
+      return position?.snxAccount?.id;
+    });
+    const collateralSubgraphResponse: any = await request(
+      subgraphEndpoint,
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
+    );
+    const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
+    const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
+    const positions = mapPositionsArrayToInterface(subgraphResponse, uniqueAccountIdCollateralMapping);
     if (positions) {
       return positions;
     }
@@ -60,7 +76,16 @@ export const getOpenPositionsByUserAddress = async (
     const query = fetchPositionsByUserQueryAndStatus(userAddress, 'OPEN', count, skip);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
     if (!subgraphResponse) throw Error(`Error fetching Open Positions By UserAddress`);
-    const positions = mapPositionsArrayToInterface(subgraphResponse);
+    const accountIdArray = subgraphResponse?.positions?.map((position: Position) => {
+      return position?.snxAccount?.id;
+    });
+    const collateralSubgraphResponse: any = await request(
+      subgraphEndpoint,
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
+    );
+    const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
+    const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
+    const positions = mapPositionsArrayToInterface(subgraphResponse, uniqueAccountIdCollateralMapping);
     if (positions) {
       return positions;
     }
@@ -81,7 +106,16 @@ export const getClosedPositionsByUserAddress = async (
     const query = fetchPositionsByUserQueryAndStatus(userAddress, 'CLOSED', count, skip);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
     if (!subgraphResponse) throw Error(`Error fetching Closed Positions By UserAddress`);
-    const positions = mapPositionsArrayToInterface(subgraphResponse);
+    const accountIdArray = subgraphResponse?.positions?.map((position: Position) => {
+      return position?.snxAccount?.id;
+    });
+    const collateralSubgraphResponse: any = await request(
+      subgraphEndpoint,
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
+    );
+    const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
+    const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
+    const positions = mapPositionsArrayToInterface(subgraphResponse, {});
     if (positions) {
       return positions;
     }
@@ -102,7 +136,16 @@ export const getLiquidatedPositionsByUserAddress = async (
     const query = fetchPositionsByUserQueryAndStatus(userAddress, 'LIQUIDATED', count, skip);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
     if (!subgraphResponse) throw Error(`Error fetching Liquidated Positions By UserAddress`);
-    const positions = mapPositionsArrayToInterface(subgraphResponse);
+    const accountIdArray = subgraphResponse?.positions?.map((position: Position) => {
+      return position?.snxAccount?.id;
+    });
+    const collateralSubgraphResponse: any = await request(
+      subgraphEndpoint,
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
+    );
+    const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
+    const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
+    const positions = mapPositionsArrayToInterface(subgraphResponse, uniqueAccountIdCollateralMapping);
     if (positions) {
       return positions;
     }
@@ -115,7 +158,7 @@ export const getLiquidatedPositionsByUserAddress = async (
 // Get position from subgraph by position ID
 export const getPositionById = async (subgraphEndpoint: string, positionId: string): Promise<Position> => {
   try {
-    const formattedPositionId = positionId?.toLowerCase();
+    const formattedPositionId = positionId;
     let subgraphResponse: any = await request(subgraphEndpoint, fetchPositionByIdQuery(formattedPositionId));
     if (!subgraphResponse) throw Error(`Error fetching Position By Id`);
     if (subgraphResponse) {
@@ -143,11 +186,11 @@ export const getPythPriceIdsForPositionIds = async (
     );
     if (!subgraphResponse) throw new Error('Error fetching Pyth Price Ids For PositionIds');
     const priceIds: string[] = [];
-    const positions: Position[] = mapPositionsArrayToInterface(subgraphResponse) || [];
+    const positions: Position[] = mapPositionsArrayToInterface(subgraphResponse, {}) || [];
     if (positions.length != 0) {
       positions.map((position) => {
-        if (position.market?.pyth?.id) {
-          priceIds.push(position.market?.pyth?.id);
+        if (position.market?.feedId) {
+          priceIds.push(position.market?.feedId);
         }
       });
     }
@@ -252,38 +295,6 @@ export const getTotalUnrealizedPnlInUsd = async (subgraphEndpoint: string, userA
   }
 };
 
-// Returns all orders associated with a position ID
-export const getAllOrdersForPosition = async (subgraphEndpoint: string, positionId: string): Promise<Order[]> => {
-  try {
-    interface PositionRelatedOrders {
-      orders: Order[];
-    }
-
-    const subgraphResponse: PositionRelatedOrders = await request(
-      subgraphEndpoint,
-      fetchAllOrdersForPosition(positionId),
-    );
-
-    if (!subgraphResponse) throw new Error('Error fetching orders for positionId');
-    if (subgraphResponse.orders.length == 0) {
-      return [];
-    }
-
-    // Store the final orders array
-    const orders: Order[] = [];
-
-    subgraphResponse.orders.forEach((order) => {
-      const formattedOrder = mapSingleOrderToInterface(order);
-      if (formattedOrder != undefined) {
-        orders.push(order);
-      }
-    });
-    return orders;
-  } catch (error) {
-    throw error;
-  }
-};
-
 // Get all positions by user address
 export const getPositionsHistory = async (
   subgraphEndpoint: string,
@@ -295,7 +306,16 @@ export const getPositionsHistory = async (
     const query = fetchPositionHistoryQuery(userAddress, count, skip);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
     if (!subgraphResponse) throw Error(`Error fetching All Positions By UserAddress`);
-    const positions = mapPositionsArrayToInterface(subgraphResponse);
+    const accountIdArray = subgraphResponse?.positions?.map((position: Position) => {
+      return position?.snxAccount?.id;
+    });
+    const collateralSubgraphResponse: any = await request(
+      subgraphEndpoint,
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
+    );
+    const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
+    const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
+    const positions = mapPositionsArrayToInterface(subgraphResponse, uniqueAccountIdCollateralMapping);
     if (positions) {
       return positions;
     }

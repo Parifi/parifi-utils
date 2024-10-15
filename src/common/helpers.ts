@@ -5,6 +5,7 @@ import {
   PYTH_USDC_USD_PRICE_ID_BETA,
   PYTH_USDC_USD_PRICE_ID_STABLE,
 } from './constants';
+import { DepositCollateral } from '../interfaces/sdkTypes';
 
 export const getDiff = (a: Decimal, b: Decimal): Decimal => {
   return a.gt(b) ? a.minus(b) : b.minus(a);
@@ -66,4 +67,22 @@ export const addPythPriceIdsForCollateralTokens = (isStable: boolean = true, pri
   const collateralPriceIds = getPriceIdsForCollaterals(isStable);
   priceIds.concat(collateralPriceIds);
   return getUniqueValuesFromArray(priceIds);
+};
+
+export const aggregateDepositsBySnxAccountId = (
+  data: DepositCollateral[] | DepositCollateral | undefined,
+): Record<string, DepositCollateral[]> => {
+  if (!data) return {};
+
+  // Ensure we are working with an array
+  const depositsArray = Array.isArray(data) ? data : [data];
+
+  return depositsArray.reduce((acc: Record<string, DepositCollateral[]>, item: DepositCollateral) => {
+    const key = item.snxAccount.id;
+    if (!acc[key]) {
+      acc[key] = []; // Initialize an empty array if it doesn't exist
+    }
+    acc[key].push(item); // Push the current item to the array
+    return acc;
+  }, {}); // Start with an empty object
 };

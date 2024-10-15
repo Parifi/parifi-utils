@@ -5,13 +5,12 @@ import { SmartAccount } from 'permissionless/accounts';
 import { Chain, Hex, Transport } from 'viem';
 import { EntryPoint } from 'permissionless/types/entrypoint';
 import { SmartAccountClient } from 'permissionless';
-import { getBatchLiquidateTxData, getBatchSettleTxData, getParifiUtilsInstance } from '../../core/parifi-utils';
 import { getPositionsToRefresh, getPublicSubgraphEndpoint } from '../../subgraph';
 import { getPythClient } from '../../pyth/pyth';
 import { generatePrivateKey } from 'viem/accounts';
 
 import { contracts as parifiContracts } from '@parifi/references';
-import { getPositionRefreshTxData, getSubgraphHelperInstance } from '../../core/subgraph-helper';
+import { getSubgraphHelperInstance } from '../../utils/subgraph-helper';
 
 export class Pimlico {
   /// Pimlico Class variables
@@ -64,55 +63,55 @@ export class Pimlico {
   };
 
   // Batch settle orders using Pimlico for OrderIds
-  public batchSettleOrdersUsingPimlico = async (orderIds: string[]): Promise<{ txHash: string }> => {
-    const chainId = this.rpcConfig.chainId;
-    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(chainId);
+  // public batchSettleOrdersUsingPimlico = async (orderIds: string[]): Promise<{ txHash: string }> => {
+  //   const chainId = this.rpcConfig.chainId;
+  //   const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(chainId);
 
-    const pythClient = await getPythClient();
+  //   const pythClient = await getPythClient();
 
-    // Get Settle orders transaction data for execution
-    const { txData } = await getBatchSettleTxData(chainId, subgraphEndpoint, pythClient, orderIds);
+  //   // Get Settle orders transaction data for execution
+  //   const { txData } = await getBatchSettleTxData(chainId, subgraphEndpoint, pythClient, orderIds);
 
-    const parifiUtilsAddress = parifiContracts[chainId].ParifiUtils.address;
+  //   const parifiUtilsAddress = parifiContracts[chainId].ParifiUtils.address;
 
-    return await executeTxUsingPimlico(this.smartAccountClient, parifiUtilsAddress, txData);
-  };
-
-  // Batch settle orders using Pimlico for OrderIds
-  public batchLiquidatePositionsUsingPimlico = async (positionIds: string[]): Promise<{ txHash: string }> => {
-    const chainId = this.rpcConfig.chainId;
-    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(chainId);
-
-    const pythClient = await getPythClient();
-
-    // Get Settle orders transaction data for execution
-    const { txData } = await getBatchLiquidateTxData(chainId, subgraphEndpoint, pythClient, positionIds);
-
-    const parifiUtilsAddress = parifiContracts[chainId].ParifiUtils.address;
-
-    return await executeTxUsingPimlico(this.smartAccountClient, parifiUtilsAddress, txData);
-  };
+  //   return await executeTxUsingPimlico(this.smartAccountClient, parifiUtilsAddress, txData);
+  // };
 
   // Batch settle orders using Pimlico for OrderIds
-  public batchSettleAndRefreshUsingPimlico = async (orderIds: string[]): Promise<{ txHash: string }> => {
-    const chainId = this.rpcConfig.chainId;
-    const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(chainId);
+  // public batchLiquidatePositionsUsingPimlico = async (positionIds: string[]): Promise<{ txHash: string }> => {
+  //   const chainId = this.rpcConfig.chainId;
+  //   const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(chainId);
 
-    const pythClient = await getPythClient();
+  //   const pythClient = await getPythClient();
 
-    // Get Settle orders transaction data for execution
-    const targetContract1 = parifiContracts[chainId].ParifiUtils.address;
-    const { txData: txData1 } = await getBatchSettleTxData(chainId, subgraphEndpoint, pythClient, orderIds);
+  //   // Get Settle orders transaction data for execution
+  //   const { txData } = await getBatchLiquidateTxData(chainId, subgraphEndpoint, pythClient, positionIds);
 
-    // Tx data to refresh positions
-    // @todo Need to fix the references library to allow chainId as ArbSepolia has some issues
-    const targetContract2 = parifiContracts[42161].SubgraphHelper.address;
-    const { txData: txData2 } = await getPositionRefreshTxData(chainId, subgraphEndpoint);
+  //   const parifiUtilsAddress = parifiContracts[chainId].ParifiUtils.address;
 
-    return await executeBatchTxsUsingPimlico(
-      this.smartAccountClient,
-      [targetContract1, targetContract2],
-      [txData1, txData2],
-    );
-  };
+  //   return await executeTxUsingPimlico(this.smartAccountClient, parifiUtilsAddress, txData);
+  // };
+
+  // Batch settle orders using Pimlico for OrderIds
+  // public batchSettleAndRefreshUsingPimlico = async (orderIds: string[]): Promise<{ txHash: string }> => {
+  //   const chainId = this.rpcConfig.chainId;
+  //   const subgraphEndpoint = this.subgraphConfig.subgraphEndpoint ?? getPublicSubgraphEndpoint(chainId);
+
+  //   const pythClient = await getPythClient();
+
+  //   // Get Settle orders transaction data for execution
+  //   const targetContract1 = parifiContracts[chainId].ParifiUtils.address;
+  //   const { txData: txData1 } = await getBatchSettleTxData(chainId, subgraphEndpoint, pythClient, orderIds);
+
+  //   // Tx data to refresh positions
+  //   // @todo Need to fix the references library to allow chainId as ArbSepolia has some issues
+  //   const targetContract2 = parifiContracts[42161].SubgraphHelper.address;
+  //   const { txData: txData2 } = await getPositionRefreshTxData(chainId, subgraphEndpoint);
+
+  //   return await executeBatchTxsUsingPimlico(
+  //     this.smartAccountClient,
+  //     [targetContract1, targetContract2],
+  //     [txData1, txData2],
+  //   );
+  // };
 }
