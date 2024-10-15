@@ -195,7 +195,7 @@ export const fetchPositionIdsForOrderIds = (orderIds: string[]) => gql`
 }
 `;
 
-export const fectchCollateralForOrderUsingAccountId = (accountId: string | string[]) => gql`
+export const fetchCollateralForOrderUsingAccountId = (accountId: string | string[]) => gql`
 {
   collateralDeposits(where:{
     snxAccount_in: [${(Array.isArray(accountId) ? accountId : [accountId]).map((id) => `"${id}"`).join(', ')}]

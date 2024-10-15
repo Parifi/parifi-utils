@@ -1,6 +1,6 @@
 import { request } from 'graphql-request';
 import {
-  fectchCollateralForOrderUsingAccountId,
+  fetchCollateralForOrderUsingAccountId,
   fetchOrdersByIdQuery,
   fetchOrdersByUserQuery,
   fetchPendingOrdersQuery,
@@ -31,7 +31,7 @@ export const getAllOrdersByUserAddress = async (
     });
     const collateralSubgraphResponse: any = await request(
       subgraphEndpoint,
-      fectchCollateralForOrderUsingAccountId(accountIdArray),
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
     );
     const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
     // console.log(collateralDeposit);
@@ -63,7 +63,7 @@ export const getAllPendingOrders = async (
     });
     const collateralSubgraphResponse: any = await request(
       subgraphEndpoint,
-      fectchCollateralForOrderUsingAccountId(accountIdArray),
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
     );
     const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
     const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
@@ -88,7 +88,7 @@ export const getOrderById = async (subgraphEndpoint: string, orderId: string): P
     if (!subgraphResponse) throw new Error('Error While Fechting Order By Id');
     const collateralSubgraphResponse: any = await request(
       subgraphEndpoint,
-      fectchCollateralForOrderUsingAccountId(subgraphResponse?.order?.snxAccount?.id || ''),
+      fetchCollateralForOrderUsingAccountId(subgraphResponse?.order?.snxAccount?.id || ''),
     );
     const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
     const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);

@@ -25,7 +25,7 @@ import {
   getUniqueValuesFromArray,
 } from '../../common';
 import Decimal from 'decimal.js';
-import { fectchCollateralForOrderUsingAccountId } from '../orders/subgraphQueries';
+import { fetchCollateralForOrderUsingAccountId } from '../orders/subgraphQueries';
 import { Position, Order } from '../../interfaces/sdkTypes';
 
 /// Position Ids interface to format subgraph response to string array
@@ -51,7 +51,7 @@ export const getAllPositionsByUserAddress = async (
     });
     const collateralSubgraphResponse: any = await request(
       subgraphEndpoint,
-      fectchCollateralForOrderUsingAccountId(accountIdArray),
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
     );
     const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
     const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
@@ -81,7 +81,7 @@ export const getOpenPositionsByUserAddress = async (
     });
     const collateralSubgraphResponse: any = await request(
       subgraphEndpoint,
-      fectchCollateralForOrderUsingAccountId(accountIdArray),
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
     );
     const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
     const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
@@ -111,7 +111,7 @@ export const getClosedPositionsByUserAddress = async (
     });
     const collateralSubgraphResponse: any = await request(
       subgraphEndpoint,
-      fectchCollateralForOrderUsingAccountId(accountIdArray),
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
     );
     const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
     const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
@@ -141,7 +141,7 @@ export const getLiquidatedPositionsByUserAddress = async (
     });
     const collateralSubgraphResponse: any = await request(
       subgraphEndpoint,
-      fectchCollateralForOrderUsingAccountId(accountIdArray),
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
     );
     const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
     const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);
@@ -311,7 +311,7 @@ export const getPositionsHistory = async (
     });
     const collateralSubgraphResponse: any = await request(
       subgraphEndpoint,
-      fectchCollateralForOrderUsingAccountId(accountIdArray),
+      fetchCollateralForOrderUsingAccountId(accountIdArray),
     );
     const collateralDeposit = mapDespositCollateralArrayToInterface(collateralSubgraphResponse);
     const uniqueAccountIdCollateralMapping = aggregateDepositsBySnxAccountId(collateralDeposit);

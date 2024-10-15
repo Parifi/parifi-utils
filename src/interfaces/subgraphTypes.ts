@@ -40,7 +40,7 @@ export enum SnxAccountType {
 
 export interface Wallet {
   /** User wallet address */
-  id: string;
+  id?: string;
 
   /** User positions */
   positions?: Position[];
@@ -49,33 +49,33 @@ export interface Wallet {
   orders?: Order[];
 
   /** Total count of orders */
-  totalOrdersCount: string;
+  totalOrdersCount?: string;
 
   /** Total count of positions created by user - open and closed positions */
-  totalPositionsCount: string;
+  totalPositionsCount?: string;
 
   /** Total count of open user positions */
-  openPositionCount: string;
+  openPositionCount?: string;
 
   /** Count of total profitable positions */
-  countProfitablePositions: string;
+  countProfitablePositions?: string;
 
   /** Count of total positions with loss */
-  countLossPositions: string;
+  countLossPositions?: string;
 
   /** Count of liquidated positions */
-  countLiquidatedPositions: string;
+  countLiquidatedPositions?: string;
 
   /** Total Realized P&L from Positions in USD */
-  totalRealizedPnlPositions: string;
+  totalRealizedPnlPositions?: string;
   /** Total Volume in USD */
-  totalVolumeInUsd: string;
+  totalVolumeInUsd?: string;
 
   /** Total Volume Longs  */
-  totalVolumeInUsdLongs: string;
+  totalVolumeInUsdLongs?: string;
 
   /** Total Volume Shorts*/
-  totalVolumeInUsdShorts: string;
+  totalVolumeInUsdShorts?: string;
 
   /** Total Borrowing Fees accrued across all positions */
   totalAccruedBorrowingFeesInUsd?: string;
@@ -85,25 +85,25 @@ export interface Wallet {
 ////////////////////////////////////////////////////////////////
 export interface SnxAccount {
   /** CORE/PERP + Account ID */
-  id: string;
+  id?: string;
 
   /** CORE / PERP */
-  type: SnxAccountType;
+  type?: SnxAccountType;
 
   /** Account ID */
-  accountId: string;
+  accountId?: string;
 
   /** Owner wallet address */
-  owner: Wallet;
+  owner?: Wallet;
 
   /** Count of total orders by this Account ID */
-  totalOrdersCount: string;
+  totalOrdersCount?: string;
 
   /** Count of total positions by this Account ID */
-  totalPositionsCount: string;
+  totalPositionsCount?: string;
 
   /** SNX Account orders */
-  orders: Order[];
+  orders?: Order[];
 }
 
 ////////////////////////////////////////////////////////////////
@@ -112,78 +112,77 @@ export interface SnxAccount {
 
 export interface Market {
   /** Unique identifier for the market */
-  id: string;
-  
+  id?: string;
+
   /** Name of the market */
-  name: string;
+  name?: string;
 
   /** Symbol representing the market */
-  symbol: string;
+  symbol?: string;
 
   /** Total size of the market */
-  size: string;
+  size?: string;
 
   /** Skew value of the market */
-  skew: string;
+  skew?: string;
 
   /** Current funding rate of the market */
-  currentFundingRate: string;
+  currentFundingRate?: string;
 
   /** Current funding velocity of the market */
-  currentFundingVelocity: string;
+  currentFundingVelocity?: string;
 
   /** Feed ID for price oracle */
-  feedId: string;
+  feedId?: string;
 
   /** Maximum funding velocity allowed for the market */
-  maxFundingVelocity: string;
+  maxFundingVelocity?: string;
 
   /** Skew scale of the market */
-  skewScale: string;
+  skewScale?: string;
 
   /** Fee charged for market maker transactions */
-  makerFee: string;
+  makerFee?: string;
 
   /** Fee charged for market taker transactions */
-  takerFee: string;
+  takerFee?: string;
 
-  maxMarketValue:string,
+  maxMarketValue?: string;
 
-  maxOpenInterest:string,
+  maxOpenInterest?: string;
 
-  interestRate:string
+  interestRate?: string;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    ORDERS    ////////////////////////////
 ////////////////////////////////////////////////////////////////
 // settlementReward, referralFees, partnerAddressts
 export interface Order {
-  id: string;
+  id?: string;
   market?: Market;
   user?: Wallet;
-  isLimitOrder: boolean;
-  deadline:string
-  expectedPrice: string;
+  isLimitOrder?: boolean;
+  deadline?: string;
+  accceptablePrice?: string;
   expectedPriceTime?: string;
   settlementTime?: string;
   trackingCode?: string;
-  deltaCollateral: string;
-  deltaSize: string;
-  deltaSizeUsd: string;
-  executionPrice: string;
-  executionFee: string;
+  deltaCollateral?: string;
+  deltaSize?: string;
+  deltaSizeUsd?: string;
+  executionPrice?: string;
+  executionFee?: string;
   referralFees?: string;
-  txHash: string;
-  createdTimestamp: string;
-  status: OrderStatus;
+  txHash?: string;
+  createdTimestamp?: string;
+  status?: OrderStatus;
   settledTxHash?: string;
   settledTimestamp?: string;
-  settledTimestampISO: string;
+  settledTimestampISO?: string;
   settledBy?: Wallet;
   positionId?: Position;
-  formattedDeltaSize:string
+  formattedDeltaSize?: string;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -192,7 +191,7 @@ export interface Order {
 
 export interface Position {
   /** Position ID - Generated using POS + Account ID + Market ID */
-  id: string; // GraphQL's ID is mapped to string
+  id?: string; // GraphQL's ID is mapped to string
 
   /** Market details for the position */
   market?: Market;
@@ -200,48 +199,48 @@ export interface Position {
   user?: Wallet /** Account ID that holds the position */;
   account?: SnxAccount;
   /** True if it is a LONG position */
-  isLong: boolean;
+  isLong?: boolean;
   /** Collateral amount deposited backing this position */
-  positionCollateral: string;
+  positionCollateral?: string;
   /** Size of the position */
-  positionSize: string;
+  positionSize?: string;
 
   /** Average price of the position */
-  avgPrice: string;
+  avgPrice?: string;
   /** Average price of the position in decimals */
-  avgPriceDec: string;
+  avgPriceDec?: string;
   /** Orders related to this position */
   orders?: Order[];
   /** Position status */
-  status: PositionStatus;
+  status?: PositionStatus;
   /** Creation transaction hash */
-  txHash: string;
+  txHash?: string;
 
   /** Liquidation transaction hash */
   liquidationTxHash?: string;
 
   /** Closing Price of the position. In case of liquidation, this is the liquidation price */
-  closingPrice: string;
+  closingPrice?: string;
 
   /** Realized PNL in USD (decimals) */
-  realizedPnl: string;
+  realizedPnl?: string;
 
   /** Realized PNL in collateral */
-  realizedPnlCollateral: string;
+  realizedPnlCollateral?: string;
   /** Amount of opening, closing  */
-  realizedFee: string;
+  realizedFee?: string;
 
   /** Net Realized PNL in USD (decimal) */
-  netRealizedPnl: string;
+  netRealizedPnl?: string;
 
   /** Timestamp when position was created */
-  createdTimestamp: string;
+  createdTimestamp?: string;
 
   /** Last position updated timestamp */
-  lastRefresh: string;
+  lastRefresh?: string;
 
   /** Last position updated timestamp in string */
-  lastRefreshISO: string;
+  lastRefreshISO?: string;
 
   /** Accrued borrowing fees till last refresh */
   accruedBorrowingFees?: string;
