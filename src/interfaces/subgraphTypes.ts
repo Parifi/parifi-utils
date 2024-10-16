@@ -341,6 +341,7 @@ export interface BatchExecute {
   priceUpdateData: string[];
 }
 
+
 export interface collateralDepositsPortfolioData {
   depositedAmount: string;
   collateralSymbol: string;
@@ -385,3 +386,4 @@ export type PriceObject = {
     publish_time: number;
   };
 };
+
