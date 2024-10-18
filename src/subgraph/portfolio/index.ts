@@ -2,12 +2,12 @@ import request from 'graphql-request';
 import { fetchUserPortfolioInfo } from './subgraphQueries';
 import {
   collateralDepositsPortfolioData,
-  PorfolioDataSubgrph,
+  PorfolioDataSubgraph,
   PortfolioWallet,
-  positiosPortolfio,
+  positionsPortolfio,
   PriceObject,
 } from '../../interfaces';
-import { ARB_SEPOLIA_MARKET_COLLATERAL_PYTH_ID, collateralMappingWithRegularSymbol } from '../../common';
+import { SYMBOL_TO_PYTH_FEED, collateralMappingWithRegularSymbol } from '../../common';
 import { formatEther } from 'ethers';
 
 // Get all order by a user address
@@ -17,7 +17,10 @@ export const getPortfolioDataByUsersAddress = async (
   collateralPrice: { id: string; price: number }[],
 ) => {
   try {
-    const subgraphResponse: PorfolioDataSubgrph = await request(subgraphEndpoint, fetchUserPortfolioInfo(usersAddress));
+    const subgraphResponse: PorfolioDataSubgraph = await request(
+      subgraphEndpoint,
+      fetchUserPortfolioInfo(usersAddress),
+    );
     // console.log(subgraphResponse);
     const portfolioData = await Promise.all(
       subgraphResponse.wallets?.map(async (data) => {
@@ -47,21 +50,37 @@ export const getPortfolioDataForUser = (
   collateralPrice: { id: string; price: number }[],
 ) => {
   try {
-    let toataldepositedCollateral = 0;
+    let totaldepositedCollateral = 0;
     let totalUnrealizedPnl = 0;
     let totalRealizedPnl = 0;
     subgraphResponse.snxAccounts.forEach((data) => {
+      let depositedCollateral;
+      let unrealizedPnL;
+      let realizedPnl;
+
       const { openPositions, otherPositions } = splitPositionsByStatus(data.positions);
-      const depositedCollateral = getDepositedCollateralBySnxAccount(data.collateralDeposits[0], collateralPrice);
-      const unrealizedPnL = getUnRealizedPnlBySnxAccount(openPositions[0], collateralPrice);
-      const realizedPnl = getRealizedPnlBySnxAccount(otherPositions[0]);
-      toataldepositedCollateral += depositedCollateral;
+      if (data.collateralDeposits.length) {
+        depositedCollateral = getDepositedCollateralBySnxAccount(data.collateralDeposits[0], collateralPrice);
+      } else {
+        depositedCollateral = 0; // No deposited collateral, assume 0
+      }
+      if (openPositions.length) {
+        unrealizedPnL = getUnRealizedPnlBySnxAccount(openPositions[0], collateralPrice);
+      } else {
+        unrealizedPnL = 0; // No open positions, assume 0
+      }
+      if (otherPositions.length) {
+        realizedPnl = getRealizedPnlBySnxAccount(otherPositions[0]);
+      } else {
+        realizedPnl = 0; // No other positions, assume 0
+      }
+      totaldepositedCollateral += depositedCollateral;
       totalUnrealizedPnl += unrealizedPnL;
       totalRealizedPnl += realizedPnl;
     });
 
     return {
-      depositedCollateral: toataldepositedCollateral.toFixed(6),
+      depositedCollateral: totaldepositedCollateral.toFixed(6),
       unrealizedPnl: totalUnrealizedPnl.toFixed(6),
       realizedPnl: totalRealizedPnl.toFixed(6),
     };
@@ -83,7 +102,7 @@ const getDepositedCollateralBySnxAccount = (
     collateralMappingWithRegularSymbol.get(collateralDeposits.collateralSymbol?.toLowerCase() || '') ||
     collateralDeposits.collateralSymbol?.toLowerCase();
 
-  const pythId = ARB_SEPOLIA_MARKET_COLLATERAL_PYTH_ID.get(collateralSymbol?.toUpperCase() || '');
+  const pythId = SYMBOL_TO_PYTH_FEED.get(collateralSymbol?.toUpperCase() || '');
 
   // Check if pythId exists before trying to access collateralPrice
   const price = pythId ? collateralPrice.find((p) => p.id === pythId.slice(2))?.price || 0 : 0;
@@ -97,14 +116,14 @@ const getDepositedCollateralBySnxAccount = (
 };
 
 const getUnRealizedPnlBySnxAccount = (
-  openPositionsArray: positiosPortolfio,
+  openPositionsArray: positionsPortolfio,
   collateralPrice: { id: string; price: number }[],
 ) => {
   let totalUnrealizedPnl = 0;
   if (!openPositionsArray) return totalUnrealizedPnl;
   const size = formatEther(openPositionsArray.positionSize ?? '0');
   const avgPrice = formatEther(openPositionsArray.avgPrice ?? '0');
-  const pythId = ARB_SEPOLIA_MARKET_COLLATERAL_PYTH_ID.get(openPositionsArray.market.marketSymbol?.toUpperCase() ?? '');
+  const pythId = SYMBOL_TO_PYTH_FEED.get(openPositionsArray.market.marketSymbol?.toUpperCase() ?? '');
   const price = pythId ? collateralPrice.find((p) => p.id === pythId.slice(2))?.price || 0 : 0;
   //   console.log('currentMarketPrice', price);
   const unrealizedPnL = (price - Number(avgPrice)) * Number(size);
@@ -113,7 +132,7 @@ const getUnRealizedPnlBySnxAccount = (
   return totalUnrealizedPnl;
 };
 
-const getRealizedPnlBySnxAccount = (closedPositionsArray: positiosPortolfio) => {
+const getRealizedPnlBySnxAccount = (closedPositionsArray: positionsPortolfio) => {
   let totalRealizedPnl = 0;
   if (!closedPositionsArray) return totalRealizedPnl;
 
@@ -125,10 +144,10 @@ const getRealizedPnlBySnxAccount = (closedPositionsArray: positiosPortolfio) => 
 };
 
 const splitPositionsByStatus = (
-  positions: positiosPortolfio[],
-): { openPositions: positiosPortolfio[]; otherPositions: positiosPortolfio[] } => {
-  const openPositions: positiosPortolfio[] = [];
-  const otherPositions: positiosPortolfio[] = [];
+  positions: positionsPortolfio[],
+): { openPositions: positionsPortolfio[]; otherPositions: positionsPortolfio[] } => {
+  const openPositions: positionsPortolfio[] = [];
+  const otherPositions: positionsPortolfio[] = [];
 
   positions.forEach((position) => {
     if (position.status === 'OPEN') {
@@ -144,6 +163,6 @@ const splitPositionsByStatus = (
 export function transformPriceArray(priceArray: PriceObject[]): { id: string; price: number }[] {
   return priceArray.map((obj) => ({
     id: obj.id,
-    price: Number(obj.price.price) / 10 ** 8,
+    price: Number(obj.price.price) / 10 ** obj.price.expo,
   }));
 }

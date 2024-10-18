@@ -341,7 +341,6 @@ export interface BatchExecute {
   priceUpdateData: string[];
 }
 
-
 export interface collateralDepositsPortfolioData {
   depositedAmount: string;
   collateralSymbol: string;
@@ -349,7 +348,7 @@ export interface collateralDepositsPortfolioData {
   collateralDecimals: string;
 }
 
-export interface positiosPortolfio {
+export interface positionsPortolfio {
   status: string;
   market: {
     marketSymbol: string;
@@ -364,10 +363,10 @@ export interface PortfolioWallet {
   id: string; // Wallet ID
   snxAccounts: Array<{
     collateralDeposits: collateralDepositsPortfolioData[];
-    positions: positiosPortolfio[];
+    positions: positionsPortolfio[];
   }>;
 }
-export interface PorfolioDataSubgrph {
+export interface PorfolioDataSubgraph {
   wallets: PortfolioWallet[]; // Array of Wallet objects
 }
 
@@ -386,4 +385,3 @@ export type PriceObject = {
     publish_time: number;
   };
 };
-

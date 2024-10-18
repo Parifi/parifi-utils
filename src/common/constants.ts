@@ -32,7 +32,7 @@ export const FACTORY_ADDRESS_SIMPLE_ACCOUNT = '0x91E60e0613810449d098b0b5Ec8b51A
 // Temporary constants
 export const SUBGRAPH_HELPER_ADDRESS = '0xf012d32505df6853187170F00C7b789A8ecC41c2';
 
-export const ARB_SEPOLIA_MARKET_COLLATERAL_PYTH_ID = new Map<string, string>([
+export const SYMBOL_TO_PYTH_FEED = new Map<string, string>([
   // market
   ['BTC', '0xc9d8b075a5c69303365ae23633d4e085199bf5c520a3b90fed1322a0342ffc33'],
   ['SOL', '0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d'],
@@ -77,7 +77,7 @@ export const collateralMappingWithRegularSymbol = new Map<string, string>([
   ['wsteth', 'eth'],
   ['fdai', 'dai'],
   ['susdc', 'usdc'],
-  ['sudce', 'usdce'],
+  ['susde', 'usde'],
   ['steth', 'eth'],
   ['fsol', 'sol'],
   ['fusdc', 'usdc'],
