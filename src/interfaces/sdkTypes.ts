@@ -78,6 +78,7 @@ export type Market = {
   initialMarginRatioD18: string;
   minimumPositionMargin: string;
   maintenanceMarginRatioD18: string;
+  minimumInitialMarginRatioD18: string;
 };
 
 export type Wallet = {

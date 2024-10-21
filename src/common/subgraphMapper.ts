@@ -59,6 +59,7 @@ export const mapSingleMarketToInterface = (response: MarketSg): Market | undefin
       initialMarginRatioD18: response.initialMarginRatioD18 ?? '0',
       minimumPositionMargin: response.minimumPositionMargin ?? '0',
       maintenanceMarginRatioD18: response.maintenanceMarginRatioD18 ?? '0',
+      minimumInitialMarginRatioD18: response.minimumInitialMarginRatioD18 ?? '0',
     };
   } catch (error) {
     console.log('Error while mapping data', error);
