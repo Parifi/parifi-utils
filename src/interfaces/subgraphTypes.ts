@@ -111,47 +111,27 @@ export interface SnxAccount {
 ////////////////////////////////////////////////////////////////
 
 export interface Market {
-  /** Unique identifier for the market */
   id?: string;
-
-  /** Name of the market */
-  name?: string;
-
-  /** Symbol representing the market */
-  symbol?: string;
-
-  /** Total size of the market */
-  size?: string;
-
-  /** Skew value of the market */
-  skew?: string;
-
-  /** Current funding rate of the market */
-  currentFundingRate?: string;
-
-  /** Current funding velocity of the market */
-  currentFundingVelocity?: string;
-
-  /** Feed ID for price oracle */
+  marketName?: string;
+  marketSymbol?: string;
+  marketPrice?: string;
   feedId?: string;
-
-  /** Maximum funding velocity allowed for the market */
-  maxFundingVelocity?: string;
-
-  /** Skew scale of the market */
-  skewScale?: string;
-
-  /** Fee charged for market maker transactions */
-  makerFee?: string;
-
-  /** Fee charged for market taker transactions */
-  takerFee?: string;
-
-  maxMarketValue?: string;
-
+  skew?: string;
+  size?: string;
   maxOpenInterest?: string;
-
+  maxMarketSize?: string;
+  maxMarketValue?: string;
   interestRate?: string;
+  currentFundingRate?: string;
+  currentFundingVelocity?: string;
+  indexPrice?: string;
+  skewScale?: string;
+  maxFundingVelocity?: string;
+  makerFee?: string;
+  takerFee?: string;
+  maintenanceMarginRatioD18?: string;
+  minimumPositionMargin?: string;
+  initialMarginRatioD18?: string;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -293,7 +273,7 @@ export interface PythPrice {
 // Interface for response received for Pyth Price data
 export interface PythPriceResponse {
   // Pyth Price ID
-  id?: string;
+  id: string;
 
   price: PythPrice;
 
@@ -340,3 +320,48 @@ export interface BatchExecute {
   id: string;
   priceUpdateData: string[];
 }
+
+export interface collateralDepositsPortfolioData {
+  depositedAmount: string;
+  collateralSymbol: string;
+  collateralName: string;
+  collateralDecimals: string;
+}
+
+export interface positionsPortfolio {
+  status: string;
+  market: {
+    marketSymbol: string;
+  };
+  positionSize: string;
+  avgPrice: string;
+  realizedPnl: string;
+  realizedFee: string;
+}
+
+export interface PortfolioWallet {
+  id: string; // Wallet ID
+  snxAccounts: Array<{
+    collateralDeposits: collateralDepositsPortfolioData[];
+    positions: positionsPortfolio[];
+  }>;
+}
+export interface PorfolioDataSubgraph {
+  wallets: PortfolioWallet[]; // Array of Wallet objects
+}
+
+export type PriceObject = {
+  id: string;
+  price: {
+    price: string;
+    conf: string;
+    expo: number;
+    publish_time: number;
+  };
+  ema_price: {
+    price: string;
+    conf: string;
+    expo: number;
+    publish_time: number;
+  };
+};
