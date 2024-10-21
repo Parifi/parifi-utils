@@ -132,6 +132,7 @@ export interface Market {
   maintenanceMarginRatioD18?: string;
   minimumPositionMargin?: string;
   initialMarginRatioD18?: string;
+  minimumInitialMarginRatioD18?: string;
 }
 
 ////////////////////////////////////////////////////////////////

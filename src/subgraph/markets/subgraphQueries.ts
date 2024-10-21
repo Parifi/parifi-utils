@@ -25,6 +25,7 @@ export const fetchAllMarketsDataQuery = gql`
       initialMarginRatioD18
       minimumPositionMargin
       maintenanceMarginRatioD18
+      minimumInitialMarginRatioD18
     }
   }
 `;
@@ -54,6 +55,7 @@ export const fetchMarketByIdQuery = (marketId: string) => gql`
     initialMarginRatioD18
   	minimumPositionMargin
     maintenanceMarginRatioD18
+    minimumInitialMarginRatioD18
     }
   }
 `;
