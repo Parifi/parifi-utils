@@ -4,7 +4,7 @@ import {
   collateralDepositsPortfolioData,
   PorfolioDataSubgraph,
   PortfolioWallet,
-  positionsPortolfio,
+  positionsPortfolio,
   PriceObject,
 } from '../../interfaces';
 import { SYMBOL_TO_PYTH_FEED, collateralMappingWithRegularSymbol } from '../../common';
@@ -116,7 +116,7 @@ const getDepositedCollateralBySnxAccount = (
 };
 
 const getUnRealizedPnlBySnxAccount = (
-  openPositionsArray: positionsPortolfio,
+  openPositionsArray: positionsPortfolio,
   collateralPrice: { id: string; price: number }[],
 ) => {
   let totalUnrealizedPnl = 0;
@@ -132,7 +132,7 @@ const getUnRealizedPnlBySnxAccount = (
   return totalUnrealizedPnl;
 };
 
-const getRealizedPnlBySnxAccount = (closedPositionsArray: positionsPortolfio) => {
+const getRealizedPnlBySnxAccount = (closedPositionsArray: positionsPortfolio) => {
   let totalRealizedPnl = 0;
   if (!closedPositionsArray) return totalRealizedPnl;
 
@@ -144,10 +144,10 @@ const getRealizedPnlBySnxAccount = (closedPositionsArray: positionsPortolfio) =>
 };
 
 const splitPositionsByStatus = (
-  positions: positionsPortolfio[],
-): { openPositions: positionsPortolfio[]; otherPositions: positionsPortolfio[] } => {
-  const openPositions: positionsPortolfio[] = [];
-  const otherPositions: positionsPortolfio[] = [];
+  positions: positionsPortfolio[],
+): { openPositions: positionsPortfolio[]; otherPositions: positionsPortfolio[] } => {
+  const openPositions: positionsPortfolio[] = [];
+  const otherPositions: positionsPortfolio[] = [];
 
   positions.forEach((position) => {
     if (position.status === 'OPEN') {
@@ -163,6 +163,6 @@ const splitPositionsByStatus = (
 export function transformPriceArray(priceArray: PriceObject[]): { id: string; price: number }[] {
   return priceArray.map((obj) => ({
     id: obj.id,
-    price: Number(obj.price.price) / 10 ** obj.price.expo,
+    price: Number(obj.price.price) / 10 ** Math.abs(obj.price.expo),
   }));
 }
