@@ -5,13 +5,12 @@ env:
   NPM_TOKEN: ${{secrets.NPM_TOKEN}}
   RUST_BACKTRACE: full
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [ 20.11.0 ]
+        node-version: [20.11.0]
     outputs:
       runner: ${{ steps.branch.outputs.runner }}
     steps:
@@ -28,7 +27,7 @@ jobs:
           npm install
 
       - name: Test sdk
-        continue-on-error: true 
+        continue-on-error: true
         env:
           GELATO_KEY: ${{secrets.GELATO_KEY}}
           PYTH_SERVICE_ENDPOINT: ${{secrets.PYTH_SERVICE_ENDPOINT}}

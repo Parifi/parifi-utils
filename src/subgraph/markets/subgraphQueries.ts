@@ -3,19 +3,28 @@ import { gql } from 'graphql-request';
 // The `fetchAllMarketsData` query fetches all market data for the first 100 markets
 export const fetchAllMarketsDataQuery = gql`
   {
-    markets(first: 80) {
+    markets {
       id
       marketName
       marketSymbol
-      size
+      marketPrice
+      feedId
       skew
+      size
+      maxOpenInterest
+      maxMarketValue
+      interestRate
       currentFundingRate
       currentFundingVelocity
-      feedId
-      maxFundingVelocity
+      indexPrice
       skewScale
+      maxFundingVelocity
       makerFee
       takerFee
+      marketPrice
+      initialMarginRatioD18
+      minimumPositionMargin
+      maintenanceMarginRatioD18
     }
   }
 `;
@@ -24,18 +33,27 @@ export const fetchAllMarketsDataQuery = gql`
 export const fetchMarketByIdQuery = (marketId: string) => gql`
   {
     market(id: "${marketId.toLowerCase()}") {
-   id
-   marketName
-   marketSymbol
-   size
-   skew
-   currentFundingRate
-   currentFundingVelocity
-   feedId
-   maxFundingVelocity
-   skewScale
-   makerFee
-   takerFee
+    id
+    marketName
+    marketSymbol
+    marketPrice
+    feedId
+    skew
+    size
+    maxOpenInterest
+    maxMarketValue
+    interestRate
+    currentFundingRate
+    currentFundingVelocity
+    indexPrice
+    skewScale
+    maxFundingVelocity
+    makerFee
+    takerFee
+    marketPrice
+    initialMarginRatioD18
+  	minimumPositionMargin
+    maintenanceMarginRatioD18
     }
   }
 `;

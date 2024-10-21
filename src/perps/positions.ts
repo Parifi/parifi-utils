@@ -16,8 +16,8 @@ export const getProfitOrLossInUsd = (
     if (normalizedMarketPrice.gt(positionAvgPrice)) {
       profitOrLoss = normalizedMarketPrice.minus(positionAvgPrice);
     } else {
-      profitOrLoss =  positionAvgPrice.minus(normalizedMarketPrice);
-      profitOrLoss.times(-1)
+      profitOrLoss = positionAvgPrice.minus(normalizedMarketPrice);
+      profitOrLoss.times(-1);
     }
   } else {
     // If short, profit when market price < avg price
@@ -25,7 +25,7 @@ export const getProfitOrLossInUsd = (
       profitOrLoss = normalizedMarketPrice.minus(positionAvgPrice);
     } else {
       profitOrLoss = positionAvgPrice.minus(normalizedMarketPrice);
-      profitOrLoss.times(-1)
+      profitOrLoss.times(-1);
     }
   }
 
@@ -33,10 +33,11 @@ export const getProfitOrLossInUsd = (
 
   return { totalProfitOrLoss };
 };
+
 export const calculatePositionLeverage = (
   position: Position,
   collateralPrice: number,
-  marketPrice: number
+  marketPrice: number,
 ): { positionLeverage: Decimal } => {
   if (!position || !position.depositCollateral?.[0] || !position.depositCollateral[0].formattedDepositedAmount) {
     return { positionLeverage: new Decimal(0) };
@@ -58,4 +59,3 @@ export const calculatePositionLeverage = (
   }
   return { positionLeverage: new Decimal(0) };
 };
-

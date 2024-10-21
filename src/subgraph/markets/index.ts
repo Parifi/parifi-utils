@@ -3,15 +3,17 @@ import { fetchAllMarketsDataQuery, fetchMarketByIdQuery } from './subgraphQuerie
 import { mapMarketsArrayToInterface, mapSingleMarketToInterface } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 import { Market } from '../../interfaces/sdkTypes';
+import { Market as MarketSg } from '../../interfaces/subgraphTypes';
 
 export const getAllMarketsFromSubgraph = async (subgraphEndpoint: string): Promise<Market[]> => {
   try {
-    const subgraphResponse: any = await request(subgraphEndpoint, fetchAllMarketsDataQuery);
+    console.log(subgraphEndpoint);
+    const subgraphResponse: { markets: MarketSg[] } = await request(subgraphEndpoint, fetchAllMarketsDataQuery);
     if (!subgraphResponse) throw Error(`Error While Fechting All Market`);
-    const markets = mapMarketsArrayToInterface(subgraphResponse);
-    if (markets) {
-      return markets;
-    }
+    const markets = mapMarketsArrayToInterface(subgraphResponse.markets)?.filter(
+      (market): market is Market => !!market,
+    );
+    if (markets) return markets;
     throw new NotFoundError('Markets not found');
   } catch (error) {
     throw error;

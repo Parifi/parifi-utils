@@ -1,6 +1,7 @@
 import { formatEther, formatUnits } from 'ethers';
 import { PriceFeedSnapshot, PythData, Token } from '../interfaces/subgraphTypes';
 import { DepositCollateral, Market, Order, Position, Wallet } from '../interfaces/sdkTypes';
+import { Market as MarketSg } from '../interfaces/subgraphTypes';
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    Wallet   ////////////////////////////
@@ -33,31 +34,38 @@ export const mapSubgraphResponseToWalletInterface = (response: any): Wallet | un
 //////////////////////    MARKET    ////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSingleMarketToInterface = (response: any): Market | undefined => {
+export const mapSingleMarketToInterface = (response: MarketSg): Market | undefined => {
   if (response === null) return undefined;
+  if (response.marketName === '' || response.marketSymbol === '') return undefined;
   try {
     return {
-      id: response.id,
-      marketName: response.marketName,
-      marketSymbol: response.marketSymbol,
-      feedId: response.feedId,
-      size: response.size,
-      currentFundingRate: response.currentFundingRate,
-      currentFundingVelocity: response.currentFundingVelocity,
-      maxFundingVelocity: response.maxFundingVelocity,
-      skewScale: response.skewScale,
-      makerFee: response.makerFee,
-      takerFee: response.takerFee,
-      skew: response.skew,
-      maxMarketValue: response.maxMarketValue,
-      maxOpenInterest: response.maxOpenInterest,
-      interestRate: response.interestRate,
+      id: response.id ?? '',
+      marketName: response.marketName ?? '',
+      marketSymbol: response.marketSymbol ?? '',
+      feedId: response.feedId ?? '',
+      marketPrice: response.marketPrice ?? '0',
+      size: response.size ?? '0',
+      skew: response.skew ?? '0',
+      maxOpenInterest: response.maxOpenInterest ?? '0',
+      maxMarketValue: response.maxMarketValue ?? '0',
+      interestRate: response.interestRate ?? '0',
+      currentFundingRate: response.currentFundingRate ?? '0',
+      currentFundingVelocity: response.currentFundingVelocity ?? '0',
+      indexPrice: response.indexPrice ?? '0',
+      skewScale: response.skewScale ?? '0',
+      maxFundingVelocity: response.maxFundingVelocity ?? '0',
+      makerFee: response.makerFee ?? '0',
+      takerFee: response.takerFee ?? '0',
+      initialMarginRatioD18: response.initialMarginRatioD18 ?? '0',
+      minimumPositionMargin: response.minimumPositionMargin ?? '0',
+      maintenanceMarginRatioD18: response.maintenanceMarginRatioD18 ?? '0',
     };
   } catch (error) {
     console.log('Error while mapping data', error);
     throw error;
   }
 };
+
 export const mapWalletsArrayToInterface = (response: any): Wallet[] | undefined => {
   if (response === null) return undefined;
   try {
@@ -69,10 +77,11 @@ export const mapWalletsArrayToInterface = (response: any): Wallet[] | undefined 
     throw error;
   }
 };
-export const mapMarketsArrayToInterface = (response: any): Market[] | undefined => {
+
+export const mapMarketsArrayToInterface = (response: MarketSg[]): (Market | undefined)[] | undefined => {
   if (response === null) return undefined;
   try {
-    return response.markets.map((market: Market) => {
+    return response.map((market: MarketSg) => {
       return mapSingleMarketToInterface(market);
     });
   } catch (error) {
