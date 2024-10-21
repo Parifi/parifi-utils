@@ -56,23 +56,30 @@ export interface LeaderboardUserData {
   totalRealizedPnlPositions: Decimal;
   totalAccruedBorrowingFeesInUsd: Decimal;
 }
+
 export type Market = {
   id: string;
   marketName: string;
   marketSymbol: string;
+  marketPrice: string;
+  feedId: string;
   size: string;
   skew: string;
+  maxOpenInterest: string;
+  maxMarketValue: string;
+  interestRate: string;
   currentFundingRate: string;
   currentFundingVelocity: string;
-  feedId: string;
+  indexPrice: string;
   maxFundingVelocity: string;
   skewScale: string;
   makerFee: string;
   takerFee: string;
-  maxMarketValue: string;
-  maxOpenInterest: string;
-  interestRate: string;
+  initialMarginRatioD18: string;
+  minimumPositionMargin: string;
+  maintenanceMarginRatioD18: string;
 };
+
 export type Wallet = {
   id: string;
   positions?: Position[];
