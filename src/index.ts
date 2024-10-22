@@ -3,7 +3,6 @@ import { Subgraph } from './subgraph';
 import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from './interfaces/classConfigs';
 import { Gelato } from './relayers/gelato';
 import { relayerRepository } from './interfaces/repositories/relayer';
-import { ParifiRelayer } from './relayers/parifi';
 import { Perps } from './perps';
 import { Core } from './core';
 
@@ -21,7 +20,6 @@ export class ParifiSdk {
   core: Core;
   relayer: {
     gelato: Gelato;
-    parifi: relayerRepository;
   };
 
   constructor(
@@ -35,7 +33,6 @@ export class ParifiSdk {
     this.perps = new Perps();
     this.relayer = {
       gelato: new Gelato(relayerConfig['gelatoConfig'], rpcConfig),
-      parifi: new ParifiRelayer(relayerConfig['parifiRealyerConfig'], rpcConfig.chainId),
     };
     this.core = new Core();
   }
