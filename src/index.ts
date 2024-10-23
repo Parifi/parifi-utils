@@ -2,7 +2,6 @@ import { Pyth } from './pyth';
 import { Subgraph } from './subgraph';
 import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from './interfaces/classConfigs';
 import { Gelato } from './relayers/gelato';
-import { relayerRepository } from './interfaces/repositories/relayer';
 import { Perps } from './perps';
 import { Core } from './core';
 import { Pimlico } from './relayers';
@@ -42,5 +41,6 @@ export class ParifiSdk {
 
   async init() {
     await this.pyth.initPyth();
+    await this.relayer.pimlico.initPimlico();
   }
 }

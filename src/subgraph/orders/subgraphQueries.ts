@@ -149,7 +149,7 @@ export const fetchPriceIdsFromOrderIdsQuery = (orderIds: string[]) =>
   {
     orders(
       where: {
-        id_in: [${orderIds.map((id) => `"${id.toLowerCase()}"`).join(', ')}]
+        id_in: [${orderIds.map((id) => `"${id}"`).join(', ')}]
       }
     ) {
       id

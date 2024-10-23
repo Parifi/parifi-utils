@@ -2,9 +2,8 @@ import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
 import { RpcConfig } from '../../src/interfaces/classConfigs';
 import { gql } from 'graphql-request';
-
 const rpcConfig: RpcConfig = {
-  chainId: Chain.ARBITRUM_MAINNET,
+  chainId: Chain.ARBITRUM_SEPOLIA,
 };
 
 const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {});
@@ -16,7 +15,7 @@ describe('Query fetching logic from subgraph', () => {
     /// Subgraph query to get selective fields from positions
     const query = gql`
       {
-        positions {
+        positions{
           id
           isLong
           lastRefresh
