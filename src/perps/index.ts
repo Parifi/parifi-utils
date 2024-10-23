@@ -12,11 +12,17 @@ export class Perps {
     return getProfitOrLossInUsd(userPosition, normalizedMarketPrice, marketDecimals);
   };
 
-  calculatePositionLeverage = (
-    position: Position,
-    collateralPrice: number,
-    marketPrice: number,
-  ): { positionLeverage: Decimal } => {
-    return calculatePositionLeverage(position, collateralPrice, marketPrice);
+  calculatePositionLeverage = ({
+    collateralAmount,
+    size,
+    collateralPrice,
+    marketPrice,
+  }: {
+    collateralAmount: number;
+    size: number;
+    collateralPrice: number;
+    marketPrice: number;
+  }): { positionLeverage: Decimal } => {
+    return calculatePositionLeverage({ collateralAmount, size, collateralPrice, marketPrice });
   };
 }

@@ -75,7 +75,7 @@ export const getOpenPositionsByUserAddress = async (
   try {
     const query = fetchPositionsByUserQueryAndStatus(userAddress, 'OPEN', count, skip);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
-    if (!subgraphResponse) throw Error(`Error fetching Open Positions By UserAddress`);
+    if (!subgraphResponse.positions) throw Error(`Error fetching Open Positions By UserAddress`);
     const accountIdArray = subgraphResponse?.positions?.map((position: Position) => {
       return position?.snxAccount?.id;
     });

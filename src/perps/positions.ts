@@ -34,22 +34,24 @@ export const getProfitOrLossInUsd = (
   return { totalProfitOrLoss };
 };
 
-export const calculatePositionLeverage = (
-  position: Position,
-  collateralPrice: number,
-  marketPrice: number,
-): { positionLeverage: Decimal } => {
-  if (!position || !position.depositCollateral?.[0] || !position.depositCollateral[0].formattedDepositedAmount) {
-    return { positionLeverage: new Decimal(0) };
-  }
-
+export const calculatePositionLeverage = ({
+  collateralAmount,
+  size,
+  collateralPrice,
+  marketPrice,
+}: {
+  collateralAmount: number;
+  size: number;
+  collateralPrice: number;
+  marketPrice: number;
+}): { positionLeverage: Decimal } => {
   // Calculate collateral in USDC
-  const collateralUsed = new Decimal(position.depositCollateral[0].formattedDepositedAmount);
+  const collateralUsed = new Decimal(collateralAmount);
   const collateralInUSDC = collateralUsed.times(collateralPrice);
 
   // Calculate position size in USDC
-  const positionSize = new Decimal(formatEther(BigInt(position.positionSize || 0)));
-  const marketPriceDecimal = new Decimal(formatEther(BigInt(marketPrice || 0)));
+  const positionSize = new Decimal(size);
+  const marketPriceDecimal = new Decimal(marketPrice);
   const positionSizeInUSDC = positionSize.times(marketPriceDecimal);
 
   // Calculate leverage if collateralInUSDC is greater than zero
@@ -57,5 +59,6 @@ export const calculatePositionLeverage = (
     const calculatedLeverage = positionSizeInUSDC.div(collateralInUSDC);
     return { positionLeverage: calculatedLeverage };
   }
+
   return { positionLeverage: new Decimal(0) };
 };

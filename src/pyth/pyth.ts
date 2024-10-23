@@ -13,34 +13,18 @@ export const getPythClient = async (
   isStable: boolean = true,
 ): Promise<AxiosInstance> => {
   try {
-    if (pythServiceEndpoint) {
-      if (pythServiceUsername && pythServicePassword) {
-        // If Username and password is provided, connect using credentials
-        return axios.create({
-          baseURL: pythServiceEndpoint,
-          auth: {
-            username: pythServiceUsername,
-            password: pythServicePassword,
-          },
-        });
-      } else {
-        // Connect to the PYTH service endpoint without authentication
-        return axios.create({
-          baseURL: pythServiceEndpoint,
-        });
-      }
-    } else {
-      // If Pyth service endpoint is not provided, connect to public endpoints
-      if (isStable) {
-        return axios.create({
-          baseURL: 'https://hermes.pyth.network',
-        });
-      } else {
-        return axios.create({
-          baseURL: 'https://hermes-beta.pyth.network',
-        });
-      }
-    }
+    const config = {
+      baseURL: pythServiceEndpoint || (isStable ? 'https://hermes.pyth.network' : 'https://hermes-beta.pyth.network'),
+      auth:
+        pythServiceUsername && pythServicePassword
+          ? {
+              username: pythServiceUsername,
+              password: pythServicePassword,
+            }
+          : undefined,
+    };
+
+    return axios.create(config);
   } catch (error) {
     console.log('Error when creating Pyth instance:', error);
     throw error;
@@ -81,7 +65,7 @@ export const normalizePythPriceForParifi = (pythPrice: number, pythExponent: num
   }
 };
 
-// Returns the latest prices from Pyth for priceIds in normalized format 
+// Returns the latest prices from Pyth for priceIds in normalized format
 // for use within the Parifi protocol. Normalized price has 8 decimals
 export const getLatestPricesNormalized = async (
   priceIds: string[],

@@ -24,7 +24,6 @@ export const getParifiSdkInstanceForTesting = async (): Promise<ParifiSdk> => {
     apiKey: process.env.GELATO_KEY || '',
   };
 
-
   const relayerConfig: RelayerConfig = {
     gelatoConfig: gelatoConfig,
   };

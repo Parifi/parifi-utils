@@ -16,77 +16,66 @@ export const getPortfolioDataByUsersAddress = async (
   usersAddress: string[],
   collateralPrice: { id: string; price: number }[],
 ) => {
-  try {
-    const subgraphResponse: PorfolioDataSubgraph = await request(
-      subgraphEndpoint,
-      fetchUserPortfolioInfo(usersAddress),
-    );
-    // console.log(subgraphResponse);
-    const portfolioData = await Promise.all(
-      subgraphResponse.wallets?.map(async (data) => {
-        const { depositedCollateral, unrealizedPnl, realizedPnl } = getPortfolioDataForUser(data, collateralPrice);
-        // console.log(
-        //   'id :' + data.id,
-        //   `Deposited collateral: ${depositedCollateral}, Unrealized PNL: ${unrealizedPnl}, Realized PNL: ${realizedPnl}`,
-        // );
+  const subgraphResponse: PorfolioDataSubgraph = await request(subgraphEndpoint, fetchUserPortfolioInfo(usersAddress));
+  // console.log(subgraphResponse);
+  const portfolioData = await Promise.all(
+    subgraphResponse.wallets?.map(async (data) => {
+      const { depositedCollateral, unrealizedPnl, realizedPnl } = getPortfolioDataForUser(data, collateralPrice);
+      // console.log(
+      //   'id :' + data.id,
+      //   `Deposited collateral: ${depositedCollateral}, Unrealized PNL: ${unrealizedPnl}, Realized PNL: ${realizedPnl}`,
+      // );
 
-        return {
-          userAddress: data.id,
-          depositedCollateral,
-          unrealizedPnl,
-          realizedPnl,
-        };
-      }) || [], // Fallback to an empty array if wallets is undefined
-    );
+      return {
+        userAddress: data.id,
+        depositedCollateral,
+        unrealizedPnl,
+        realizedPnl,
+      };
+    }) || [], // Fallback to an empty array if wallets is undefined
+  );
 
-    return portfolioData;
-  } catch (error) {
-    throw error;
-  }
+  return portfolioData;
 };
 
 export const getPortfolioDataForUser = (
   subgraphResponse: PortfolioWallet,
   collateralPrice: { id: string; price: number }[],
 ) => {
-  try {
-    let totaldepositedCollateral = 0;
-    let totalUnrealizedPnl = 0;
-    let totalRealizedPnl = 0;
-    subgraphResponse.snxAccounts.forEach((data) => {
-      let depositedCollateral;
-      let unrealizedPnL;
-      let realizedPnl;
+  let totaldepositedCollateral = 0;
+  let totalUnrealizedPnl = 0;
+  let totalRealizedPnl = 0;
+  subgraphResponse.snxAccounts.forEach((data) => {
+    let depositedCollateral;
+    let unrealizedPnL;
+    let realizedPnl;
 
-      const { openPositions, otherPositions } = splitPositionsByStatus(data.positions);
-      if (data.collateralDeposits.length) {
-        depositedCollateral = getDepositedCollateralBySnxAccount(data.collateralDeposits[0], collateralPrice);
-      } else {
-        depositedCollateral = 0; // No deposited collateral, assume 0
-      }
-      if (openPositions.length) {
-        unrealizedPnL = getUnRealizedPnlBySnxAccount(openPositions[0], collateralPrice);
-      } else {
-        unrealizedPnL = 0; // No open positions, assume 0
-      }
-      if (otherPositions.length) {
-        realizedPnl = getRealizedPnlBySnxAccount(otherPositions[0]);
-      } else {
-        realizedPnl = 0; // No other positions, assume 0
-      }
-      totaldepositedCollateral += depositedCollateral;
-      totalUnrealizedPnl += unrealizedPnL;
-      totalRealizedPnl += realizedPnl;
-    });
+    const { openPositions, otherPositions } = splitPositionsByStatus(data.positions);
+    if (data.collateralDeposits.length) {
+      depositedCollateral = getDepositedCollateralBySnxAccount(data.collateralDeposits[0], collateralPrice);
+    } else {
+      depositedCollateral = 0; // No deposited collateral, assume 0
+    }
+    if (openPositions.length) {
+      unrealizedPnL = getUnRealizedPnlBySnxAccount(openPositions[0], collateralPrice);
+    } else {
+      unrealizedPnL = 0; // No open positions, assume 0
+    }
+    if (otherPositions.length) {
+      realizedPnl = getRealizedPnlBySnxAccount(otherPositions[0]);
+    } else {
+      realizedPnl = 0; // No other positions, assume 0
+    }
+    totaldepositedCollateral += depositedCollateral;
+    totalUnrealizedPnl += unrealizedPnL;
+    totalRealizedPnl += realizedPnl;
+  });
 
-    return {
-      depositedCollateral: totaldepositedCollateral.toFixed(6),
-      unrealizedPnl: totalUnrealizedPnl.toFixed(6),
-      realizedPnl: totalRealizedPnl.toFixed(6),
-    };
-  } catch (error) {
-    throw error;
-  }
+  return {
+    depositedCollateral: totaldepositedCollateral.toFixed(6),
+    unrealizedPnl: totalUnrealizedPnl.toFixed(6),
+    realizedPnl: totalRealizedPnl.toFixed(6),
+  };
 };
 
 const getDepositedCollateralBySnxAccount = (
