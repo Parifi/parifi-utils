@@ -110,7 +110,7 @@ export const getOrderById = async (subgraphEndpoint: string, orderId: string): P
 // Get all price IDs of tokens related to the orders ids
 export const getPythPriceIdsForOrderIds = async (subgraphEndpoint: string, orderIds: string[]): Promise<string[]> => {
   try {
-    const formattedOrderIds: string[] = orderIds.map((orderId) => orderId.toLowerCase());
+    const formattedOrderIds: string[] = orderIds;
     let subgraphResponse: any = await request(subgraphEndpoint, fetchPriceIdsFromOrderIdsQuery(formattedOrderIds));
     if (!subgraphResponse) throw new Error('Error While Fechting Pyth Price Ids For Order Ids');
     const priceIds: string[] = [];

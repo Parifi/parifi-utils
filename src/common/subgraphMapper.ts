@@ -104,7 +104,7 @@ export const mapSingleOrderToInterface = (
     return {
       id: orderResponse.id,
       market: mapSingleMarketToInterface(orderResponse.market),
-      user: mapSubgraphResponseToWalletInterface(orderResponse.user),
+      user: orderResponse.user ? mapSubgraphResponseToWalletInterface(orderResponse.user) : undefined,
       isLimitOrder: orderResponse.isLimitOrder,
       deadline: orderResponse.expirationTime,
       deltaCollateral: orderResponse.deltaCollateral,
@@ -126,8 +126,8 @@ export const mapSingleOrderToInterface = (
       formattedDeltaSize: formatEther(orderResponse.deltaSize ?? '0'),
       depositCollateral: depositCollateral,
       snxAccount: {
-        id: orderResponse.snxAccount.id,
-        accountId: orderResponse.snxAccount.accountId,
+        id: orderResponse?.snxAccount?.id,
+        accountId: orderResponse?.snxAccount?.accountId,
       },
     };
   } catch (error) {
