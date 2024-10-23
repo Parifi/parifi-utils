@@ -1,18 +1,16 @@
-import { Chain } from '@parifi/references';
 import { ParifiSdk } from '../../src';
-import { RpcConfig } from '../../src/interfaces/classConfigs';
 import { gql } from 'graphql-request';
-
-const rpcConfig: RpcConfig = {
-  chainId: Chain.ARBITRUM_MAINNET,
-};
-
-const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {});
+import { configDotenv } from 'dotenv';
+import { getParifiSdkInstanceForTesting } from '..';
+configDotenv();
 
 describe('Query fetching logic from subgraph', () => {
+  let parifiSdk: ParifiSdk | undefined = undefined;
+  beforeAll(async () => {
+    parifiSdk = await getParifiSdkInstanceForTesting();
+  });
   it('should return results for fetching any valid query data', async () => {
-    await parifiSdk.init();
-
+    if (!parifiSdk) throw new Error('Parifi SDK not initialized');
     /// Subgraph query to get selective fields from positions
     const query = gql`
       {
@@ -25,5 +23,6 @@ describe('Query fetching logic from subgraph', () => {
     `;
 
     const response = await parifiSdk.subgraph.executeSubgraphQuery(query);
+    expect(response.positions.length).toBeGreaterThan(0);
   });
 });

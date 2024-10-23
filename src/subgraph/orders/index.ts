@@ -85,7 +85,7 @@ export const getOrderById = async (subgraphEndpoint: string, orderId: string): P
   try {
     const formattedOrderId = orderId;
     let subgraphResponse: any = await request(subgraphEndpoint, fetchOrdersByIdQuery(formattedOrderId));
-    if (!subgraphResponse) throw new Error('Error While Fechting Order By Id');
+    if (!subgraphResponse.order) throw new Error('Error While Fechting Order By Id');
     const collateralSubgraphResponse: any = await request(
       subgraphEndpoint,
       fetchCollateralForOrderUsingAccountId(subgraphResponse?.order?.snxAccount?.id || ''),
