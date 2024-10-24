@@ -3,7 +3,7 @@ import { SYMBOL_TO_PYTH_FEED } from '../../src';
 
 describe('Portfolio data fetching logic from subgraph', () => {
   it('should return  portfolio data', async () => {
-    const userAddress = [
+    const userAddresses = [
       '0x0000000000000000000000000000000000000000',
       '0x14a574faf59023792372251501337fd2bdb75986',
       '0x000000091e379eda0a6f8ec0d945ecac32628538',
@@ -15,11 +15,21 @@ describe('Portfolio data fetching logic from subgraph', () => {
     const priceIdArray: string[] = Array.from(SYMBOL_TO_PYTH_FEED.values());
     const data = await parifiSdk.pyth.getLatestPricesFromPyth(priceIdArray);
     const data1 = parifiSdk.subgraph.transformPriceArray(data);
-    // console.log(data1);
+
+    data1.map(({ id }) => {
+      expect(priceIdArray.includes(id));
+    });
+
     console.log('----------------------------------------------------------------');
-    const data2 = await parifiSdk.subgraph.getPortfolioDataByUsersAddress(userAddress, data1);
+    const data2 = await parifiSdk.subgraph.getPortfolioDataByUsersAddress(userAddresses, data1);
     console.log('----------------------------------------------------------------');
-    console.log(data2);
+    // ensure that each ensure have this own information
+    data2.map(({ userAddress, depositedCollateral, unrealizedPnl, realizedPnl }) => {
+      expect(userAddresses.includes(userAddress));
+      expect(depositedCollateral).toBeDefined();
+      expect(unrealizedPnl).toBeDefined();
+      expect(realizedPnl).toBeDefined();
+    });
     console.log('----------------------------------------------------------------');
   });
 });

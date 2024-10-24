@@ -1,7 +1,8 @@
-import { Chain } from '@parifi/references';
+import { RpcConfig } from '@parifi/synthetix-sdk-ts/dist/interface/classConfigs';
 import { ParifiSdk } from '../../src';
-import { RpcConfig } from '../../src/interfaces/classConfigs';
 import { gql } from 'graphql-request';
+import { Chain } from '@parifi/references';
+import { getParifiSdkInstanceForTesting } from '..';
 const rpcConfig: RpcConfig = {
   chainId: Chain.ARBITRUM_SEPOLIA,
 };
@@ -9,9 +10,12 @@ const rpcConfig: RpcConfig = {
 const parifiSdk = new ParifiSdk(rpcConfig, {}, {}, {});
 
 describe('Query fetching logic from subgraph', () => {
+  let parifiSdk: ParifiSdk | undefined = undefined;
+  beforeAll(async () => {
+    parifiSdk = await getParifiSdkInstanceForTesting();
+  });
   it('should return results for fetching any valid query data', async () => {
-    await parifiSdk.init();
-
+    if (!parifiSdk) throw new Error('Parifi SDK not initialized');
     /// Subgraph query to get selective fields from positions
     const query = gql`
       {
@@ -24,5 +28,6 @@ describe('Query fetching logic from subgraph', () => {
     `;
 
     const response = await parifiSdk.subgraph.executeSubgraphQuery(query);
+    expect(response.positions.length).toBeGreaterThan(0);
   });
 });
