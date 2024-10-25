@@ -8,7 +8,7 @@ import { Market as MarketSg } from '../interfaces/subgraphTypes';
 ////////////////////////////////////////////////////////////////
 
 export const mapSubgraphResponseToWalletInterface = (response: any): Wallet | undefined => {
-  if (response === null) return undefined;
+  if (!response) return undefined;
   try {
     return {
       id: response.id,
@@ -35,7 +35,7 @@ export const mapSubgraphResponseToWalletInterface = (response: any): Wallet | un
 ////////////////////////////////////////////////////////////////
 
 export const mapSingleMarketToInterface = (response: MarketSg): Market | undefined => {
-  if (response === null) return undefined;
+  if (!response) return undefined;
   if (response.marketName === '' || response.marketSymbol === '') return undefined;
   try {
     return {
@@ -68,7 +68,7 @@ export const mapSingleMarketToInterface = (response: MarketSg): Market | undefin
 };
 
 export const mapWalletsArrayToInterface = (response: any): Wallet[] | undefined => {
-  if (response === null) return undefined;
+  if (!response) return undefined;
   try {
     return response.accounts.map((account: Wallet) => {
       return mapSubgraphResponseToWalletInterface(account);
@@ -80,7 +80,7 @@ export const mapWalletsArrayToInterface = (response: any): Wallet[] | undefined 
 };
 
 export const mapMarketsArrayToInterface = (response: MarketSg[]): (Market | undefined)[] | undefined => {
-  if (response === null) return undefined;
+  if (!response) return undefined;
   try {
     return response.map((market: MarketSg) => {
       return mapSingleMarketToInterface(market);
@@ -140,7 +140,7 @@ export const mapOrdersArrayToInterface = (
   response: any,
   collateralDepositResponse: Record<string, DepositCollateral[]>,
 ): Order[] | undefined => {
-  if (response === null) return undefined;
+  if (!response) return undefined;
   try {
     return response.orders.map((order: Order) => {
       const depositedCollateral = collateralDepositResponse[order?.snxAccount?.id || ''];
@@ -152,7 +152,7 @@ export const mapOrdersArrayToInterface = (
   }
 };
 export const mapOrderArrayToPriceid = (response:any) =>{
-  if (response === null) return undefined;
+  if (!response) return undefined;
   try {
     return response.orders.map((order: Order) => {
       return  {
@@ -165,7 +165,7 @@ export const mapOrderArrayToPriceid = (response:any) =>{
   }
 }
 export const mapDespositCollateralArrayToInterface = (response: any): DepositCollateral[] | undefined => {
-  if (response === null) return undefined;
+  if (!response) return undefined;
   try {
     return response.collateralDeposits.map((depositedCollateral: DepositCollateral) => {
       return mapSingleDepoistCollateral(depositedCollateral);
@@ -184,7 +184,7 @@ export const mapSinglePositionToInterface = (
   response: any,
   depositCollateral?: DepositCollateral[] | undefined,
 ): Position | undefined => {
-  if (response === null) return undefined;
+  if (!response) return undefined;
   try {
     return {
       id: response.id,
@@ -225,7 +225,7 @@ export const mapPositionsArrayToInterface = (
   response: any,
   collateralDepositResponse: Record<string, DepositCollateral[]>,
 ): Position[] | undefined => {
-  if (response === null) return undefined;
+  if (!response) return undefined;
 
   try {
     return response.positions.map((position: any) => {
@@ -243,7 +243,7 @@ export const mapPositionsArrayToInterface = (
 ////////////////////////////////////////////////////////////////
 
 export const mapSubgraphResponseToTokenInterface = (response: any): Token | undefined => {
-  if (response === null) return undefined;
+  if (!response) return undefined;
 
   try {
     return {
@@ -266,7 +266,7 @@ export const mapSubgraphResponseToTokenInterface = (response: any): Token | unde
 ////////////////////////////////////////////////////////////////
 
 export const mapSubgraphResponseToPriceFeedSnapshotInterface = (response: any): PriceFeedSnapshot | undefined => {
-  if (response === null) return undefined;
+  if (!response) return undefined;
 
   try {
     return {
@@ -283,7 +283,7 @@ export const mapSubgraphResponseToPriceFeedSnapshotInterface = (response: any): 
 };
 
 export const mapSubgraphResponseToPythDataInterface = (response: any): PythData | undefined => {
-  if (response === null) return undefined;
+  if (!response) return undefined;
 
   try {
     return {
