@@ -1,21 +1,20 @@
-import Decimal from "decimal.js";
-import { Position } from "../interfaces/sdkTypes";
+import Decimal from 'decimal.js';
 
 export const getProfitOrLossInUsd = (
-  positionData: Position,
-  normalizedMarketPrice: Decimal,
+  normalizedMarketPrice: number,
+  avgPrice: number,
+  positionSize: number,
+  isLong: boolean,
   marketDecimals: number = 18,
 ): { totalProfitOrLoss: Decimal } => {
   let profitOrLoss: Decimal;
-  const { avgPrice, positionSize, isLong } = positionData;
   const positionAvgPrice = new Decimal(avgPrice).div(Decimal.pow(10, marketDecimals));
   const positionSizeDecimal = new Decimal(Math.abs(Number(positionSize))).abs().div(Decimal.pow(10, marketDecimals));
+  const normalizedMarketPriceDecimal = new Decimal(normalizedMarketPrice).div(Decimal.pow(10, marketDecimals));
   if (isLong) {
-    // If long, profit when market price > avg price, loss when market price < avg price
-    profitOrLoss = normalizedMarketPrice.minus(positionAvgPrice);
+    profitOrLoss = normalizedMarketPriceDecimal.minus(positionAvgPrice);
   } else {
-    // If short, profit when market price < avg price, loss when market price > avg price
-    profitOrLoss = positionAvgPrice.minus(normalizedMarketPrice);
+    profitOrLoss = positionAvgPrice.minus(normalizedMarketPriceDecimal);
   }
 
   // Adjust the sign for short positions (profit is positive when market price is lower)
