@@ -1,36 +1,16 @@
 import Decimal from 'decimal.js';
-import { Position } from '../interfaces/sdkTypes';
-import { formatEther } from 'ethers';
 
 export const getProfitOrLossInUsd = (
-  positionData: Position,
-  normalizedMarketPrice: Decimal,
+  normalizedMarketPrice: number,
+  avgPrice: number,
+  positionSize: number,
   marketDecimals: number = 18,
 ): { totalProfitOrLoss: Decimal } => {
-  let profitOrLoss: Decimal;
-  const { avgPrice, positionSize, isLong } = positionData;
-  const positionAvgPrice = new Decimal(avgPrice).div(Decimal.pow(10, marketDecimals));
-  const positionSizeDecimal = new Decimal(Math.abs(Number(positionSize))).abs().div(Decimal.pow(10, marketDecimals));
-  if (isLong) {
-    // If long, profit when market price > avg price
-    if (normalizedMarketPrice.gt(positionAvgPrice)) {
-      profitOrLoss = normalizedMarketPrice.minus(positionAvgPrice);
-    } else {
-      profitOrLoss = positionAvgPrice.minus(normalizedMarketPrice);
-      profitOrLoss.times(-1);
-    }
-  } else {
-    // If short, profit when market price < avg price
-    if (normalizedMarketPrice.gt(positionAvgPrice)) {
-      profitOrLoss = normalizedMarketPrice.minus(positionAvgPrice);
-    } else {
-      profitOrLoss = positionAvgPrice.minus(normalizedMarketPrice);
-      profitOrLoss.times(-1);
-    }
-  }
-
-  const totalProfitOrLoss = positionSizeDecimal.times(profitOrLoss);
-
+  const positionSizeDecimal = new Decimal(positionSize).div(Decimal.pow(10, marketDecimals));
+  const avgPriceDecimal = new Decimal(avgPrice).div(Decimal.pow(10, marketDecimals));
+  const profitOrLossPerToken = new Decimal(normalizedMarketPrice).minus(avgPriceDecimal);
+  const totalProfitOrLoss = positionSizeDecimal.times(profitOrLossPerToken);
+  console.log("totalProfitOrLoss",totalProfitOrLoss)
   return { totalProfitOrLoss };
 };
 
@@ -62,3 +42,4 @@ export const calculatePositionLeverage = ({
 
   return { positionLeverage: new Decimal(0) };
 };
+
