@@ -1,31 +1,20 @@
 import Decimal from 'decimal.js';
 
 export const getProfitOrLossInUsd = (
-  normalizedMarketPrice: number,
-  avgPrice: number,
-  positionSize: number,
-  isLong: boolean,
+  normalizedMarketPrice: Decimal,
+  avgPrice: Decimal,
+  positionSize: Decimal,
   marketDecimals: number = 18,
 ): { totalProfitOrLoss: Decimal } => {
-  let profitOrLoss: Decimal;
-  const positionAvgPrice = new Decimal(avgPrice).div(Decimal.pow(10, marketDecimals));
-  const positionSizeDecimal = new Decimal(Math.abs(Number(positionSize))).abs().div(Decimal.pow(10, marketDecimals));
-  const normalizedMarketPriceDecimal = new Decimal(normalizedMarketPrice).div(Decimal.pow(10, marketDecimals));
-  if (isLong) {
-    profitOrLoss = normalizedMarketPriceDecimal.minus(positionAvgPrice);
-  } else {
-    profitOrLoss = positionAvgPrice.minus(normalizedMarketPriceDecimal);
-  }
-
-  // Adjust the sign for short positions (profit is positive when market price is lower)
-  if (!isLong) {
-    profitOrLoss = profitOrLoss.times(new Decimal(-1));
-  }
-
-  const totalProfitOrLoss = positionSizeDecimal.times(profitOrLoss);
-
+  // Initialize position size and prices as Decimals without Number conversion
+  const positionSizeDecimal = positionSize.div(Decimal.pow(10, marketDecimals));
+  const avgPriceDecimal = avgPrice.div(Decimal.pow(10, marketDecimals));
+  const profitOrLossPerToken = normalizedMarketPrice.minus(avgPriceDecimal);
+  const totalProfitOrLoss = positionSizeDecimal.times(profitOrLossPerToken);
+  console.log("totalProfitOrLoss",totalProfitOrLoss)
   return { totalProfitOrLoss };
 };
+
 export const calculatePositionLeverage = ({
   collateralAmount,
   size,

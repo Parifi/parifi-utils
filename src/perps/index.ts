@@ -5,13 +5,12 @@ import { Position } from '../interfaces/sdkTypes';
 export class Perps {
   constructor() {}
   getProfitOrLossInUsd = (
-    normalizedMarketPrice: number,
-    avgPrice: number,
-    positionSize: number,
-    isLong: boolean,
+    normalizedMarketPrice: Decimal,
+    avgPrice: Decimal,
+    positionSize: Decimal,
     marketDecimals: number = 18,
   ): { totalProfitOrLoss: Decimal } => {
-    return getProfitOrLossInUsd(normalizedMarketPrice, avgPrice, positionSize, isLong, marketDecimals);
+    return getProfitOrLossInUsd(normalizedMarketPrice, avgPrice, positionSize, marketDecimals);
   };
 
   calculatePositionLeverage = ({
