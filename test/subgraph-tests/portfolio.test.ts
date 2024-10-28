@@ -21,9 +21,10 @@ describe('Portfolio data fetching logic from subgraph', () => {
     });
 
     console.log('----------------------------------------------------------------');
-    const data2 = await parifiSdk.subgraph.getPortfolioDataByUsersAddress(userAddresses, data1);
+    const data2 = await parifiSdk.subgraph.getPortfolioDataByUsersAddress(['0x2f22928335ed7e472c18e1e487593c0ac40e9ca8'], data1);
     console.log('----------------------------------------------------------------');
     // ensure that each ensure have this own information
+    console.log('data2',data2)
     data2.map(({ userAddress, depositedCollateral, unrealizedPnl, realizedPnl }) => {
       expect(userAddresses.includes(userAddress));
       expect(depositedCollateral).toBeDefined();

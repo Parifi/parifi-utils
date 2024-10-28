@@ -10,7 +10,6 @@ export const getProfitOrLossInUsd = (
   const avgPriceDecimal = new Decimal(avgPrice).div(Decimal.pow(10, marketDecimals));
   const profitOrLossPerToken = new Decimal(normalizedMarketPrice).minus(avgPriceDecimal);
   const totalProfitOrLoss = positionSizeDecimal.times(profitOrLossPerToken);
-  console.log("totalProfitOrLoss",totalProfitOrLoss)
   return { totalProfitOrLoss };
 };
 
