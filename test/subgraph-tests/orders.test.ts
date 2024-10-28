@@ -6,6 +6,7 @@ describe('Order fetching logic from subgraph', () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
     const userAddress = TEST_USER_ADDRESS;
     const orderData = await parifiSdk.subgraph.getAllOrdersByUserAddress(userAddress, 100, 0);
+    console.log('orderData',orderData[0])
     expect(orderData[0]?.user?.id).toBe(userAddress);
   });
 

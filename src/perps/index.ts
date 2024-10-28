@@ -1,15 +1,16 @@
 import Decimal from 'decimal.js';
-import { calculatePositionLeverage, getProfitOrLossInUsd } from './positions';
+import {  calculatePositionLeverage, getProfitOrLossInUsd } from './positions';
 import { Position } from '../interfaces/sdkTypes';
 
 export class Perps {
   constructor() {}
   getProfitOrLossInUsd = (
-    userPosition: Position,
-    normalizedMarketPrice: Decimal,
-    marketDecimals: number,
+    normalizedMarketPrice: number,
+    avgPrice: number,
+    positionSize: number,
+    marketDecimals: number = 18,
   ): { totalProfitOrLoss: Decimal } => {
-    return getProfitOrLossInUsd(userPosition, normalizedMarketPrice, marketDecimals);
+    return getProfitOrLossInUsd(normalizedMarketPrice, avgPrice, positionSize, marketDecimals);
   };
 
   calculatePositionLeverage = ({
