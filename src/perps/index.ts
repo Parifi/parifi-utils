@@ -5,9 +5,9 @@ import { Position } from '../interfaces/sdkTypes';
 export class Perps {
   constructor() {}
   getProfitOrLossInUsd = (
-    normalizedMarketPrice: Decimal,
-    avgPrice: Decimal,
-    positionSize: Decimal,
+    normalizedMarketPrice: number,
+    avgPrice: number,
+    positionSize: number,
     marketDecimals: number = 18,
   ): { totalProfitOrLoss: Decimal } => {
     return getProfitOrLossInUsd(normalizedMarketPrice, avgPrice, positionSize, marketDecimals);

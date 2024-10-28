@@ -1,15 +1,14 @@
 import Decimal from 'decimal.js';
 
 export const getProfitOrLossInUsd = (
-  normalizedMarketPrice: Decimal,
-  avgPrice: Decimal,
-  positionSize: Decimal,
+  normalizedMarketPrice: number,
+  avgPrice: number,
+  positionSize: number,
   marketDecimals: number = 18,
 ): { totalProfitOrLoss: Decimal } => {
-  // Initialize position size and prices as Decimals without Number conversion
-  const positionSizeDecimal = positionSize.div(Decimal.pow(10, marketDecimals));
-  const avgPriceDecimal = avgPrice.div(Decimal.pow(10, marketDecimals));
-  const profitOrLossPerToken = normalizedMarketPrice.minus(avgPriceDecimal);
+  const positionSizeDecimal = new Decimal(positionSize).div(Decimal.pow(10, marketDecimals));
+  const avgPriceDecimal = new Decimal(avgPrice).div(Decimal.pow(10, marketDecimals));
+  const profitOrLossPerToken = new Decimal(normalizedMarketPrice).minus(avgPriceDecimal);
   const totalProfitOrLoss = positionSizeDecimal.times(profitOrLossPerToken);
   console.log("totalProfitOrLoss",totalProfitOrLoss)
   return { totalProfitOrLoss };
