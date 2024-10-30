@@ -1,15 +1,15 @@
 import Decimal from 'decimal.js';
 
 export const getProfitOrLossInUsd = (
-  normalizedMarketPrice: number,
+  marketPrice: number,
   avgPrice: number,
   positionSize: number,
-  marketDecimals: number = 18,
 ): { totalProfitOrLoss: Decimal } => {
-  const positionSizeDecimal = new Decimal(positionSize).div(Decimal.pow(10, marketDecimals));
-  const avgPriceDecimal = new Decimal(avgPrice).div(Decimal.pow(10, marketDecimals));
-  const profitOrLossPerToken = new Decimal(normalizedMarketPrice).minus(avgPriceDecimal);
+  const positionSizeDecimal = new Decimal(positionSize);
+  const avgPriceDecimal = new Decimal(avgPrice);
+  const profitOrLossPerToken = new Decimal(marketPrice).minus(avgPriceDecimal);
   const totalProfitOrLoss = positionSizeDecimal.times(profitOrLossPerToken);
+
   return { totalProfitOrLoss };
 };
 
@@ -41,4 +41,3 @@ export const calculatePositionLeverage = ({
 
   return { positionLeverage: new Decimal(0) };
 };
-
