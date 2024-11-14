@@ -105,7 +105,7 @@ export const fetchTopAccountsByReferralFees = (count: number = 20, skip: number 
   }
 }`;
 export const fetchAccountByWalletAddress = (walletAddress: string) =>
- gql`
+  gql`
   {
     wallet(id: "${walletAddress}") {
       id
@@ -132,3 +132,17 @@ export const fetchLeaderboardUserData = (userAddresses: string[]) => gql`
     totalAccruedBorrowingFeesInUsd 
   }
 }`;
+
+// New snx code
+
+export const fetchintegratorFees = (usersAddress: string[]) =>
+  gql`
+   {
+     wallet(
+      where: {id_in: [${usersAddress.map((id) => `"${id}"`).join(', ')}]}
+    ) {
+       id
+       integratorFeesGenerated
+     }
+   }
+ `;

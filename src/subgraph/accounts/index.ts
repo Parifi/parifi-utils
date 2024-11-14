@@ -2,6 +2,7 @@ import Decimal from 'decimal.js';
 import { request } from 'graphql-request';
 import {
   fetchAccountByWalletAddress,
+  fetchintegratorFees,
   fetchLeaderboardUserData,
   fetchPortfolioData,
   fetchRealizedPnlData,
@@ -174,7 +175,6 @@ export const getPortfolioDataForUsers = async (
   }
 };
 
-
 // Returns the leaderboard page details for a user address
 export const getLeaderboardUserData = async (
   subgraphEndpoint: string,
@@ -188,8 +188,14 @@ export const getLeaderboardUserData = async (
   return leaderboardUserData;
 };
 
-export const getAccountByAddress  = async (subgraphEndpoint:string,userAddresses:string)=>{
-  const subgraphResponse:any = await  request(subgraphEndpoint, fetchAccountByWalletAddress(userAddresses))
+export const getAccountByAddress = async (subgraphEndpoint: string, userAddresses: string) => {
+  const subgraphResponse: any = await request(subgraphEndpoint, fetchAccountByWalletAddress(userAddresses));
   if (!subgraphResponse) throw new Error('Error While Fechting Wallet for Address');
   return subgraphResponse?.wallet;
-}
+};
+
+export const getFeesByAddress = async (subgraphEndpoint: string, userAddresses: string[]) => {
+  const subgraphResponse: any = await request(subgraphEndpoint, fetchintegratorFees(userAddresses));
+  if (!subgraphResponse) throw new Error('Error While Fechting Wallet for Address');
+  return subgraphResponse?.wallets;
+};
