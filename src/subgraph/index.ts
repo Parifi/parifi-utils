@@ -28,6 +28,7 @@ import { Pyth } from '../pyth';
 import Decimal from 'decimal.js';
 import {
   getAccountByAddress,
+  getFeesByAddress,
   getLeaderboardUserData,
   getPortfolioDataForUsers,
   getRealizedPnlForUser,
@@ -240,6 +241,11 @@ export class Subgraph {
   ////////////////////////////////////////////////////////////////
   /////////////////////    PROTOCOL    ///////////////////////////
   ////////////////////////////////////////////////////////////////
+
+  public async getFeesByAddress(userAddresses: string[]) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return getFeesByAddress(subgraphEndpoint, userAddresses);
+  }
   public async getExecutionFee(): Promise<{ executionFeeEth: Decimal; executionFeeUsdc: Decimal }> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return getExecutionFee(subgraphEndpoint);
