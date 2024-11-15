@@ -147,7 +147,7 @@ export const fetchintegratorFees = (usersAddress: string[]) =>
    }
  `;
 
-export const checkActiveUser = (userAddress: string) => gql`
+export const checkExistingUser = (userAddress: string) => gql`
   {
     wallet(id: "${userAddress.toLowerCase()}" ) {
       id
