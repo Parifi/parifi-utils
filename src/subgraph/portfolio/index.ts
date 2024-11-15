@@ -17,15 +17,9 @@ export const getPortfolioDataByUsersAddress = async (
   collateralPrice: { id: string; price: number }[],
 ) => {
   const subgraphResponse: PorfolioDataSubgraph = await request(subgraphEndpoint, fetchUserPortfolioInfo(usersAddress));
-  // console.log(subgraphResponse);
   const portfolioData = await Promise.all(
     subgraphResponse.wallets?.map(async (data) => {
       const { depositedCollateral, unrealizedPnl, realizedPnl } = getPortfolioDataForUser(data, collateralPrice);
-      // console.log(
-      //   'id :' + data.id,
-      //   `Deposited collateral: ${depositedCollateral}, Unrealized PNL: ${unrealizedPnl}, Realized PNL: ${realizedPnl}`,
-      // );
-
       return {
         userAddress: data.id,
         depositedCollateral,
@@ -126,7 +120,8 @@ const getRealizedPnlBySnxAccount = (closedPositionsArray: positionsPortfolio) =>
   if (!closedPositionsArray) return totalRealizedPnl;
 
   const realizedPnl =
-    Number(closedPositionsArray.realizedPnl ?? '0') - Number(formatEther(closedPositionsArray.realizedFee ?? '0'));
+    Number(formatEther(closedPositionsArray.realizedPnl ?? '0')) -
+    Number(formatEther(closedPositionsArray.realizedFee ?? '0'));
   totalRealizedPnl += realizedPnl;
 
   return totalRealizedPnl;

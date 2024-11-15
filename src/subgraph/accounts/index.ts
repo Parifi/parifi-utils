@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js';
 import { request } from 'graphql-request';
 import {
+  checkExistingUser,
   fetchAccountByWalletAddress,
   fetchintegratorFees,
   fetchLeaderboardUserData,
@@ -198,4 +199,12 @@ export const getFeesByAddress = async (subgraphEndpoint: string, userAddresses: 
   const subgraphResponse: any = await request(subgraphEndpoint, fetchintegratorFees(userAddresses));
   if (!subgraphResponse) throw new Error('Error While Fechting Wallet for Address');
   return subgraphResponse?.wallets;
+};
+
+export const checkisExistingUser = async (subgraphEndpoint: string, userAddress: string) => {
+  const subgraphResponse: any = await request(subgraphEndpoint, checkExistingUser(userAddress));
+  if (!subgraphResponse) throw new Error('Error While Fechting Wallet for Address');
+  if (!subgraphResponse?.wallet) return false;
+  if (Number(subgraphResponse?.wallet.totalOrdersCount)) return true;
+  return false;
 };

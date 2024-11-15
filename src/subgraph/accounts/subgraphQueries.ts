@@ -138,7 +138,7 @@ export const fetchLeaderboardUserData = (userAddresses: string[]) => gql`
 export const fetchintegratorFees = (usersAddress: string[]) =>
   gql`
    {
-     wallet(
+     wallets(
       where: {id_in: [${usersAddress.map((id) => `"${id}"`).join(', ')}]}
     ) {
        id
@@ -146,3 +146,12 @@ export const fetchintegratorFees = (usersAddress: string[]) =>
      }
    }
  `;
+
+export const checkExistingUser = (userAddress: string) => gql`
+  {
+    wallet(id: "${userAddress.toLowerCase()}" ) {
+      id
+      totalOrdersCount
+    }
+  }
+`;

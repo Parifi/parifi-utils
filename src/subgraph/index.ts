@@ -27,6 +27,7 @@ import { getPublicSubgraphEndpoint } from './common';
 import { Pyth } from '../pyth';
 import Decimal from 'decimal.js';
 import {
+  checkisExistingUser,
   getAccountByAddress,
   getFeesByAddress,
   getLeaderboardUserData,
@@ -246,6 +247,12 @@ export class Subgraph {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return getFeesByAddress(subgraphEndpoint, userAddresses);
   }
+
+  public async checkisExistingUser(userAddress: string) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await checkisExistingUser(subgraphEndpoint, userAddress);
+  }
+
   public async getExecutionFee(): Promise<{ executionFeeEth: Decimal; executionFeeUsdc: Decimal }> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return getExecutionFee(subgraphEndpoint);
