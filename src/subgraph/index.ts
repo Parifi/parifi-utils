@@ -42,7 +42,7 @@ import {
   ReferralRewardsInUsd,
   UserPortfolioData,
 } from '../interfaces/sdkTypes';
-import { getExecutionFee } from './protocol';
+import { getExecutionFee, getProtocolTradeInformtaion } from './protocol';
 import { PriceObject } from '../interfaces';
 
 export * from './common';
@@ -268,5 +268,9 @@ export class Subgraph {
 
   public transformPriceArray(priceArray: PriceObject[]): { id: string; price: number }[] {
     return transformPriceArray(priceArray);
+  }
+  public getProtocolTradeInformtaion(){
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return getProtocolTradeInformtaion(subgraphEndpoint)
   }
 }
