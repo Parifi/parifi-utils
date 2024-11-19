@@ -1,5 +1,5 @@
 import request from 'graphql-request';
-import { fetchExecutionFee } from './subgraphQueries';
+import { fetchExecutionFee, fetchProtocolTradeInfo } from './subgraphQueries';
 import Decimal from 'decimal.js';
 import { DECIMAL_ZERO } from '../../common';
 
@@ -26,3 +26,16 @@ export const getExecutionFee = async (
     return { executionFeeEth: DECIMAL_ZERO, executionFeeUsdc: DECIMAL_ZERO };
   }
 };
+export interface SubgraphResponseInterface {
+    orderTotalFees: string;
+    totalVolume: string;
+    totalActivePositions: string;
+    activeUsersCount: string;
+}
+export const getProtocolTradeInformtaion = async (
+  subgraphEndpoint: string
+) : Promise<SubgraphResponseInterface> => {
+
+  const subgraphResponse:any = await request(subgraphEndpoint,fetchProtocolTradeInfo())
+  return subgraphResponse.protocolDatas
+}

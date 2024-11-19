@@ -9,3 +9,12 @@ export const fetchExecutionFee = () => gql`
     }
   }
 `;
+
+export const fetchProtocolTradeInfo = () => gql`
+ { protocolDatas {
+    orderTotalFees
+    totalVolume
+    totalActivePositions
+    activeUsersCount
+  }}
+`;
