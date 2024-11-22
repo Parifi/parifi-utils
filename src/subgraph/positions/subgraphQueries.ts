@@ -235,3 +235,21 @@ export const fetchPositionHistoryQuery = (userAddress: string, count: number = 1
             accruedBorrowingFees
         }
     }`;
+export const fetchLiquidatePositions = (accountId: string) =>
+  gql`
+    query {
+      wallets(where: { snxAccounts_: { accountId: "${accountId}" } }) {
+        id
+        positions {
+          id
+          positionSize
+          avgPrice
+          closingPrice
+          status
+          market {
+            marketSymbol
+          }
+        }
+      }
+    }
+  `;

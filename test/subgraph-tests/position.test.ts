@@ -23,4 +23,11 @@ describe('Order fetching logic from subgraph', () => {
     const position = await parifiSdk.subgraph.getClosedPositionsByUserAddress(userAddress);
     expect(position[0]?.user?.id).toBe(userAddress);
   });
+  
+
+  it('should return position details by User address', async () => {
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+    const position = await parifiSdk.subgraph.getLiqudationPosition('10316853981992787796');
+    console.log(position)
+  });
 });
