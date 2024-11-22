@@ -243,6 +243,7 @@ export const fetchLiquidatePositions = (accountId: string) =>
         positions {
           id
           positionSize
+          isLong
           avgPrice
           closingPrice
           status
