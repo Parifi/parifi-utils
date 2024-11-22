@@ -2,6 +2,7 @@ import { request } from 'graphql-request';
 import {
   fetchAllPositionsForCollateralData,
   fetchAllPositionsUnrealizedPnl,
+  fetchLiquidatePositions,
   fetchPositionByIdQuery,
   fetchPositionHistoryQuery,
   fetchPositionsByUserQuery,
@@ -324,3 +325,16 @@ export const getPositionsHistory = async (
     throw error;
   }
 };
+export const getLiqudationPosition = async(
+  subgraphEndpoint: string,
+  accountId:string
+) => {
+ try {
+  const query = fetchLiquidatePositions(accountId)
+  let subgraphResponse: any = await request(subgraphEndpoint, query);
+  if (!subgraphResponse) throw Error(`Error fetching All Liquidate Positions By AccountId`);
+  return subgraphResponse.wallets[0]
+ } catch (error) {
+   throw error;
+ }
+}
