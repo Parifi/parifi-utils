@@ -339,12 +339,20 @@ export interface positionsPortfolio {
   realizedPnl: string;
   realizedFee: string;
 }
+export interface ordersPortfolio {
+    status:string 
+    collateralToken: {
+      symbol:string
+    }
+    deltaCollateral:string
+  }
 
 export interface PortfolioWallet {
   id: string; // Wallet ID
   snxAccounts: Array<{
     collateralDeposits: collateralDepositsPortfolioData[];
     positions: positionsPortfolio[];
+    orders:ordersPortfolio[];
   }>;
 }
 export interface PorfolioDataSubgraph {

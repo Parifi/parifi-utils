@@ -2,6 +2,7 @@ import request from 'graphql-request';
 import { fetchUserPortfolioInfo } from './subgraphQueries';
 import {
   collateralDepositsPortfolioData,
+  ordersPortfolio,
   PorfolioDataSubgraph,
   PortfolioWallet,
   positionsPortfolio,
@@ -43,7 +44,7 @@ export const getPortfolioDataForUser = (
     let depositedCollateral;
     let unrealizedPnL;
     let realizedPnl;
-
+    /** sum of all pending order's collateral delta * collateral price*/
     const { openPositions, otherPositions } = splitPositionsByStatus(data.positions);
     if (data.collateralDeposits.length) {
       depositedCollateral = getDepositedCollateralBySnxAccount(data.collateralDeposits[0], collateralPrice);
@@ -60,6 +61,9 @@ export const getPortfolioDataForUser = (
     } else {
       realizedPnl = 0; // No other positions, assume 0
     }
+    if (data.orders) {
+      totaldepositedCollateral += getTotalCollateralUsedInPendingOrder(data.orders, collateralPrice);
+    }
     totaldepositedCollateral += depositedCollateral;
     totalUnrealizedPnl += unrealizedPnL;
     totalRealizedPnl += realizedPnl;
@@ -71,7 +75,21 @@ export const getPortfolioDataForUser = (
     realizedPnl: totalRealizedPnl.toFixed(6),
   };
 };
-
+const getTotalCollateralUsedInPendingOrder = (
+  orders: ordersPortfolio[],
+  collateralPrice: { id: string; price: number }[],
+) => {
+  const pendingOrders = orders.filter((order) => order.status === 'PENDING');
+  let totalPendingOrderCollateral = 0;
+  if (pendingOrders.length) return 0;
+  pendingOrders.map((order) => {
+    const deltaCollateral = formatEther(order.deltaCollateral ?? '0');
+    const pythId = SYMBOL_TO_PYTH_FEED.get(order?.collateralToken?.symbol?.toUpperCase() || 'USDC');
+    const price = pythId ? collateralPrice.find((p) => p.id === pythId.slice(2))?.price || 0 : 0;
+    totalPendingOrderCollateral += Number(deltaCollateral) * price;
+  });
+  return totalPendingOrderCollateral;
+};
 const getDepositedCollateralBySnxAccount = (
   collateralDeposits: collateralDepositsPortfolioData,
   collateralPrice: { id: string; price: number }[],

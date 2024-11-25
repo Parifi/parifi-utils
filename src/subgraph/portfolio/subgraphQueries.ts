@@ -13,6 +13,13 @@ export const fetchUserPortfolioInfo = (usersAddress: string[]) => gql`
         collateralName
         collateralDecimals
       }
+      orders {
+      status
+      collateralToken {
+        symbol
+      }
+      deltaCollateral
+    }
       positions {
         market{
           marketSymbol
