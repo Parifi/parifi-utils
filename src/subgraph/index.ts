@@ -7,6 +7,7 @@ import {
 } from './orders';
 import { PythConfig, RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
 import {
+  getAllOpenPositionAndAccountInfos,
   getAllPositionsByUserAddress,
   getClosedPositionsByUserAddress,
   getLiqudationPosition,
@@ -192,6 +193,10 @@ public async getLiqudationPosition(
 ){
   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
   return await  getLiqudationPosition(subgraphEndpoint,accountId)
+}
+public async getAllOpenPositionsAndAccountInfo(count:number,skip:number){
+  const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+  return await  getAllOpenPositionAndAccountInfos(subgraphEndpoint,count,skip)
 }
   public async getLiquidatedPositionsByUserAddress(
     userAddress: string,

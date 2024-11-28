@@ -30,4 +30,9 @@ describe('Order fetching logic from subgraph', () => {
     const position = await parifiSdk.subgraph.getLiqudationPosition('10316853981992787796');
     console.log(position)
   });
+  it('should return All Open position', async () => {
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+    const position = await parifiSdk.subgraph.getAllOpenPositionsAndAccountInfo(20,20);
+    console.log('OPEN POSITIONS',position)
+  });
 });

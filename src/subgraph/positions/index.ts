@@ -1,5 +1,6 @@
 import { request } from 'graphql-request';
 import {
+  fetchAllOpenPositionAndAccountInfo,
   fetchAllPositionsForCollateralData,
   fetchAllPositionsUnrealizedPnl,
   fetchLiquidatePositions,
@@ -337,4 +338,14 @@ export const getLiqudationPosition = async(
  } catch (error) {
    throw error;
  }
+}
+export const getAllOpenPositionAndAccountInfos = async(subgraphEndpoint: string,count:number,skip:number) =>{
+  try {
+    const query = fetchAllOpenPositionAndAccountInfo(count,skip)
+    let subgraphResponse: any = await request(subgraphEndpoint, query);
+    if (!subgraphResponse) throw Error(`Error fetching All Open Positions`);
+    return subgraphResponse.positions
+   } catch (error) {
+     throw error;
+   }
 }

@@ -254,3 +254,23 @@ export const fetchLiquidatePositions = (accountId: string) =>
       }
     }
   `;
+export const fetchAllOpenPositionAndAccountInfo = (count: number = 20, skip: number = 0) => gql`
+{
+  positions(
+    orderBy: createdTimestamp
+    orderDirection: desc 
+    first: ${count}
+    skip: ${skip}
+    where: { status: OPEN }
+  ) {
+    id
+    market {
+      id
+    }
+    snxAccount {
+      id
+      accountId
+    }
+  }
+}
+`;
