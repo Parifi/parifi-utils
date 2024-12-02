@@ -267,6 +267,10 @@ export const fetchAllOpenPositionAndAccountInfo = (count: number = 20, skip: num
     market {
       id
     }
+    avgPriceDec
+    user{
+      id
+    }
     snxAccount {
       id
       accountId

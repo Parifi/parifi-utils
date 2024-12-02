@@ -21,7 +21,7 @@ import {
   getTotalDepositedCollateralInUsd,
   getTotalUnrealizedPnlInUsd,
 } from './positions';
-import { getPortfolioDataByUsersAddress, transformPriceArray } from './portfolio';
+import { getOpenPositionsAndDepositCollateralByAddress, getPortfolioDataByUsersAddress, transformPriceArray } from './portfolio';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
 import { Chain } from '@parifi/references';
 import request, { GraphQLClient } from 'graphql-request';
@@ -276,7 +276,13 @@ public async getAllOpenPositionsAndAccountInfo(count:number,skip:number){
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return getPortfolioDataByUsersAddress(subgraphEndpoint, userAddresses, collateralPrice);
   }
-
+public async getOpenPositionAndCollateralDataByUser(
+  userAddresses: string[],
+  collateralPrice: { id: string; price: number }[],
+){
+  const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+return getOpenPositionsAndDepositCollateralByAddress(subgraphEndpoint,userAddresses,collateralPrice)
+}
   public transformPriceArray(priceArray: PriceObject[]): { id: string; price: number }[] {
     return transformPriceArray(priceArray);
   }

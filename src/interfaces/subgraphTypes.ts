@@ -343,6 +343,7 @@ export interface positionsPortfolio {
 export interface PortfolioWallet {
   id: string; // Wallet ID
   snxAccounts: Array<{
+    accountId?:string
     collateralDeposits: collateralDepositsPortfolioData[];
     positions: positionsPortfolio[];
   }>;

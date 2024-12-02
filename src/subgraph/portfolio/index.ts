@@ -1,5 +1,5 @@
 import request from 'graphql-request';
-import { fetchUserPortfolioInfo } from './subgraphQueries';
+import { fetchUserOpenPositionAndDepositCollateral, fetchUserPortfolioInfo } from './subgraphQueries';
 import {
   collateralDepositsPortfolioData,
   PorfolioDataSubgraph,
@@ -31,7 +31,34 @@ export const getPortfolioDataByUsersAddress = async (
 
   return portfolioData;
 };
-
+export const getOpenPositionsAndDepositCollateralByAddress = async (
+  subgraphEndpoint: string,
+  usersAddress: string[],
+  collateralPrice: { id: string; price: number }[],
+) =>{
+  const subgraphResponse: PorfolioDataSubgraph = await request(subgraphEndpoint, fetchUserOpenPositionAndDepositCollateral(usersAddress));
+const openPositionData = await Promise.all(subgraphResponse.wallets?.map(async (data) => {
+ const {depositedCollateral,accountIds}  = getAccountIdAndCollateral(data,collateralPrice)
+       return {
+        depositedCollateral :  depositedCollateral,
+        accountIds :  accountIds
+       }
+  })) || []
+  return openPositionData 
+}
+export const getAccountIdAndCollateral = (
+  subgraphResponse: PortfolioWallet,
+  collateralPrice: { id: string; price: number }[],
+) => {
+  let depositedCollateral = 0;
+  let accountIds:string[] = []
+  subgraphResponse.snxAccounts.forEach((data) => {
+  if (data.collateralDeposits.length && data.positions.length) {
+    depositedCollateral += getDepositedCollateralBySnxAccount(data.collateralDeposits[0], collateralPrice) ?? 0;
+    accountIds.push(data.accountId ?? '')
+  }})
+  return {depositedCollateral,accountIds}
+};
 export const getPortfolioDataForUser = (
   subgraphResponse: PortfolioWallet,
   collateralPrice: { id: string; price: number }[],
