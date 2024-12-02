@@ -37,7 +37,7 @@ export const getOpenPositionsAndDepositCollateralByAddress = async (
   collateralPrice: { id: string; price: number }[],
 ) =>{
   const subgraphResponse: PorfolioDataSubgraph = await request(subgraphEndpoint, fetchUserOpenPositionAndDepositCollateral(usersAddress));
-const openPositionData = await subgraphResponse.wallets?.map((data) => {
+const openPositionData =  subgraphResponse.wallets?.map((data) => {
  const {depositedCollateral,accountIds}  = getAccountIdAndCollateral(data,collateralPrice)
        return {
         depositedCollateral :  depositedCollateral,
