@@ -36,7 +36,7 @@ describe('Portfolio data fetching logic from subgraph', () => {
     });
     console.log('----------------------------------------------------------------');
   });
-  
+
   it('should return All Open position info and collateral Data', async () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
     const priceIdArray: string[] = Array.from(SYMBOL_TO_PYTH_FEED.values());
@@ -47,7 +47,10 @@ describe('Portfolio data fetching logic from subgraph', () => {
       expect(priceIdArray.includes(id));
     });
 
-    const position = await parifiSdk.subgraph.getOpenPositionAndCollateralDataByUser(['0x2f45b4c0c23751339a4f95a7d91f22ea311aa7ea'],data1);
-    console.log('MY OPEN POSITION DATA',position,( position[0]).accountIds)
+    const position = await parifiSdk.subgraph.getOpenPositionAndCollateralDataByUser(
+      ['0x000000091e379eda0a6f8ec0d945ecac32628538', '0x2f45b4c0c23751339a4f95a7d91f22ea311aa7ea'],
+      data1,
+    );
+    console.log('MY OPEN POSITION DATA', position, position[0].accountIds);
   });
 });

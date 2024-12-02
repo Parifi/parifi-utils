@@ -9,6 +9,7 @@ import {
 } from '../../interfaces';
 import { SYMBOL_TO_PYTH_FEED, collateralMappingWithRegularSymbol } from '../../common';
 import { formatEther } from 'ethers';
+import { zeroAddress } from 'viem';
 
 // Get all order by a user address
 export const getPortfolioDataByUsersAddress = async (
@@ -35,29 +36,38 @@ export const getOpenPositionsAndDepositCollateralByAddress = async (
   subgraphEndpoint: string,
   usersAddress: string[],
   collateralPrice: { id: string; price: number }[],
-) =>{
-  const subgraphResponse: PorfolioDataSubgraph = await request(subgraphEndpoint, fetchUserOpenPositionAndDepositCollateral(usersAddress));
-const openPositionData =  subgraphResponse.wallets?.map((data) => {
- const {depositedCollateral,accountIds}  = getAccountIdAndCollateral(data,collateralPrice)
-       return {
-        depositedCollateral :  depositedCollateral,
-        accountIds :  accountIds
-       }
-  }) || []
-  return openPositionData 
-}
+) => {
+  const subgraphResponse: PorfolioDataSubgraph = await request(
+    subgraphEndpoint,
+    fetchUserOpenPositionAndDepositCollateral(usersAddress),
+  );
+  const openPositionData =
+    subgraphResponse.wallets?.map((data) => {
+      const { depositedCollateral, accountIds, userAddress } = getAccountIdAndCollateral(data, collateralPrice);
+      return {
+        depositedCollateral: depositedCollateral,
+        accountIds: accountIds,
+        userAddress: userAddress,
+      };
+    }) || [];
+  return openPositionData;
+};
+
 export const getAccountIdAndCollateral = (
   subgraphResponse: PortfolioWallet,
   collateralPrice: { id: string; price: number }[],
 ) => {
   let depositedCollateral = 0;
-  let accountIds:string[] = []
+  let accountIds: string[] = [];
+  let userAddress: string = zeroAddress;
   subgraphResponse.snxAccounts.forEach((data) => {
-  if (data.collateralDeposits.length && data.positions.length) {
-    depositedCollateral += getDepositedCollateralBySnxAccount(data.collateralDeposits[0], collateralPrice) ?? 0;
-    accountIds.push((data?.positions[0]?.snxAccount?.accountId) ?? '')
-  }})
-  return {depositedCollateral,accountIds}
+    if (data.collateralDeposits.length && data.positions.length) {
+      depositedCollateral += getDepositedCollateralBySnxAccount(data.collateralDeposits[0], collateralPrice) ?? 0;
+      accountIds.push(data?.positions[0]?.snxAccount?.accountId ?? '');
+      userAddress = data?.positions[0]?.user?.id ?? zeroAddress;
+    }
+  });
+  return { depositedCollateral, accountIds, userAddress };
 };
 export const getPortfolioDataForUser = (
   subgraphResponse: PortfolioWallet,
@@ -72,7 +82,7 @@ export const getPortfolioDataForUser = (
     let realizedPnl;
 
     const { openPositions, otherPositions } = splitPositionsByStatus(data.positions);
-    if (data.collateralDeposits.length) {
+    if (data.collateralDeposits.length && data.positions[0]?.status === 'OPEN') {
       depositedCollateral = getDepositedCollateralBySnxAccount(data.collateralDeposits[0], collateralPrice);
     } else {
       depositedCollateral = 0; // No deposited collateral, assume 0

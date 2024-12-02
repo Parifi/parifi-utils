@@ -41,12 +41,14 @@ export const fetchUserOpenPositionAndDepositCollateral = (usersAddress: string[]
           }
           positions(where: {status: OPEN}) {
           snxAccount {
-            accountId
+           accountId
         }
+          user{
+           id
+       }
       }
         }
       }
     }
   `;
 };
-
