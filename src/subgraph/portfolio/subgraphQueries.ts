@@ -39,10 +39,11 @@ export const fetchUserOpenPositionAndDepositCollateral = (usersAddress: string[]
             collateralName
             collateralDecimals
           }
-          accountId
-          positions(where: { status: OPEN }) {
-            status
-          }
+          positions(where: {status: OPEN}) {
+          snxAccount {
+            accountId
+        }
+      }
         }
       }
     }

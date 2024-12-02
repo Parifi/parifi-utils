@@ -55,7 +55,7 @@ export const getAccountIdAndCollateral = (
   subgraphResponse.snxAccounts.forEach((data) => {
   if (data.collateralDeposits.length && data.positions.length) {
     depositedCollateral += getDepositedCollateralBySnxAccount(data.collateralDeposits[0], collateralPrice) ?? 0;
-    accountIds.push(data.accountId ?? '')
+    accountIds.push((data?.positions[0]?.snxAccount?.accountId) ?? '')
   }})
   return {depositedCollateral,accountIds}
 };
