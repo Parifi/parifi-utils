@@ -37,13 +37,13 @@ export const getOpenPositionsAndDepositCollateralByAddress = async (
   collateralPrice: { id: string; price: number }[],
 ) =>{
   const subgraphResponse: PorfolioDataSubgraph = await request(subgraphEndpoint, fetchUserOpenPositionAndDepositCollateral(usersAddress));
-const openPositionData = await Promise.all(subgraphResponse.wallets?.map(async (data) => {
+const openPositionData = await subgraphResponse.wallets?.map((data) => {
  const {depositedCollateral,accountIds}  = getAccountIdAndCollateral(data,collateralPrice)
        return {
         depositedCollateral :  depositedCollateral,
         accountIds :  accountIds
        }
-  })) || []
+  }) || []
   return openPositionData 
 }
 export const getAccountIdAndCollateral = (
@@ -72,7 +72,7 @@ export const getPortfolioDataForUser = (
     let realizedPnl;
 
     const { openPositions, otherPositions } = splitPositionsByStatus(data.positions);
-    if (data.collateralDeposits.length && data.positions[0]?.status === 'OPEN') {
+    if (data.collateralDeposits.length) {
       depositedCollateral = getDepositedCollateralBySnxAccount(data.collateralDeposits[0], collateralPrice);
     } else {
       depositedCollateral = 0; // No deposited collateral, assume 0

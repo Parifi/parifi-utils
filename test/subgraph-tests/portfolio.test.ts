@@ -47,7 +47,7 @@ describe('Portfolio data fetching logic from subgraph', () => {
       expect(priceIdArray.includes(id));
     });
 
-    const position = await parifiSdk.subgraph.getOpenPositionAndCollateralDataByUser(['0xe8d09bb14c5fb2b76ca2988f7982d8d7138d62a2'],data1);
-    console.log('MY OPEN POSITION DATA',position)
+    const position = await parifiSdk.subgraph.getOpenPositionAndCollateralDataByUser(['0x2f45b4c0c23751339a4f95a7d91f22ea311aa7ea'],data1);
+    console.log('MY OPEN POSITION DATA',position,( position[0]).accountIds)
   });
 });
