@@ -72,7 +72,7 @@ export const getPortfolioDataForUser = (
     let realizedPnl;
 
     const { openPositions, otherPositions } = splitPositionsByStatus(data.positions);
-    if (data.collateralDeposits.length) {
+    if (data.collateralDeposits.length && data.positions[0]?.status === 'OPEN') {
       depositedCollateral = getDepositedCollateralBySnxAccount(data.collateralDeposits[0], collateralPrice);
     } else {
       depositedCollateral = 0; // No deposited collateral, assume 0
