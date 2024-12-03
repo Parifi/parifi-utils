@@ -39,14 +39,14 @@ describe('Order fetching logic from subgraph', () => {
     const startTime = '1730612233'
     const endTime = '1731217033'
     const parifiSdk = await getParifiSdkInstanceForTesting();
-    const position = await parifiSdk.subgraph.getAllOpenPositionWithTime(startTime,endTime)
-    // console.log(`All open position between startTime ${startTime} and endTime ${endTime}`,position)
+    const position = await parifiSdk.subgraph.getAllOpenPositionWithTime(20,10,startTime,endTime)
+    console.log(`All open position between startTime ${startTime} and endTime ${endTime}`,position)
   });
   it('should return All Closed position based on time ' , async () => {
     const startTime = '1730612233'
     const endTime = '1731217033'
     const parifiSdk = await getParifiSdkInstanceForTesting();
-    const position = await parifiSdk.subgraph.getAllClosedAndLiquidatedPosition(startTime,endTime);
-    // console.log(`All Closed position based on time ${startTime} end time ${endTime}`,position)
+    const position = await parifiSdk.subgraph.getAllClosedAndLiquidatedPosition(20,10,startTime,endTime);
+    console.log(`All Closed position based on time ${startTime} end time ${endTime}`,position)
   });
 });

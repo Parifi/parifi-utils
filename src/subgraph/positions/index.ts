@@ -350,11 +350,13 @@ export const getAllOpenPositionAndAccountInfos = async (subgraphEndpoint: string
 };
 export const getAllClosedAndLiquidatedPosition = async (
   subgraphEndpoint: string,
+  count: number,
+  skip: number,
   startTime: string,
   endTime: string,
 ) => {
   try {
-    const query = fetchAllClosedAndLiquidatedPosition(startTime, endTime);
+    const query = fetchAllClosedAndLiquidatedPosition(count, skip, startTime, endTime);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
     if (!subgraphResponse) throw Error(`Error fetching All Closed Positions`);
     return subgraphResponse.positions;
@@ -364,11 +366,13 @@ export const getAllClosedAndLiquidatedPosition = async (
 };
 export const getAllOpenPositionWithTime = async (
   subgraphEndpoint: string,
+  count: number,
+  skip: number,
   startTime: string,
   endTime: string,
 ) => {
   try {
-    const query = fetchAllOpenPosition(startTime, endTime);
+    const query = fetchAllOpenPosition(count, skip, startTime, endTime);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
     if (!subgraphResponse) throw Error(`Error fetching All Open Positions`);
     return subgraphResponse.positions;

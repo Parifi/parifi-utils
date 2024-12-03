@@ -240,13 +240,13 @@ export class Subgraph {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getPositionsHistory(subgraphEndpoint, userAddress, count, skip);
   }
-  public async getAllOpenPositionWithTime(stratTime: string, endTime: string) {
+  public async getAllOpenPositionWithTime(count: number, skip: number, stratTime: string, endTime: string) {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getAllOpenPositionWithTime(subgraphEndpoint, stratTime, endTime);
+    return await getAllOpenPositionWithTime(subgraphEndpoint, count, skip, stratTime, endTime);
   }
-  public async getAllClosedAndLiquidatedPosition(stratTime: string, endTime: string) {
+  public async getAllClosedAndLiquidatedPosition(count: number, skip: number, stratTime: string, endTime: string) {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await getAllClosedAndLiquidatedPosition(subgraphEndpoint, stratTime, endTime);
+    return await getAllClosedAndLiquidatedPosition(subgraphEndpoint, count, skip, stratTime, endTime);
   }
   ////////////////////////////////////////////////////////////////
   //////////////////////    MARKET    ////////////////////////////

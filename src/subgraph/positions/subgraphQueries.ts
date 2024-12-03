@@ -277,10 +277,18 @@ export const fetchAllOpenPositionAndAccountInfo = (count: number = 20, skip: num
     }
   }
 }`;
-export const fetchAllClosedAndLiquidatedPosition = (startTimestamp: string, endTimestamp: string, statusNot = 'OPEN') =>
+export const fetchAllClosedAndLiquidatedPosition = (
+  count: number = 20,
+  skip: number = 0,
+  startTimestamp: string,
+  endTimestamp: string,
+  statusNot = 'OPEN',
+) =>
   gql`
 {
       positions(
+        first: ${count}
+        skip: ${skip}
         where: {
           createdTimestamp_gte: "${startTimestamp}",
           createdTimestamp_lte: "${endTimestamp}",
@@ -298,11 +306,15 @@ export const fetchAllClosedAndLiquidatedPosition = (startTimestamp: string, endT
     }
   `;
 export const fetchAllOpenPosition = (
+  count: number = 20,
+  skip: number = 0,
   startTimestamp: string,
   endTimestamp: string,
 ) => gql`
   {
     positions(
+      first: ${count}
+      skip: ${skip}
       where: {
         createdTimestamp_gte: "${startTimestamp}", 
         createdTimestamp_lte: "${endTimestamp}", 
