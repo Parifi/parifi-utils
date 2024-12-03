@@ -276,5 +276,50 @@ export const fetchAllOpenPositionAndAccountInfo = (count: number = 20, skip: num
       accountId
     }
   }
-}
+}`;
+export const fetchAllClosedAndLiquidatedPosition = (startTimestamp: string, endTimestamp: string, statusNot = 'OPEN') =>
+  gql`
+{
+      positions(
+        where: {
+          createdTimestamp_gte: "${startTimestamp}",
+          createdTimestamp_lte: "${endTimestamp}",
+          status_not: ${statusNot}
+        }
+      ) {
+        id
+        user {
+          id
+        }
+        status
+        netRealizedPnl
+        realizedPnl  # currently using this the netRealizedPnl is zero for liqudated position
+      }
+    }
+  `;
+export const fetchAllOpenPosition = (
+  startTimestamp: string,
+  endTimestamp: string,
+) => gql`
+  {
+    positions(
+      where: {
+        createdTimestamp_gte: "${startTimestamp}", 
+        createdTimestamp_lte: "${endTimestamp}", 
+        status: OPEN
+      }
+    ) {
+      id
+      market {
+        id
+      }
+      user {
+        id
+      }
+      snxAccount {
+        id
+        accountId
+      }
+    }
+  }
 `;

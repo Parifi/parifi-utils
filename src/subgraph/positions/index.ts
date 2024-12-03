@@ -1,5 +1,7 @@
 import { request } from 'graphql-request';
 import {
+  fetchAllClosedAndLiquidatedPosition,
+  fetchAllOpenPosition,
   fetchAllOpenPositionAndAccountInfo,
   fetchAllPositionsForCollateralData,
   fetchAllPositionsUnrealizedPnl,
@@ -326,26 +328,51 @@ export const getPositionsHistory = async (
     throw error;
   }
 };
-export const getLiqudationPosition = async(
-  subgraphEndpoint: string,
-  accountId:string
-) => {
- try {
-  const query = fetchLiquidatePositions(accountId)
-  let subgraphResponse: any = await request(subgraphEndpoint, query);
-  if (!subgraphResponse) throw Error(`Error fetching All Liquidate Positions By AccountId`);
-  return subgraphResponse.wallets[0]
- } catch (error) {
-   throw error;
- }
-}
-export const getAllOpenPositionAndAccountInfos = async(subgraphEndpoint: string,count:number,skip:number) =>{
+export const getLiqudationPosition = async (subgraphEndpoint: string, accountId: string) => {
   try {
-    const query = fetchAllOpenPositionAndAccountInfo(count,skip)
+    const query = fetchLiquidatePositions(accountId);
+    let subgraphResponse: any = await request(subgraphEndpoint, query);
+    if (!subgraphResponse) throw Error(`Error fetching All Liquidate Positions By AccountId`);
+    return subgraphResponse.wallets[0];
+  } catch (error) {
+    throw error;
+  }
+};
+export const getAllOpenPositionAndAccountInfos = async (subgraphEndpoint: string, count: number, skip: number) => {
+  try {
+    const query = fetchAllOpenPositionAndAccountInfo(count, skip);
     let subgraphResponse: any = await request(subgraphEndpoint, query);
     if (!subgraphResponse) throw Error(`Error fetching All Open Positions`);
-    return subgraphResponse.positions
-   } catch (error) {
-     throw error;
-   }
-}
+    return subgraphResponse.positions;
+  } catch (error) {
+    throw error;
+  }
+};
+export const getAllClosedAndLiquidatedPosition = async (
+  subgraphEndpoint: string,
+  startTime: string,
+  endTime: string,
+) => {
+  try {
+    const query = fetchAllClosedAndLiquidatedPosition(startTime, endTime);
+    let subgraphResponse: any = await request(subgraphEndpoint, query);
+    if (!subgraphResponse) throw Error(`Error fetching All Closed Positions`);
+    return subgraphResponse.positions;
+  } catch (error) {
+    throw error;
+  }
+};
+export const getAllOpenPositionWithTime = async (
+  subgraphEndpoint: string,
+  startTime: string,
+  endTime: string,
+) => {
+  try {
+    const query = fetchAllOpenPosition(startTime, endTime);
+    let subgraphResponse: any = await request(subgraphEndpoint, query);
+    if (!subgraphResponse) throw Error(`Error fetching All Open Positions`);
+    return subgraphResponse.positions;
+  } catch (error) {
+    throw error;
+  }
+};
