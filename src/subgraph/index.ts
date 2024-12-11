@@ -26,6 +26,7 @@ import {
 import {
   getOpenPositionsAndDepositCollateralByAddress,
   getPortfolioDataByUsersAddress,
+  getRealizedPnlForLiquidatedPositions,
   transformPriceArray,
 } from './portfolio';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
@@ -234,6 +235,14 @@ export class Subgraph {
   public async getTotalUnrealizedPnlInUsd(userAddress: string): Promise<Decimal> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getTotalUnrealizedPnlInUsd(subgraphEndpoint, userAddress);
+  }
+
+  public async getRealizedPnlForLiquidatedPositions(
+    accountId: string[],
+    collateralPrices: { id: string; price: number }[],
+  ) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getRealizedPnlForLiquidatedPositions(subgraphEndpoint, accountId, collateralPrices);
   }
 
   public async getPositionsHistory(userAddress: string, count: number = 100, skip: number = 0): Promise<Position[]> {

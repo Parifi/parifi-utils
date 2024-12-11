@@ -17,7 +17,6 @@ import {
 import {
   mapDespositCollateralArrayToInterface,
   mapPositionsArrayToInterface,
-  mapSingleOrderToInterface,
   mapSinglePositionToInterface,
 } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
@@ -30,7 +29,7 @@ import {
 } from '../../common';
 import Decimal from 'decimal.js';
 import { fetchCollateralForOrderUsingAccountId } from '../orders/subgraphQueries';
-import { Position, Order } from '../../interfaces/sdkTypes';
+import { Position } from '../../interfaces/sdkTypes';
 
 /// Position Ids interface to format subgraph response to string array
 interface PositionIdsSubgraphResponse {

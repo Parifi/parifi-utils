@@ -52,3 +52,19 @@ export const fetchUserOpenPositionAndDepositCollateral = (usersAddress: string[]
     }
   `;
 };
+
+export const fecthLiquidatedPositionReliazedPnlBasedOnCollateralDeposits = (accountId: string[]) => {
+  return gql`
+    {
+      snxAccounts(where: { accountId_in: [${accountId.map((id) => `"${id}"`).join(', ')}] }) {
+          accountId
+          collateralDeposits {
+            depositedAmount
+            collateralSymbol
+            collateralName
+            collateralDecimals
+          }
+      }
+    }
+  `;
+};

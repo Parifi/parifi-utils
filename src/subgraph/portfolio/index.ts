@@ -1,7 +1,12 @@
 import request from 'graphql-request';
-import { fetchUserOpenPositionAndDepositCollateral, fetchUserPortfolioInfo } from './subgraphQueries';
+import {
+  fecthLiquidatedPositionReliazedPnlBasedOnCollateralDeposits,
+  fetchUserOpenPositionAndDepositCollateral,
+  fetchUserPortfolioInfo,
+} from './subgraphQueries';
 import {
   collateralDepositsPortfolioData,
+  LiquidatePositionCollateral,
   PorfolioDataSubgraph,
   PortfolioWallet,
   positionsPortfolio,
@@ -107,6 +112,25 @@ export const getPortfolioDataForUser = (
     unrealizedPnl: totalUnrealizedPnl.toFixed(6),
     realizedPnl: totalRealizedPnl.toFixed(6),
   };
+};
+
+export const getRealizedPnlForLiquidatedPositions = async (
+  subgraphEndpoint: string,
+  accountId: string[],
+  collateralPrice: { id: string; price: number }[],
+) => {
+  const subgraphResponse: { snxAccounts: LiquidatePositionCollateral[] } = await request(
+    subgraphEndpoint,
+    fecthLiquidatedPositionReliazedPnlBasedOnCollateralDeposits(accountId),
+  );
+  const data = subgraphResponse.snxAccounts.map((data) => {
+    console.log(data);
+    return {
+      accountId: data.accountId,
+      realizedPnl: (getDepositedCollateralBySnxAccount(data.collateralDeposits[0], collateralPrice) ?? 0) * -1,
+    };
+  });
+  return data;
 };
 
 const getDepositedCollateralBySnxAccount = (

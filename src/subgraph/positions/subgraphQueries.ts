@@ -304,6 +304,9 @@ export const fetchAllClosedAndLiquidatedPosition = (
         status
         netRealizedPnl
         realizedPnl  # currently using this the netRealizedPnl is zero for liqudated position
+        snxAccount {
+          accountId
+        }
       }
     }
   `;
