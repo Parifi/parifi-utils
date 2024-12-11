@@ -299,6 +299,8 @@ export const fetchAllClosedAndLiquidatedPosition = (
         user {
           id
         }
+        positionSize
+        avgPriceDec
         status
         netRealizedPnl
         realizedPnl  # currently using this the netRealizedPnl is zero for liqudated position
@@ -321,6 +323,8 @@ export const fetchAllOpenPosition = (
         status: OPEN
       }
     ) {
+      positionSize
+      avgPriceDec
       id
       market {
         id
