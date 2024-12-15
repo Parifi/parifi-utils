@@ -30,4 +30,23 @@ describe('Order fetching logic from subgraph', () => {
     const position = await parifiSdk.subgraph.getLiqudationPosition('10316853981992787796');
     console.log(position)
   });
+  it('should return All Open position', async () => {
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+    const position = await parifiSdk.subgraph.getAllOpenPositionsAndAccountInfo(20,20);
+    console.log('OPEN POSITIONS',position)
+  });
+  it('should return All Open position based on time ' , async () => {
+    const startTime = '1730612233'
+    const endTime = '1731217033'
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+    const position = await parifiSdk.subgraph.getAllOpenPositionWithTime(20,10,startTime,endTime)
+    console.log(`All open position between startTime ${startTime} and endTime ${endTime}`,position)
+  });
+  it('should return All Closed position based on time ' , async () => {
+    const startTime = '1730612233'
+    const endTime = '1731217033'
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+    const position = await parifiSdk.subgraph.getAllClosedAndLiquidatedPosition(20,10,startTime,endTime);
+    console.log(`All Closed position based on time ${startTime} end time ${endTime}`,position)
+  });
 });

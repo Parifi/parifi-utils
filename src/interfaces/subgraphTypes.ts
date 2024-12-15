@@ -330,6 +330,7 @@ export interface collateralDepositsPortfolioData {
 }
 
 export interface positionsPortfolio {
+  snxAccount?: { accountId: string };
   status: string;
   market: {
     marketSymbol: string;
@@ -338,6 +339,9 @@ export interface positionsPortfolio {
   avgPrice: string;
   realizedPnl: string;
   realizedFee: string;
+  user?: {
+    id: string;
+  };
 }
 
 export interface PortfolioWallet {
@@ -365,4 +369,40 @@ export type PriceObject = {
     expo: number;
     publish_time: number;
   };
+};
+
+export type LeaderBoardClosedPosition = {
+  id: string;
+  user: {
+    id: string;
+  };
+  positionSize: string;
+  avgPriceDec: string;
+  status: string;
+  netRealizedPnl: string;
+  realizedPnl: string;
+  snxAccount: {
+    accountId: string;
+  };
+};
+
+export type LeaderBoardOpenPosition = {
+  positionSize: string;
+  avgPriceDec: string;
+  id: string;
+  market: {
+    id: string;
+  };
+  user: {
+    id: string;
+  };
+  snxAccount: {
+    id: string;
+    accountId: string;
+  };
+};
+
+export type LiquidatePositionCollateral = {
+  accountId: string;
+  collateralDeposits: collateralDepositsPortfolioData[];
 };

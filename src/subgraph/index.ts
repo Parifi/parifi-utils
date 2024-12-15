@@ -7,6 +7,9 @@ import {
 } from './orders';
 import { PythConfig, RpcConfig, SubgraphConfig } from '../interfaces/classConfigs';
 import {
+  getAllClosedAndLiquidatedPosition,
+  getAllOpenPositionAndAccountInfos,
+  getAllOpenPositionWithTime,
   getAllPositionsByUserAddress,
   getClosedPositionsByUserAddress,
   getLiqudationPosition,
@@ -20,7 +23,12 @@ import {
   getTotalDepositedCollateralInUsd,
   getTotalUnrealizedPnlInUsd,
 } from './positions';
-import { getPortfolioDataByUsersAddress, transformPriceArray } from './portfolio';
+import {
+  getOpenPositionsAndDepositCollateralByAddress,
+  getPortfolioDataByUsersAddress,
+  getRealizedPnlForLiquidatedPositions,
+  transformPriceArray,
+} from './portfolio';
 import { getAllMarketsFromSubgraph, getMarketById } from './markets';
 import { Chain } from '@parifi/references';
 import request, { GraphQLClient } from 'graphql-request';
@@ -187,12 +195,14 @@ export class Subgraph {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getClosedPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
   }
-public async getLiqudationPosition(
-  accountId:string
-){
-  const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  return await  getLiqudationPosition(subgraphEndpoint,accountId)
-}
+  public async getLiqudationPosition(accountId: string) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getLiqudationPosition(subgraphEndpoint, accountId);
+  }
+  public async getAllOpenPositionsAndAccountInfo(count: number, skip: number) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getAllOpenPositionAndAccountInfos(subgraphEndpoint, count, skip);
+  }
   public async getLiquidatedPositionsByUserAddress(
     userAddress: string,
     count: number = 20,
@@ -227,9 +237,25 @@ public async getLiqudationPosition(
     return await getTotalUnrealizedPnlInUsd(subgraphEndpoint, userAddress);
   }
 
+  public async getRealizedPnlForLiquidatedPositions(
+    accountId: string[],
+    collateralPrices: { id: string; price: number }[],
+  ) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getRealizedPnlForLiquidatedPositions(subgraphEndpoint, accountId, collateralPrices);
+  }
+
   public async getPositionsHistory(userAddress: string, count: number = 100, skip: number = 0): Promise<Position[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getPositionsHistory(subgraphEndpoint, userAddress, count, skip);
+  }
+  public async getAllOpenPositionWithTime(count: number, skip: number, stratTime: string, endTime: string) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getAllOpenPositionWithTime(subgraphEndpoint, count, skip, stratTime, endTime);
+  }
+  public async getAllClosedAndLiquidatedPosition(count: number, skip: number, stratTime: string, endTime: string) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getAllClosedAndLiquidatedPosition(subgraphEndpoint, count, skip, stratTime, endTime);
   }
   ////////////////////////////////////////////////////////////////
   //////////////////////    MARKET    ////////////////////////////
@@ -271,12 +297,18 @@ public async getLiqudationPosition(
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return getPortfolioDataByUsersAddress(subgraphEndpoint, userAddresses, collateralPrice);
   }
-
+  public async getOpenPositionAndCollateralDataByUser(
+    userAddresses: string[],
+    collateralPrice: { id: string; price: number }[],
+  ) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return getOpenPositionsAndDepositCollateralByAddress(subgraphEndpoint, userAddresses, collateralPrice);
+  }
   public transformPriceArray(priceArray: PriceObject[]): { id: string; price: number }[] {
     return transformPriceArray(priceArray);
   }
-  public getProtocolTradeInformtaion(){
+  public getProtocolTradeInformtaion() {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return getProtocolTradeInformtaion(subgraphEndpoint)
+    return getProtocolTradeInformtaion(subgraphEndpoint);
   }
 }

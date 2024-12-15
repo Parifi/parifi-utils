@@ -1,5 +1,8 @@
 import { request } from 'graphql-request';
 import {
+  fetchAllClosedAndLiquidatedPosition,
+  fetchAllOpenPosition,
+  fetchAllOpenPositionAndAccountInfo,
   fetchAllPositionsForCollateralData,
   fetchAllPositionsUnrealizedPnl,
   fetchLiquidatePositions,
@@ -14,7 +17,6 @@ import {
 import {
   mapDespositCollateralArrayToInterface,
   mapPositionsArrayToInterface,
-  mapSingleOrderToInterface,
   mapSinglePositionToInterface,
 } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
@@ -27,7 +29,7 @@ import {
 } from '../../common';
 import Decimal from 'decimal.js';
 import { fetchCollateralForOrderUsingAccountId } from '../orders/subgraphQueries';
-import { Position, Order } from '../../interfaces/sdkTypes';
+import { Position } from '../../interfaces/sdkTypes';
 
 /// Position Ids interface to format subgraph response to string array
 interface PositionIdsSubgraphResponse {
@@ -325,16 +327,55 @@ export const getPositionsHistory = async (
     throw error;
   }
 };
-export const getLiqudationPosition = async(
+export const getLiqudationPosition = async (subgraphEndpoint: string, accountId: string) => {
+  try {
+    const query = fetchLiquidatePositions(accountId);
+    let subgraphResponse: any = await request(subgraphEndpoint, query);
+    if (!subgraphResponse) throw Error(`Error fetching All Liquidate Positions By AccountId`);
+    return subgraphResponse.wallets[0];
+  } catch (error) {
+    throw error;
+  }
+};
+export const getAllOpenPositionAndAccountInfos = async (subgraphEndpoint: string, count: number, skip: number) => {
+  try {
+    const query = fetchAllOpenPositionAndAccountInfo(count, skip);
+    let subgraphResponse: any = await request(subgraphEndpoint, query);
+    if (!subgraphResponse) throw Error(`Error fetching All Open Positions`);
+    return subgraphResponse.positions;
+  } catch (error) {
+    throw error;
+  }
+};
+export const getAllClosedAndLiquidatedPosition = async (
   subgraphEndpoint: string,
-  accountId:string
+  count: number,
+  skip: number,
+  startTime: string,
+  endTime: string,
 ) => {
- try {
-  const query = fetchLiquidatePositions(accountId)
-  let subgraphResponse: any = await request(subgraphEndpoint, query);
-  if (!subgraphResponse) throw Error(`Error fetching All Liquidate Positions By AccountId`);
-  return subgraphResponse.wallets[0]
- } catch (error) {
-   throw error;
- }
-}
+  try {
+    const query = fetchAllClosedAndLiquidatedPosition(count, skip, startTime, endTime);
+    let subgraphResponse: any = await request(subgraphEndpoint, query);
+    if (!subgraphResponse) throw Error(`Error fetching All Closed Positions`);
+    return subgraphResponse.positions;
+  } catch (error) {
+    throw error;
+  }
+};
+export const getAllOpenPositionWithTime = async (
+  subgraphEndpoint: string,
+  count: number,
+  skip: number,
+  startTime: string,
+  endTime: string,
+) => {
+  try {
+    const query = fetchAllOpenPosition(count, skip, startTime, endTime);
+    let subgraphResponse: any = await request(subgraphEndpoint, query);
+    if (!subgraphResponse) throw Error(`Error fetching All Open Positions`);
+    return subgraphResponse.positions;
+  } catch (error) {
+    throw error;
+  }
+};

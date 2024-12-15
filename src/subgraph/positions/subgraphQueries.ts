@@ -254,3 +254,91 @@ export const fetchLiquidatePositions = (accountId: string) =>
       }
     }
   `;
+export const fetchAllOpenPositionAndAccountInfo = (count: number = 20, skip: number = 0) => gql`
+{
+  positions(
+    orderBy: createdTimestamp
+    orderDirection: desc 
+    first: ${count}
+    skip: ${skip}
+    where: { status: OPEN }
+  ) {
+    id
+    market {
+      id
+    }
+    avgPriceDec
+    user{
+      id
+    }
+    snxAccount {
+      id
+      accountId
+    }
+  }
+}`;
+export const fetchAllClosedAndLiquidatedPosition = (
+  count: number = 20,
+  skip: number = 0,
+  startTimestamp: string,
+  endTimestamp: string,
+  statusNot = 'OPEN',
+) =>
+  gql`
+{
+      positions(
+        first: ${count}
+        skip: ${skip}
+        where: {
+          createdTimestamp_gte: "${startTimestamp}",
+          createdTimestamp_lte: "${endTimestamp}",
+          status_not: ${statusNot}
+        }
+      ) {
+        id
+        user {
+          id
+        }
+        positionSize
+        avgPriceDec
+        status
+        netRealizedPnl
+        realizedPnl  # currently using this the netRealizedPnl is zero for liqudated position
+        snxAccount {
+          accountId
+        }
+      }
+    }
+  `;
+export const fetchAllOpenPosition = (
+  count: number = 20,
+  skip: number = 0,
+  startTimestamp: string,
+  endTimestamp: string,
+) => gql`
+  {
+    positions(
+      first: ${count}
+      skip: ${skip}
+      where: {
+        createdTimestamp_gte: "${startTimestamp}", 
+        createdTimestamp_lte: "${endTimestamp}", 
+        status: OPEN
+      }
+    ) {
+      positionSize
+      avgPriceDec
+      id
+      market {
+        id
+      }
+      user {
+        id
+      }
+      snxAccount {
+        id
+        accountId
+      }
+    }
+  }
+`;
