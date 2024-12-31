@@ -1,20 +1,12 @@
 import { gql } from 'graphql-request';
 
-// Fetch execution fee for protocol from subgraph
-export const fetchExecutionFee = () => gql`
+export const fetchProtocolTradeInfo = () => gql`
   {
     protocolData(id: "1") {
-      executionFeeEth
-      executionFeeUsdc
+      orderTotalFees
+      totalVolume
+      totalActivePositions
+      activeUsersCount
     }
   }
-`;
-
-export const fetchProtocolTradeInfo = () => gql`
- { protocolDatas {
-    orderTotalFees
-    totalVolume
-    totalActivePositions
-    activeUsersCount
-  }}
 `;

@@ -51,8 +51,8 @@ import {
   ReferralRewardsInUsd,
   UserPortfolioData,
 } from '../interfaces/sdkTypes';
-import { getExecutionFee, getProtocolTradeInformtaion } from './protocol';
 import { PriceObject } from '../interfaces';
+import { getProtocolStats } from './protocol';
 
 export * from './common';
 export * from './markets';
@@ -257,6 +257,37 @@ export class Subgraph {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getAllClosedAndLiquidatedPosition(subgraphEndpoint, count, skip, stratTime, endTime);
   }
+
+  public async getFeesByAddress(userAddresses: string[]) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return getFeesByAddress(subgraphEndpoint, userAddresses);
+  }
+
+  public async checkisExistingUser(userAddress: string) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await checkisExistingUser(subgraphEndpoint, userAddress);
+  }
+
+  public async getPortfolioDataByUsersAddress(
+    userAddresses: string[],
+    collateralPrice: { id: string; price: number }[],
+  ) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return getPortfolioDataByUsersAddress(subgraphEndpoint, userAddresses, collateralPrice);
+  }
+
+  public async getOpenPositionAndCollateralDataByUser(
+    userAddresses: string[],
+    collateralPrice: { id: string; price: number }[],
+  ) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return getOpenPositionsAndDepositCollateralByAddress(subgraphEndpoint, userAddresses, collateralPrice);
+  }
+
+  public transformPriceArray(priceArray: PriceObject[]): { id: string; price: number }[] {
+    return transformPriceArray(priceArray);
+  }
+
   ////////////////////////////////////////////////////////////////
   //////////////////////    MARKET    ////////////////////////////
   ////////////////////////////////////////////////////////////////
@@ -275,40 +306,8 @@ export class Subgraph {
   /////////////////////    PROTOCOL    ///////////////////////////
   ////////////////////////////////////////////////////////////////
 
-  public async getFeesByAddress(userAddresses: string[]) {
+  public getProtocolStats() {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return getFeesByAddress(subgraphEndpoint, userAddresses);
-  }
-
-  public async checkisExistingUser(userAddress: string) {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await checkisExistingUser(subgraphEndpoint, userAddress);
-  }
-
-  public async getExecutionFee(): Promise<{ executionFeeEth: Decimal; executionFeeUsdc: Decimal }> {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return getExecutionFee(subgraphEndpoint);
-  }
-
-  public async getPortfolioDataByUsersAddress(
-    userAddresses: string[],
-    collateralPrice: { id: string; price: number }[],
-  ) {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return getPortfolioDataByUsersAddress(subgraphEndpoint, userAddresses, collateralPrice);
-  }
-  public async getOpenPositionAndCollateralDataByUser(
-    userAddresses: string[],
-    collateralPrice: { id: string; price: number }[],
-  ) {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return getOpenPositionsAndDepositCollateralByAddress(subgraphEndpoint, userAddresses, collateralPrice);
-  }
-  public transformPriceArray(priceArray: PriceObject[]): { id: string; price: number }[] {
-    return transformPriceArray(priceArray);
-  }
-  public getProtocolTradeInformtaion() {
-    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return getProtocolTradeInformtaion(subgraphEndpoint);
+    return getProtocolStats(subgraphEndpoint);
   }
 }
