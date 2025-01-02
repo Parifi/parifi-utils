@@ -1,29 +1,73 @@
 import { formatEther, formatUnits } from 'ethers';
 import { PriceFeedSnapshot, PythData, Token } from '../interfaces/subgraphTypes';
-import { DepositCollateral, Market, Order, Position, Wallet } from '../interfaces/sdkTypes';
+import { CollateralDeposit, Market, Order, Position, SnxAccount, Wallet } from '../interfaces/sdkTypes';
 import { Market as MarketSg } from '../interfaces/subgraphTypes';
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    Wallet   ////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSubgraphResponseToWalletInterface = (response: any): Wallet | undefined => {
+export const mapResponseToWallet = (response: any): Wallet | undefined => {
   if (!response) return undefined;
   try {
     return {
       id: response.id,
-      totalOrdersCount: response.totalOrdersCount,
-      totalPositionsCount: response.totalPositionsCount,
-      totalRealizedPnlPositions: response.totalRealizedPnlPositions,
-      openPositionCount: response.openPositionCount,
-      countProfitablePositions: response.countProfitablePositions,
-      countLossPositions: response.countLossPositions,
-      countLiquidatedPositions: response.countLiquidatedPositions,
-      totalVolumeInUsd: response.totalVolumeInUsd,
-      totalVolumeInUsdLongs: response.totalVolumeInUsdLongs,
-      totalVolumeInUsdShorts: response.totalVolumeInUsdShorts,
-      totalAccruedBorrowingFeesInUsd: response.totalAccruedBorrowingFeesInUsd,
+      // snxAccounts: mapSnxAccountsArray(response.snxAccounts)
     };
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
+
+export const mapWalletsArrayToInterface = (response: any): Wallet[] | undefined => {
+  if (!response) return undefined;
+  try {
+    return response.accounts.map((account: Wallet) => {
+      return mapResponseToWallet(account);
+    });
+  } catch (error) {
+    console.log('Error while mapping data', error);
+    throw error;
+  }
+};
+
+////////////////////////////////////////////////////////////////
+//////////////////////    SNX Account   ////////////////////////
+////////////////////////////////////////////////////////////////
+
+export const mapResponseToSnxAccount = (response: any): SnxAccount | undefined => {
+  if (!response) return undefined;
+
+  return {
+    id: response.id,
+    type: response.type,
+    accountId: response.accountId,
+    owner: response.owner,
+    totalOrdersCount: response.totalOrdersCount,
+    totalPositionsCount: response.totalPositionsCount,
+    openPositionCount: response.openPositionCount,
+    countProfitablePositions: response.countProfitablePositions,
+    countLossPositions: response.countLossPositions,
+    countLiquidatedPositions: response.countLiquidatedPositions,
+    totalRealizedPnlPositions: response.totalRealizedPnlPositions,
+    totalVolumeInUsd: response.totalVolumeInUsd,
+    totalVolumeInUsdLongs: response.totalVolumeInUsdLongs,
+    totalVolumeInUsdShorts: response.totalVolumeInUsdShorts,
+    totalAccruedBorrowingFeesInUsd: response.totalAccruedBorrowingFeesInUsd,
+    integratorFeesGenerated: response.integratorFeesGenerated,
+    orders: response.orders,
+    positions: response.positions,
+    collateralDeposits: response.collateralDeposits,
+  };
+};
+
+export const mapResponseToSnxAccountArray = (response: any): SnxAccount[] | undefined => {
+  if (!response) return undefined;
+  try {
+    return response.snxAccounts.map((snxAccount: SnxAccount) => {
+      return mapResponseToSnxAccount(snxAccount);
+    });
   } catch (error) {
     console.log('Error while mapping data', error);
     throw error;
@@ -67,18 +111,6 @@ export const mapSingleMarketToInterface = (response: MarketSg): Market | undefin
   }
 };
 
-export const mapWalletsArrayToInterface = (response: any): Wallet[] | undefined => {
-  if (!response) return undefined;
-  try {
-    return response.accounts.map((account: Wallet) => {
-      return mapSubgraphResponseToWalletInterface(account);
-    });
-  } catch (error) {
-    console.log('Error while mapping data', error);
-    throw error;
-  }
-};
-
 export const mapMarketsArrayToInterface = (response: MarketSg[]): (Market | undefined)[] | undefined => {
   if (!response) return undefined;
   try {
@@ -95,40 +127,34 @@ export const mapMarketsArrayToInterface = (response: MarketSg[]): (Market | unde
 //////////////////////    ORDERS    ////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSingleOrderToInterface = (
-  orderResponse: any,
-  depositCollateral?: DepositCollateral[] | undefined,
-): Order | undefined => {
-  if (orderResponse === null) return undefined;
+export const mapResponseToOrder = (response: any): Order | undefined => {
+  if (!response) return undefined;
   try {
     return {
-      id: orderResponse.id,
-      market: mapSingleMarketToInterface(orderResponse.market),
-      user: orderResponse.user ? mapSubgraphResponseToWalletInterface(orderResponse.user) : undefined,
-      isLimitOrder: orderResponse.isLimitOrder,
-      deadline: orderResponse.expirationTime,
-      deltaCollateral: orderResponse.deltaCollateral,
-      deltaSize: orderResponse.deltaSize,
-      deltaSizeUsd: orderResponse.deltaSizeUsd,
-      executionFee: orderResponse.collectedFees,
-      txHash: orderResponse.txHash,
-      createdTimestamp: orderResponse.createdTimestamp,
-      status: orderResponse.status,
-      settledTxHash: orderResponse.settledTxHash,
-      settledTimestamp: orderResponse.settledTimestamp,
-      settledTimestampISO: orderResponse.settledTimestampISO,
-      executionPrice: orderResponse.executionPrice,
-      formattedExecutionPrice: formatEther(orderResponse.executionPrice ?? '0'),
-      expectedPrice: orderResponse.acceptablePrice,
-      formateedExpectedPrice: formatEther(orderResponse.acceptablePrice ?? '0'),
-      settledBy: orderResponse.settledBy ? mapSubgraphResponseToWalletInterface(orderResponse.settledBy) : undefined,
-      positionId: orderResponse.position ? orderResponse.position.id : undefined,
-      formattedDeltaSize: formatEther(orderResponse.deltaSize ?? '0'),
-      depositCollateral: depositCollateral,
-      snxAccount: {
-        id: orderResponse?.snxAccount?.id,
-        accountId: orderResponse?.snxAccount?.accountId,
-      },
+      id: response.id,
+      market: mapSingleMarketToInterface(response.market),
+      snxAccountId: response.snxAccount.id,
+      isLimitOrder: response.isLimitOrder,
+      acceptablePrice: response.acceptablePrice,
+      commitmentTime: response.commitmentTime,
+      expectedPriceTime: response.expectedPriceTime,
+      settlementTime: response.settlementTime,
+      expirationTime: response.expirationTime,
+      trackingCode: response.trackingCode,
+      deltaSize: response.deltaSize,
+      deltaSizeUsd: response.deltaSizeUsd,
+      executionPrice: response.executionPrice,
+      collectedFees: response.collectedFees,
+      settlementReward: response.settlementReward,
+      referralFees: response.referralFees,
+      partnerAddress: response.partnerAddress,
+      txHash: response.txHash,
+      createdTimestamp: response.createdTimestamp,
+      status: response.status,
+      settledTxHash: response.settledTxHash,
+      settledTimestamp: response.settledTimestamp,
+      settledTimestampISO: response.settledTimestampISO,
+      settledBy: mapResponseToWallet(response.settledBy),
     };
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -136,39 +162,57 @@ export const mapSingleOrderToInterface = (
   }
 };
 
-export const mapOrdersArrayToInterface = (
-  response: any,
-  collateralDepositResponse: Record<string, DepositCollateral[]>,
-): Order[] | undefined => {
+export const mapResponseToOrderArray = (response: any): Order[] | undefined => {
   if (!response) return undefined;
   try {
     return response.orders.map((order: Order) => {
-      const depositedCollateral = collateralDepositResponse[order?.snxAccount?.id || ''];
-      return mapSingleOrderToInterface(order, depositedCollateral);
+      return mapResponseToOrder(order);
     });
   } catch (error) {
     console.log('Error while mapping data', error);
     throw error;
   }
 };
-export const mapOrderArrayToPriceid = (response:any) =>{
+
+////////////////////////////////////////////////////////////////
+////////////////////    Collaterals   //////////////////////////
+////////////////////////////////////////////////////////////////
+
+function mapResponseToCollateralDeposit(response: any): CollateralDeposit | undefined {
+  return {
+    id: response.id,
+    snxAccountId: response.snxAccountId,
+    collateralId: response.collateralId,
+    collateralName: response.collateralName,
+    collateralSymbol: response.collateralSymbol,
+    collateralDecimals: response.collateralDecimals,
+    collateralAddress: response.collateralAddress,
+    currentDepositedAmount: response.currentDepositedAmount,
+    totalAmountDeposited: response.totalAmountDeposited,
+    totalAmountWithdrawn: response.totalAmountWithdrawn,
+    totalAmountLiquidated: response.totalAmountLiquidated,
+  };
+}
+
+export const mapResponseToCollateralDepositArray = (response: any): CollateralDeposit[] | undefined => {
   if (!response) return undefined;
   try {
-    return response.orders.map((order: Order) => {
-      return  {
-        priceIds :order.market?.feedId
-      }
+    return response.collateralDeposits.map((deposit: CollateralDeposit) => {
+      return mapResponseToCollateralDeposit(deposit);
     });
   } catch (error) {
     console.log('Error while mapping data', error);
     throw error;
   }
-}
-export const mapDespositCollateralArrayToInterface = (response: any): DepositCollateral[] | undefined => {
+};
+
+export const mapOrderArrayToPriceid = (response: any) => {
   if (!response) return undefined;
   try {
-    return response.collateralDeposits.map((depositedCollateral: DepositCollateral) => {
-      return mapSingleDepoistCollateral(depositedCollateral);
+    return response.orders.map((order: Order) => {
+      return {
+        priceIds: order.market?.feedId,
+      };
     });
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -180,40 +224,29 @@ export const mapDespositCollateralArrayToInterface = (response: any): DepositCol
 //////////////////////    POSITION    //////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSinglePositionToInterface = (
-  response: any,
-  depositCollateral?: DepositCollateral[] | undefined,
-): Position | undefined => {
+export const mapResponseToPosition = (response: any): Position | undefined => {
   if (!response) return undefined;
   try {
     return {
       id: response.id,
-      market: response.market ? mapSingleMarketToInterface(response.market) : undefined,
-      user: response.user ? mapSubgraphResponseToWalletInterface(response.user) : undefined,
+      market: mapSingleMarketToInterface(response.market),
+      snxAccountId: response.snxAccountId,
       isLong: response.isLong,
-      positionCollateral: response.positionCollateral,
       positionSize: response.positionSize,
       avgPrice: response.avgPrice,
-      formattedAvgPrice: formatEther(response.avgPrice ?? '0'),
+      avgPriceDec: response.avgPriceDec,
       status: response.status,
       txHash: response.txHash,
       liquidationTxHash: response.liquidationTxHash,
       closingPrice: response.closingPrice,
-      formattedClosingPrice: formatEther(response.closingPrice ?? '0'),
       realizedPnl: response.realizedPnl,
       realizedFee: response.realizedFee,
       netRealizedPnl: response.netRealizedPnl,
       createdTimestamp: response.createdTimestamp,
       lastRefresh: response.lastRefresh,
       lastRefreshISO: response.lastRefreshISO,
-      canBeLiquidated: response.canBeLiquidated,
       accruedBorrowingFees: response.accruedBorrowingFees,
-      depositCollateral: depositCollateral,
-      formattedRealizedFee: formatEther(response.realizedFee ?? '0'),
-      snxAccount: {
-        id: response.snxAccount.id,
-        accountId: response.snxAccount.accountId,
-      },
+      canBeLiquidated: response.canBeLiquidated,
     };
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -221,16 +254,12 @@ export const mapSinglePositionToInterface = (
   }
 };
 
-export const mapPositionsArrayToInterface = (
-  response: any,
-  collateralDepositResponse: Record<string, DepositCollateral[]>,
-): Position[] | undefined => {
+export const mapResponseToPositionArray = (response: any): Position[] | undefined => {
   if (!response) return undefined;
 
   try {
     return response.positions.map((position: any) => {
-      const depositedCollateral = collateralDepositResponse[position?.snxAccount?.id || ''];
-      return mapSinglePositionToInterface(position, depositedCollateral);
+      return mapResponseToPosition(position);
     });
   } catch (error) {
     console.log('Error while mapping data', error);
