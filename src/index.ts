@@ -3,7 +3,6 @@ import { Subgraph } from './subgraph';
 import { PythConfig, RelayerConfig, RpcConfig, SubgraphConfig } from './interfaces/classConfigs';
 import { Gelato } from './relayers/gelato';
 import { Perps } from './perps';
-import { Core } from './core';
 import { Pimlico } from './relayers';
 
 export * from './common';
@@ -17,10 +16,9 @@ export class ParifiSdk {
   subgraph: Subgraph;
   pyth: Pyth;
   perps: Perps;
-  core: Core;
   relayer: {
     gelato: Gelato;
-    pimlico:Pimlico
+    pimlico: Pimlico;
   };
 
   constructor(
@@ -36,7 +34,6 @@ export class ParifiSdk {
       gelato: new Gelato(relayerConfig['gelatoConfig'], rpcConfig),
       pimlico: new Pimlico(relayerConfig['pimlicoConfig'], rpcConfig, subgraphConfig),
     };
-    this.core = new Core();
   }
 
   async init() {
