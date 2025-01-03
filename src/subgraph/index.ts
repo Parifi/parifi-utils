@@ -47,6 +47,14 @@ import {
 import { PriceObject, SnxAccount } from '../interfaces';
 import { getProtocolStats } from './protocol';
 import { getAllOrdersByUserAddress, getOrderById } from './orders';
+import {
+  getAllPositionsByUserAddress,
+  getClosedPositionsByUserAddress,
+  getLiquidatedPositionsByUserAddress,
+  getOpenPositionsByUserAddress,
+  getPositionById,
+  getUserPositionsHistory,
+} from './positions';
 
 export * from './common';
 export * from './markets';
@@ -142,101 +150,55 @@ export class Subgraph {
   ////////////////////////////////////////////////////////////////
   //////////////////////    POSITION    //////////////////////////
   ////////////////////////////////////////////////////////////////
-  // public async getAllPositionsByUserAddress(
-  //   userAddress: string,
-  //   count: number = 20,
-  //   skip?: number,
-  // ): Promise<Position[]> {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getAllPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
-  // }
+  public async getAllPositionsByUserAddress(
+    userAddress: string,
+    count: number = 10,
+    skip: number = 0,
+  ): Promise<SnxAccount[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getAllPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
+  }
 
-  // // @todo Add function to get multiple positions in a single call
+  public async getOpenPositionsByUserAddress(
+    userAddress: string,
+    count: number = 10,
+    skip: number = 0,
+  ): Promise<SnxAccount[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getOpenPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
+  }
 
-  // public async getPositionById(positionId: string): Promise<Position> {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return getPositionById(subgraphEndpoint, positionId);
-  // }
+  public async getClosedPositionsByUserAddress(
+    userAddress: string,
+    count: number = 10,
+    skip: number = 0,
+  ): Promise<SnxAccount[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getClosedPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
+  }
 
-  // public async getOpenPositionsByUserAddress(
-  //   userAddress: string,
-  //   count: number = 20,
-  //   skip?: number,
-  // ): Promise<Position[]> {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getOpenPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
-  // }
+  public async getLiquidatedPositionsByUserAddress(
+    userAddress: string,
+    count: number = 10,
+    skip: number = 0,
+  ): Promise<SnxAccount[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getLiquidatedPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
+  }
 
-  // public async getClosedPositionsByUserAddress(
-  //   userAddress: string,
-  //   count: number = 20,
-  //   skip?: number,
-  // ): Promise<Position[]> {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getClosedPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
-  // }
-  // public async getLiqudationPosition(accountId: string) {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getLiqudationPosition(subgraphEndpoint, accountId);
-  // }
-  // public async getAllOpenPositionsAndAccountInfo(count: number, skip: number) {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getAllOpenPositionAndAccountInfos(subgraphEndpoint, count, skip);
-  // }
-  // public async getLiquidatedPositionsByUserAddress(
-  //   userAddress: string,
-  //   count: number = 20,
-  //   skip?: number,
-  // ): Promise<Position[]> {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getLiquidatedPositionsByUserAddress(subgraphEndpoint, userAddress, count, skip);
-  // }
+  public async getPositionById(positionId: string): Promise<Position> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getPositionById(subgraphEndpoint, positionId);
+  }
 
-  // public async getPythPriceIdsForPositionIds(positionIds: string[]): Promise<string[]> {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getPythPriceIdsForPositionIds(subgraphEndpoint, positionIds);
-  // }
-
-  // public async getPositionsToLiquidate(count: number = 10): Promise<string[]> {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getPositionsToLiquidate(subgraphEndpoint, count);
-  // }
-
-  // public async getTotalDepositedCollateralInUsd(userAddress: string): Promise<Decimal> {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getTotalDepositedCollateralInUsd(subgraphEndpoint, userAddress);
-  // }
-
-  // public async getTotalUnrealizedPnlInUsd(userAddress: string): Promise<Decimal> {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getTotalUnrealizedPnlInUsd(subgraphEndpoint, userAddress);
-  // }
-
-  // public async getRealizedPnlForLiquidatedPositions(
-  //   accountId: string[],
-  //   collateralPrices: { id: string; price: number }[],
-  // ) {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getRealizedPnlForLiquidatedPositions(subgraphEndpoint, accountId, collateralPrices);
-  // }
-
-  // public async getPositionsHistory(userAddress: string, count: number = 100, skip: number = 0): Promise<Position[]> {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getPositionsHistory(subgraphEndpoint, userAddress, count, skip);
-  // }
-  // public async getAllOpenPositionWithTime(count: number, skip: number, stratTime: string, endTime: string) {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getAllOpenPositionWithTime(subgraphEndpoint, count, skip, stratTime, endTime);
-  // }
-  // public async getAllClosedAndLiquidatedPosition(count: number, skip: number, stratTime: string, endTime: string) {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return await getAllClosedAndLiquidatedPosition(subgraphEndpoint, count, skip, stratTime, endTime);
-  // }
-
-  // public async getFeesByAddress(userAddresses: string[]) {
-  //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-  //   return getFeesByAddress(subgraphEndpoint, userAddresses);
-  // }
+  public async getUserPositionsHistory(
+    userAddress: string,
+    count: number = 100,
+    skip: number = 0,
+  ): Promise<SnxAccount[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getUserPositionsHistory(subgraphEndpoint, userAddress, count, skip);
+  }
 
   // public async checkisExistingUser(userAddress: string) {
   //   const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
