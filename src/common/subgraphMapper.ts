@@ -83,7 +83,7 @@ export const mapResponseToSnxAccountArray = (response: any): SnxAccount[] | unde
 //////////////////////    MARKET    ////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSingleMarketToInterface = (response: any): Market | undefined => {
+export const mapResponseToMarket = (response: any): Market | undefined => {
   if (!response) return undefined;
   if (response?.marketName === '' || response?.marketSymbol === '') return undefined;
   try {
@@ -116,11 +116,11 @@ export const mapSingleMarketToInterface = (response: any): Market | undefined =>
   }
 };
 
-export const mapMarketsArrayToInterface = (response: any): (Market | undefined)[] | undefined => {
+export const mapResponseToMarketArray = (response: any): (Market | undefined)[] | undefined => {
   if (!response) return undefined;
   try {
     return response.map((market: any) => {
-      return mapSingleMarketToInterface(market);
+      return mapResponseToMarket(market);
     });
   } catch (error) {
     console.log('Error while mapping data', error);
@@ -137,7 +137,7 @@ export const mapResponseToOrder = (response: any): Order | undefined => {
   try {
     return {
       id: response?.id,
-      market: response?.market ?? mapSingleMarketToInterface(response?.market),
+      market: response?.market ?? mapResponseToMarket(response?.market),
       snxAccountId: response?.snxAccount?.id,
       isLimitOrder: response?.isLimitOrder,
       acceptablePrice: response?.acceptablePrice,
@@ -226,7 +226,7 @@ export const mapResponseToPosition = (response: any): Position | undefined => {
   try {
     return {
       id: response?.id,
-      market: response?.market ?? mapSingleMarketToInterface(response?.market),
+      market: response?.market ?? mapResponseToMarket(response?.market),
       snxAccountId: response?.snxAccountId,
       isLong: response?.isLong,
       positionSize: response?.positionSize,
@@ -268,7 +268,7 @@ export const mapResponseToPositionArray = (response: any): Position[] | undefine
 //////////////////////    TOKEN    /////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSubgraphResponseToTokenInterface = (response: any): Token | undefined => {
+export const mapResponseToToken = (response: any): Token | undefined => {
   if (!response) return undefined;
 
   try {
@@ -277,7 +277,7 @@ export const mapSubgraphResponseToTokenInterface = (response: any): Token | unde
       name: response?.name,
       symbol: response?.symbol,
       decimals: response?.decimals,
-      pyth: response?.pyth ? mapSubgraphResponseToPythDataInterface(response?.pyth) : undefined,
+      pyth: response?.pyth ? mapResponseToPythData(response?.pyth) : undefined,
       lastPriceUSD: response?.lastPriceUSD,
       lastPriceTimestamp: response?.lastPriceTimestamp,
     };
@@ -291,7 +291,7 @@ export const mapSubgraphResponseToTokenInterface = (response: any): Token | unde
 ////////////////////////    PYTH    ////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export const mapSubgraphResponseToPriceFeedSnapshotInterface = (response: any): PriceFeedSnapshot | undefined => {
+export const mapResponseToPriceFeedSnapshot = (response: any): PriceFeedSnapshot | undefined => {
   if (!response) return undefined;
 
   try {
@@ -308,7 +308,7 @@ export const mapSubgraphResponseToPriceFeedSnapshotInterface = (response: any): 
   }
 };
 
-export const mapSubgraphResponseToPythDataInterface = (response: any): PythData | undefined => {
+export const mapResponseToPythData = (response: any): PythData | undefined => {
   if (!response) return undefined;
 
   try {

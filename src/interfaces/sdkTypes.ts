@@ -7,7 +7,7 @@ import { OrderStatus, PositionStatus, PythData, SnxAccountType } from './subgrap
 
 export type Wallet = {
   id: string;
-  snxAccounts?: [SnxAccount];
+  snxAccounts?: SnxAccount[];
 };
 
 ////////////////////////////////////////////////////////////////
@@ -31,9 +31,9 @@ export type SnxAccount = {
   totalVolumeInUsdShorts?: string;
   totalAccruedBorrowingFeesInUsd?: string;
   integratorFeesGenerated?: string;
-  orders?: [Order];
-  positions?: [Position];
-  collateralDeposits?: [CollateralDeposit];
+  orders?: Order[];
+  positions?: Position[];
+  collateralDeposits?: CollateralDeposit[];
 };
 
 ////////////////////////////////////////////////////////////////
@@ -185,4 +185,13 @@ export type Token = {
   pyth?: PythData;
   lastPriceUSD?: string;
   lastPriceTimestamp?: string;
+};
+
+////////////////////////////////////////////////////////////////
+///////////////////////    Pyth    /////////////////////////////
+////////////////////////////////////////////////////////////////
+
+export type FormattedPythPrice = {
+  priceId: string;
+  formattedPrice: Decimal;
 };

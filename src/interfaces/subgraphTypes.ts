@@ -38,20 +38,20 @@ export enum SnxAccountType {
 //////////////////////    ACCOUNT   ////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export interface Wallet {
+export interface WalletSubgraph {
   /** User wallet address */
   id?: string;
 
-  snxAccounts?: [SnxAccount];
+  snxAccounts?: SnxAccountSubgraph[];
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////// SNX ACCOUNT //////////////////////////
 ////////////////////////////////////////////////////////////////
-export type SnxAccount = {
+export type SnxAccountSubgraph = {
   id: string;
   type?: SnxAccountType;
   accountId?: string;
-  owner?: Wallet;
+  owner?: WalletSubgraph;
   totalOrdersCount?: string;
   totalPositionsCount?: string;
   openPositionCount?: string;
@@ -64,16 +64,16 @@ export type SnxAccount = {
   totalVolumeInUsdShorts?: string;
   totalAccruedBorrowingFeesInUsd?: string;
   integratorFeesGenerated?: string;
-  orders?: [Order];
-  positions?: [Position];
-  collateralDeposits?: [CollateralDeposit];
+  orders?: OrderSubgraph[];
+  positions?: PositionSubgraph[];
+  collateralDeposits?: CollateralDepositSubgraph[];
 };
 
 ////////////////////////////////////////////////////////////////
 ////////////////////    Collaterals   //////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export type CollateralDeposit = {
+export type CollateralDepositSubgraph = {
   id: string;
   snxAccountId?: string; // " SNX Account id including the type PERP/CORE"
   collateralId?: string;
@@ -87,13 +87,13 @@ export type CollateralDeposit = {
   totalAmountLiquidated?: string;
 };
 
-export type Synth = { id: string; name?: string; symbol?: string; decimals?: number; synthAddress?: string };
+export type SynthSubgraph = { id: string; name?: string; symbol?: string; decimals?: number; synthAddress?: string };
 
 ////////////////////////////////////////////////////////////////
 /////////////////////////    Market   //////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export type Market = {
+export type MarketSubgraph = {
   id: string;
   marketName?: string;
   marketSymbol?: string;
@@ -122,9 +122,9 @@ export type Market = {
 /////////////////////////    Orders   //////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export type Order = {
+export type OrderSubgraph = {
   id: string;
-  market?: Market;
+  market?: MarketSubgraph;
   snxAccountId?: string; // " SNX Account id including the type PERP/CORE"
   isLimitOrder?: boolean;
   acceptablePrice?: string;
@@ -146,16 +146,16 @@ export type Order = {
   settledTxHash?: string;
   settledTimestamp?: string;
   settledTimestampISO: string;
-  settledBy?: Wallet;
+  settledBy?: WalletSubgraph;
 };
 
 ////////////////////////////////////////////////////////////////
 ///////////////////////    Positions   /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export type Position = {
+export type PositionSubgraph = {
   id: string;
-  market?: Market;
+  market?: MarketSubgraph;
   snxAccountId?: string; // " SNX Account id including the type PERP/CORE"
   isLong?: boolean;
   positionSize?: string;
@@ -178,7 +178,7 @@ export type Position = {
 ////////////////////////////////////////////////////////////////
 //////////////////////    TOKEN    /////////////////////////////
 ////////////////////////////////////////////////////////////////
-export interface Token {
+export interface TokenSubgraph {
   // //" Smart contract address of the token "
   id?: string;
 
