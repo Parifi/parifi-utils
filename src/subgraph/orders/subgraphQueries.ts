@@ -14,11 +14,14 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 50, 
       }
       collateralDeposits {
         id
-        currentDepositedAmount
         collateralName
         collateralSymbol
         collateralDecimals
         collateralAddress
+        currentDepositedAmount
+        totalAmountDeposited
+        totalAmountWithdrawn
+        totalAmountLiquidated
       }
       orders {
         id

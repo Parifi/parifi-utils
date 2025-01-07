@@ -15,11 +15,14 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 2
       }
       collateralDeposits {
         id
-        currentDepositedAmount
         collateralName
         collateralSymbol
         collateralDecimals
         collateralAddress
+        currentDepositedAmount
+        totalAmountDeposited
+        totalAmountWithdrawn
+        totalAmountLiquidated
       }
       positions {
         id
@@ -71,11 +74,14 @@ export const fetchPositionsByUserQueryAndStatus = (
       }
       collateralDeposits {
         id
-        currentDepositedAmount
         collateralName
         collateralSymbol
         collateralDecimals
         collateralAddress
+        currentDepositedAmount
+        totalAmountDeposited
+        totalAmountWithdrawn
+        totalAmountLiquidated
       }
       positions {
         id
@@ -122,11 +128,14 @@ export const fetchUserPositionHistory = (userAddress: string, count: number = 20
       }
       collateralDeposits {
         id
-        currentDepositedAmount
         collateralName
         collateralSymbol
         collateralDecimals
         collateralAddress
+        currentDepositedAmount
+        totalAmountDeposited
+        totalAmountWithdrawn
+        totalAmountLiquidated
       }
       positions {
         id
