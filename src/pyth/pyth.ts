@@ -1,9 +1,9 @@
 import axios, { AxiosInstance } from 'axios';
-import { PRICE_FEED_DECIMALS, getUniqueValuesFromArray } from '../common';
+import { getUniqueValuesFromArray } from '../common';
 import Decimal from 'decimal.js';
 import { PythPriceResponse } from '../interfaces/subgraphTypes';
 import { mapPythPriceResponseToInterface } from './pythMapper';
-import { NormalizedPrice } from '../interfaces/sdkTypes';
+import { FormattedPythPrice } from '../interfaces/sdkTypes';
 
 // Returns a Pyth client object based on the params provided
 export const getPythClient = async (
@@ -55,33 +55,28 @@ export const getVaaPriceUpdateData = async (priceIds: string[], pythClient: Axio
 
 // Pyth currently uses different exponents for supported assets. Parifi uses all price feeds with 8 decimals
 // This function converts the price from Pyth to a format Parifi uses with 8 decimals.
-export const normalizePythPriceForParifi = (pythPrice: number, pythExponent: number): Decimal => {
-  if (pythExponent > -PRICE_FEED_DECIMALS) {
-    const adjustedFactor = new Decimal(10).pow(PRICE_FEED_DECIMALS + pythExponent);
-    return new Decimal(pythPrice).mul(adjustedFactor);
-  } else {
-    const adjustedFactor = new Decimal(10).pow(-1 * (PRICE_FEED_DECIMALS + pythExponent));
-    return new Decimal(pythPrice).div(adjustedFactor);
-  }
+export const formatPythPrice = (pythPrice: number, pythExponent: number): Decimal => {
+  const adjustedFactor = new Decimal(10).pow(pythExponent);
+  return new Decimal(pythPrice).mul(adjustedFactor);
 };
 
 // Returns the latest prices from Pyth for priceIds in normalized format
 // for use within the Parifi protocol. Normalized price has 8 decimals
-export const getLatestPricesNormalized = async (
+export const getLatestFormattedPrice = async (
   priceIds: string[],
   pythClient: AxiosInstance,
-): Promise<NormalizedPrice[]> => {
-  let normalizedPythPrices: NormalizedPrice[] = [];
+): Promise<FormattedPythPrice[]> => {
+  let formattedPrices: FormattedPythPrice[] = [];
 
   const priceData = await getLatestPricesFromPyth(priceIds, pythClient);
   priceData.map((pythPrice) => {
-    const normalizedPrice = normalizePythPriceForParifi(Number(pythPrice.price.price), pythPrice.price.expo);
-    normalizedPythPrices.push({
+    const formattedPrice = formatPythPrice(Number(pythPrice.price.price), pythPrice.price.expo);
+    formattedPrices.push({
       priceId: `0x${pythPrice.id}`,
-      normalizedPrice: normalizedPrice,
+      formattedPrice: formattedPrice,
     });
   });
-  return normalizedPythPrices;
+  return formattedPrices;
 };
 
 // Get latest prices from Pyth for priceIds

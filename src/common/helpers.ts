@@ -1,11 +1,4 @@
 import { Decimal } from 'decimal.js';
-import {
-  PYTH_ETH_USD_PRICE_ID_BETA,
-  PYTH_ETH_USD_PRICE_ID_STABLE,
-  PYTH_USDC_USD_PRICE_ID_BETA,
-  PYTH_USDC_USD_PRICE_ID_STABLE,
-} from './constants';
-import { DepositCollateral } from '../interfaces/sdkTypes';
 
 export const getDiff = (a: Decimal, b: Decimal): Decimal => {
   return a.gt(b) ? a.minus(b) : b.minus(a);
@@ -33,56 +26,4 @@ export const getUniqueValuesFromArray = (originalArray: string[]): string[] => {
     }
   });
   return uniqueArray;
-};
-
-export function getNormalizedPriceByIdFromPriceIdArray(
-  priceId: string,
-  prices: { priceId: string | undefined; normalizedPrice: Decimal }[],
-) {
-  // Loop through the prices array
-  for (const price of prices) {
-    // Check if the priceId matches
-    if (price.priceId == priceId) {
-      // Return the normalizedPrice if matched
-      return price.normalizedPrice;
-    }
-  }
-  // Return 0 if no matching priceId found
-  return 0;
-}
-
-// Returns the Pyth price IDs of collateral tokens
-export const getPriceIdsForCollaterals = (isStable: boolean): string[] => {
-  if (isStable) {
-    // Return Pyth Stable price ids
-    return [PYTH_ETH_USD_PRICE_ID_STABLE, PYTH_USDC_USD_PRICE_ID_STABLE];
-  } else {
-    // Return Pyth Beta price ids
-    return [PYTH_ETH_USD_PRICE_ID_BETA, PYTH_USDC_USD_PRICE_ID_BETA];
-  }
-};
-
-// Return Pyth price ids with price ids of collateral tokens
-export const addPythPriceIdsForCollateralTokens = (isStable: boolean = true, priceIds: string[]): string[] => {
-  const collateralPriceIds = getPriceIdsForCollaterals(isStable);
-  priceIds.concat(collateralPriceIds);
-  return getUniqueValuesFromArray(priceIds);
-};
-
-export const aggregateDepositsBySnxAccountId = (
-  data: DepositCollateral[] | DepositCollateral | undefined,
-): Record<string, DepositCollateral[]> => {
-  if (!data) return {};
-
-  // Ensure we are working with an array
-  const depositsArray = Array.isArray(data) ? data : [data];
-
-  return depositsArray.reduce((acc: Record<string, DepositCollateral[]>, item: DepositCollateral) => {
-    const key = item.snxAccount.id;
-    if (!acc[key]) {
-      acc[key] = []; // Initialize an empty array if it doesn't exist
-    }
-    acc[key].push(item); // Push the current item to the array
-    return acc;
-  }, {}); // Start with an empty object
 };

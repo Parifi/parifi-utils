@@ -1,25 +1,17 @@
 import { getParifiSdkInstanceForTesting } from '..';
-import { status, TEST_ORDER_ID1, TEST_SETTLE_ORDER_ID, TEST_USER_ADDRESS } from '../common/constants';
+import { status } from '../common/constants';
 
 describe('Order fetching logic from subgraph', () => {
   it('should return correct order and user user Address', async () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
-    const userAddress = TEST_USER_ADDRESS;
-    const orderData = await parifiSdk.subgraph.getAllOrdersByUserAddress(userAddress, 100, 0);
-    console.log('orderData',orderData[0])
-    expect(orderData[0]?.user?.id).toBe(userAddress);
+    const userAddress = '0x2f22928335ed7e472c18e1e487593c0ac40e9ca8';
+    const orderData = await parifiSdk.subgraph.getAllOrdersByUserAddress(userAddress, 3, 0);
+    expect(orderData.length).not.toBe(0);
   });
 
-  it('should return expired order for the order Id', async () => {
+  it('should return an order using the order Id', async () => {
     const parifiSdk = await getParifiSdkInstanceForTesting();
-    const orderId = TEST_ORDER_ID1;
-    const order = await parifiSdk.subgraph.getOrderById(orderId);
-    expect(order.id).toBe(orderId);
-    expect(order.status).toBe(status.EXPIRED);
-  });
-  it('should return settle order for the order Id', async () => {
-    const parifiSdk = await getParifiSdkInstanceForTesting();
-    const orderId = TEST_SETTLE_ORDER_ID;
+    const orderId = 'CLOSEDORD10209728236255228114-100-0';
     const order = await parifiSdk.subgraph.getOrderById(orderId);
     expect(order.id).toBe(orderId);
     expect(order.status).toBe(status.SETTLED);

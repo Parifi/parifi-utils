@@ -1,43 +1,36 @@
 import Decimal from 'decimal.js';
 
-export const getProfitOrLossInUsd = (
-  marketPrice: number,
-  avgPrice: number,
-  positionSize: number,
-): { totalProfitOrLoss: Decimal } => {
-  const positionSizeDecimal = new Decimal(positionSize);
-  const avgPriceDecimal = new Decimal(avgPrice);
-  const profitOrLossPerToken = new Decimal(marketPrice).minus(avgPriceDecimal);
-  const totalProfitOrLoss = positionSizeDecimal.times(profitOrLossPerToken);
-
-  return { totalProfitOrLoss };
+// Calculates the Profit/Loss of the position given marketPrice and avgPrice
+// @param positionSize is negative for a short position and positive for Long position
+export const getProfitOrLossInUsd = (marketPrice: number, avgPrice: number, positionSize: number): Decimal => {
+  const profitOrLossPerToken = new Decimal(marketPrice).minus(avgPrice);
+  return new Decimal(positionSize).times(profitOrLossPerToken);
 };
 
-export const calculatePositionLeverage = ({
-  collateralAmount,
-  size,
-  collateralPrice,
-  marketPrice,
-}: {
-  collateralAmount: number;
-  size: number;
-  collateralPrice: number;
-  marketPrice: number;
-}): { positionLeverage: Decimal } => {
-  // Calculate collateral in USDC
-  const collateralUsed = new Decimal(collateralAmount);
-  const collateralInUSDC = collateralUsed.times(collateralPrice);
+// Calculates the formatted position size using collateral and leverage
+// using equation: Size = Collateral * Leverage
+export const calculateSizeFromCollateralAndLeverage = (
+  collateralValueInUsd: number,
+  leverage: number,
+  marketPrice: number,
+): Decimal => {
+  const sizeInUsd = new Decimal(collateralValueInUsd).times(leverage);
+  return sizeInUsd.div(marketPrice);
+};
 
-  // Calculate position size in USDC
-  const positionSize = new Decimal(size);
-  const marketPriceDecimal = new Decimal(marketPrice);
-  const positionSizeInUSDC = positionSize.times(marketPriceDecimal);
+// Calculates the Collateral amount using size and leverage values
+// using equation: Collateral = Size / Leverage
+export const calculateCollateralFromSizeAndLeverage = (
+  sizeInUsd: number,
+  leverage: number,
+  collateralPrice: number,
+): Decimal => {
+  const collateralInUsd = new Decimal(sizeInUsd).div(leverage);
+  return collateralInUsd.div(collateralPrice);
+};
 
-  // Calculate leverage if collateralInUSDC is greater than zero
-  if (collateralInUSDC.gt(0)) {
-    const calculatedLeverage = positionSizeInUSDC.div(collateralInUSDC);
-    return { positionLeverage: calculatedLeverage };
-  }
-
-  return { positionLeverage: new Decimal(0) };
+// Calculates the leverage value of a position using size and collateral values
+// using equation: Leverage = Size / Collateral
+export const calculateLeverageFromCollateralAndSize = (collateralValueInUsd: number, sizeInUsd: number): number => {
+  return sizeInUsd / collateralValueInUsd;
 };

@@ -1,39 +1,42 @@
 import { request } from 'graphql-request';
 import { fetchAllMarketsDataQuery, fetchMarketByIdQuery } from './subgraphQueries';
-import { mapMarketsArrayToInterface, mapSingleMarketToInterface } from '../../common/subgraphMapper';
+import { mapResponseToMarket, mapResponseToMarketArray } from '../../common/subgraphMapper';
 import { NotFoundError } from '../../error/not-found.error';
 import { Market } from '../../interfaces/sdkTypes';
-import { Market as MarketSg } from '../../interfaces/subgraphTypes';
+import { MarketSubgraph } from '../../interfaces/subgraphTypes';
 
+// Returns data for all the markets from subgraph.
+// If the subgraph query fails, the function returns an empty array
 export const getAllMarketsFromSubgraph = async (subgraphEndpoint: string): Promise<Market[]> => {
   try {
-    console.log(subgraphEndpoint);
-    const subgraphResponse: { markets: MarketSg[] } = await request(subgraphEndpoint, fetchAllMarketsDataQuery);
-    if (!subgraphResponse) throw Error(`Error While Fechting All Market`);
-    const markets = mapMarketsArrayToInterface(subgraphResponse.markets)?.filter(
-      (market): market is Market => !!market,
-    );
+    const subgraphResponse: { markets: MarketSubgraph[] } = await request(subgraphEndpoint, fetchAllMarketsDataQuery);
+    if (!subgraphResponse) throw Error(`Error while fetching markets`);
+
+    const markets = mapResponseToMarketArray(subgraphResponse.markets)?.filter((market): market is Market => !!market);
     if (markets) return markets;
     throw new NotFoundError('Markets not found');
   } catch (error) {
-    throw error;
+    console.log('Markets not found. Subgraph request failed', error);
+    return [];
   }
 };
 
 // Get all details of a market from subgraph by market ID
+// Throws error when query fails or market not found
 export const getMarketById = async (subgraphEndpoint: string, marketId: string): Promise<Market> => {
   try {
-    const formattedMarketId = marketId.toLowerCase();
-    const subgraphResponse: any = await request(subgraphEndpoint, fetchMarketByIdQuery(formattedMarketId));
-    if (!subgraphResponse) throw Error(`Error While Fechting Market By Id`);
+    const subgraphResponse: any = await request(subgraphEndpoint, fetchMarketByIdQuery(marketId));
+    if (!subgraphResponse) throw Error(`Error while fetching markets`);
+
     if (subgraphResponse) {
-      const market = mapSingleMarketToInterface(subgraphResponse.market);
+      const market = mapResponseToMarket(subgraphResponse.market);
       if (market && market.id === marketId) {
         return market;
       }
     }
-    throw Error(`Market with Market Id ${formattedMarketId} Not Found`);
+    throw Error(`Market with Market Id ${marketId} Not Found`);
   } catch (error) {
+    console.log(`Market with Market Id ${marketId} Not Found`, error);
     throw error;
   }
 };
