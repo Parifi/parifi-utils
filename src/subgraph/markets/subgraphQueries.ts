@@ -33,7 +33,7 @@ export const fetchAllMarketsDataQuery = gql`
 // Fetch all details of a market by ID
 export const fetchMarketByIdQuery = (marketId: string) => gql`
   {
-    market(id: "${marketId.toLowerCase()}") {
+    market(id: "${marketId}") {
     id
     marketName
     marketSymbol

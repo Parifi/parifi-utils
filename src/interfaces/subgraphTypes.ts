@@ -38,89 +38,69 @@ export enum SnxAccountType {
 //////////////////////    ACCOUNT   ////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export interface Wallet {
+export interface WalletSubgraph {
   /** User wallet address */
   id?: string;
 
-  /** User positions */
-  positions?: Position[];
-
-  /** User orders */
-  orders?: Order[];
-
-  /** Total count of orders */
-  totalOrdersCount?: string;
-
-  /** Total count of positions created by user - open and closed positions */
-  totalPositionsCount?: string;
-
-  /** Total count of open user positions */
-  openPositionCount?: string;
-
-  /** Count of total profitable positions */
-  countProfitablePositions?: string;
-
-  /** Count of total positions with loss */
-  countLossPositions?: string;
-
-  /** Count of liquidated positions */
-  countLiquidatedPositions?: string;
-
-  /** Total Realized P&L from Positions in USD */
-  totalRealizedPnlPositions?: string;
-  /** Total Volume in USD */
-  totalVolumeInUsd?: string;
-
-  /** Total Volume Longs  */
-  totalVolumeInUsdLongs?: string;
-
-  /** Total Volume Shorts*/
-  totalVolumeInUsdShorts?: string;
-
-  /** Total Borrowing Fees accrued across all positions */
-  totalAccruedBorrowingFeesInUsd?: string;
+  snxAccounts?: SnxAccountSubgraph[];
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////// SNX ACCOUNT //////////////////////////
 ////////////////////////////////////////////////////////////////
-export interface SnxAccount {
-  /** CORE/PERP + Account ID */
-  id?: string;
-
-  /** CORE / PERP */
+export type SnxAccountSubgraph = {
+  id: string;
   type?: SnxAccountType;
-
-  /** Account ID */
   accountId?: string;
-
-  /** Owner wallet address */
-  owner?: Wallet;
-
-  /** Count of total orders by this Account ID */
+  owner?: WalletSubgraph;
   totalOrdersCount?: string;
-
-  /** Count of total positions by this Account ID */
   totalPositionsCount?: string;
-
-  /** SNX Account orders */
-  orders?: Order[];
-}
+  openPositionCount?: string;
+  countProfitablePositions?: string;
+  countLossPositions?: string;
+  countLiquidatedPositions?: string;
+  totalRealizedPnlPositions?: string;
+  totalVolumeInUsd?: string;
+  totalVolumeInUsdLongs?: string;
+  totalVolumeInUsdShorts?: string;
+  totalAccruedBorrowingFeesInUsd?: string;
+  integratorFeesGenerated?: string;
+  orders?: OrderSubgraph[];
+  positions?: PositionSubgraph[];
+  collateralDeposits?: CollateralDepositSubgraph[];
+};
 
 ////////////////////////////////////////////////////////////////
-//////////////////////    MARKET    ////////////////////////////
+////////////////////    Collaterals   //////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export interface Market {
-  id?: string;
+export type CollateralDepositSubgraph = {
+  id: string;
+  snxAccountId?: string; // " SNX Account id including the type PERP/CORE"
+  collateralId?: string;
+  collateralName?: string;
+  collateralSymbol?: string;
+  collateralDecimals?: string;
+  collateralAddress?: string;
+  currentDepositedAmount?: string;
+  totalAmountDeposited?: string;
+  totalAmountWithdrawn?: string;
+  totalAmountLiquidated?: string;
+};
+
+export type SynthSubgraph = { id: string; name?: string; symbol?: string; decimals?: number; synthAddress?: string };
+
+////////////////////////////////////////////////////////////////
+/////////////////////////    Market   //////////////////////////
+////////////////////////////////////////////////////////////////
+
+export type MarketSubgraph = {
+  id: string;
   marketName?: string;
   marketSymbol?: string;
-  marketPrice?: string;
   feedId?: string;
   skew?: string;
   size?: string;
   maxOpenInterest?: string;
-  maxMarketSize?: string;
-  maxMarketValue?: string;
   interestRate?: string;
   currentFundingRate?: string;
   currentFundingVelocity?: string;
@@ -129,111 +109,76 @@ export interface Market {
   maxFundingVelocity?: string;
   makerFee?: string;
   takerFee?: string;
-  maintenanceMarginRatioD18?: string;
-  minimumPositionMargin?: string;
+  maxMarketValue?: string;
+  marketPrice?: string;
   initialMarginRatioD18?: string;
+  maintenanceMarginRatioD18?: string;
   minimumInitialMarginRatioD18?: string;
-}
+  flagRewardRatioD18?: string;
+  minimumPositionMargin?: string;
+};
 
 ////////////////////////////////////////////////////////////////
-//////////////////////    ORDERS    ////////////////////////////
+/////////////////////////    Orders   //////////////////////////
 ////////////////////////////////////////////////////////////////
-// settlementReward, referralFees, partnerAddressts
-export interface Order {
-  id?: string;
-  market?: Market;
-  user?: Wallet;
+
+export type OrderSubgraph = {
+  id: string;
+  market?: MarketSubgraph;
+  snxAccountId?: string; // " SNX Account id including the type PERP/CORE"
   isLimitOrder?: boolean;
-  deadline?: string;
-  accceptablePrice?: string;
+  acceptablePrice?: string;
+  commitmentTime?: string;
   expectedPriceTime?: string;
   settlementTime?: string;
+  expirationTime?: string;
   trackingCode?: string;
-  deltaCollateral?: string;
   deltaSize?: string;
   deltaSizeUsd?: string;
   executionPrice?: string;
-  executionFee?: string;
+  collectedFees?: string;
+  settlementReward?: string;
   referralFees?: string;
+  partnerAddress?: string;
   txHash?: string;
   createdTimestamp?: string;
   status?: OrderStatus;
   settledTxHash?: string;
   settledTimestamp?: string;
-  settledTimestampISO?: string;
-  settledBy?: Wallet;
-  positionId?: Position;
-  formattedDeltaSize?: string;
-}
+  settledTimestampISO: string;
+  settledBy?: WalletSubgraph;
+};
 
 ////////////////////////////////////////////////////////////////
-//////////////////////    POSITION    //////////////////////////
+///////////////////////    Positions   /////////////////////////
 ////////////////////////////////////////////////////////////////
 
-export interface Position {
-  /** Position ID - Generated using POS + Account ID + Market ID */
-  id?: string; // GraphQL's ID is mapped to string
-
-  /** Market details for the position */
-  market?: Market;
-  /** User address */
-  user?: Wallet /** Account ID that holds the position */;
-  account?: SnxAccount;
-  /** True if it is a LONG position */
+export type PositionSubgraph = {
+  id: string;
+  market?: MarketSubgraph;
+  snxAccountId?: string; // " SNX Account id including the type PERP/CORE"
   isLong?: boolean;
-  /** Collateral amount deposited backing this position */
-  positionCollateral?: string;
-  /** Size of the position */
   positionSize?: string;
-
-  /** Average price of the position */
   avgPrice?: string;
-  /** Average price of the position in decimals */
   avgPriceDec?: string;
-  /** Orders related to this position */
-  orders?: Order[];
-  /** Position status */
   status?: PositionStatus;
-  /** Creation transaction hash */
   txHash?: string;
-
-  /** Liquidation transaction hash */
   liquidationTxHash?: string;
-
-  /** Closing Price of the position. In case of liquidation, this is the liquidation price */
   closingPrice?: string;
-
-  /** Realized PNL in USD (decimals) */
   realizedPnl?: string;
-
-  /** Realized PNL in collateral */
-  realizedPnlCollateral?: string;
-  /** Amount of opening, closing  */
   realizedFee?: string;
-
-  /** Net Realized PNL in USD (decimal) */
   netRealizedPnl?: string;
-
-  /** Timestamp when position was created */
   createdTimestamp?: string;
-
-  /** Last position updated timestamp */
   lastRefresh?: string;
-
-  /** Last position updated timestamp in string */
   lastRefreshISO?: string;
-
-  /** Accrued borrowing fees till last refresh */
   accruedBorrowingFees?: string;
-
-  /** True if the position can be liquidated */
   canBeLiquidated?: boolean;
-}
+};
 
 ////////////////////////////////////////////////////////////////
 //////////////////////    TOKEN    /////////////////////////////
 ////////////////////////////////////////////////////////////////
-export interface Token {
+export interface TokenSubgraph {
   // //" Smart contract address of the token "
   id?: string;
 
@@ -330,6 +275,7 @@ export interface collateralDepositsPortfolioData {
 }
 
 export interface positionsPortfolio {
+  snxAccount?: { accountId: string };
   status: string;
   market: {
     marketSymbol: string;
@@ -338,6 +284,9 @@ export interface positionsPortfolio {
   avgPrice: string;
   realizedPnl: string;
   realizedFee: string;
+  user?: {
+    id: string;
+  };
 }
 
 export interface PortfolioWallet {
@@ -365,4 +314,40 @@ export type PriceObject = {
     expo: number;
     publish_time: number;
   };
+};
+
+export type LeaderBoardClosedPosition = {
+  id: string;
+  user: {
+    id: string;
+  };
+  positionSize: string;
+  avgPriceDec: string;
+  status: string;
+  netRealizedPnl: string;
+  realizedPnl: string;
+  snxAccount: {
+    accountId: string;
+  };
+};
+
+export type LeaderBoardOpenPosition = {
+  positionSize: string;
+  avgPriceDec: string;
+  id: string;
+  market: {
+    id: string;
+  };
+  user: {
+    id: string;
+  };
+  snxAccount: {
+    id: string;
+    accountId: string;
+  };
+};
+
+export type LiquidatePositionCollateral = {
+  accountId: string;
+  collateralDeposits: collateralDepositsPortfolioData[];
 };

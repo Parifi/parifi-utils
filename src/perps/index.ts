@@ -1,28 +1,49 @@
 import Decimal from 'decimal.js';
-import { calculatePositionLeverage, getProfitOrLossInUsd } from './positions';
-import { Position } from '../interfaces/sdkTypes';
+import {
+  calculateCollateralFromSizeAndLeverage,
+  calculateLeverageFromCollateralAndSize,
+  calculateSizeFromCollateralAndLeverage,
+  getProfitOrLossInUsd,
+} from './positions';
 
 export class Perps {
   constructor() {}
-  getProfitOrLossInUsd = (
-    marketPrice: number,
-    avgPrice: number,
-    positionSize: number,
-  ): { totalProfitOrLoss: Decimal } => {
+
+  getProfitOrLossInUsd = (marketPrice: number, avgPrice: number, positionSize: number): Decimal => {
     return getProfitOrLossInUsd(marketPrice, avgPrice, positionSize);
   };
 
-  calculatePositionLeverage = ({
-    collateralAmount,
-    size,
-    collateralPrice,
+  calculateSizeFromCollateralAndLeverage = ({
+    collateralValueInUsd,
+    leverage,
     marketPrice,
   }: {
-    collateralAmount: number;
-    size: number;
-    collateralPrice: number;
+    collateralValueInUsd: number;
+    leverage: number;
     marketPrice: number;
-  }): { positionLeverage: Decimal } => {
-    return calculatePositionLeverage({ collateralAmount, size, collateralPrice, marketPrice });
+  }): Decimal => {
+    return calculateSizeFromCollateralAndLeverage(collateralValueInUsd, leverage, marketPrice);
+  };
+
+  calculateCollateralFromSizeAndLeverage = ({
+    sizeInUsd,
+    leverage,
+    collateralPrice,
+  }: {
+    sizeInUsd: number;
+    leverage: number;
+    collateralPrice: number;
+  }): Decimal => {
+    return calculateCollateralFromSizeAndLeverage(sizeInUsd, leverage, collateralPrice);
+  };
+
+  calculateLeverageFromCollateralAndSize = ({
+    collateralValueInUsd,
+    sizeInUsd,
+  }: {
+    collateralValueInUsd: number;
+    sizeInUsd: number;
+  }): number => {
+    return calculateLeverageFromCollateralAndSize(collateralValueInUsd, sizeInUsd);
   };
 }
