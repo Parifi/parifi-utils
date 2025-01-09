@@ -5,6 +5,13 @@ import {
   calculateSizeFromCollateralAndLeverage,
   getProfitOrLossInUsd,
 } from './positions';
+import { CollateralDeposit, Position } from '../interfaces';
+import { collateralMappingWithRegularSymbol, convertWeiToEther, DECIMAL_ZERO, SYMBOL_TO_PYTH_FEED } from '../common';
+import {
+  calculateUnrealizedPnlForPositions,
+  calculateUsdValueOfCollateralDeposits,
+  getPriceFromPriceArray,
+} from './offchain';
 
 export class Perps {
   constructor() {}
@@ -45,5 +52,29 @@ export class Perps {
     sizeInUsd: number;
   }): number => {
     return calculateLeverageFromCollateralAndSize(collateralValueInUsd, sizeInUsd);
+  };
+
+  // Calculates the unrealized pnl in USD for an array of positions off-chain
+  // using the provided position array and price data
+  calculateUnrealizedPnlForPositions = (positions: Position[], priceData: { id: string; price: number }[]): Decimal => {
+    return calculateUnrealizedPnlForPositions(positions, priceData);
+  };
+
+  // Calculates the total USD value for an array of collateral deposits off-chain
+  // using the provided collateral deposits array and price data
+  calculateUsdValueOfCollateralDeposits = (
+    collateralDeposits: CollateralDeposit[],
+    priceData: { id: string; price: number }[],
+  ): Decimal => {
+    return calculateUsdValueOfCollateralDeposits(collateralDeposits, priceData);
+  };
+
+  // Returns the price for a price id from a provided price data array
+  getPriceFromPriceArray = (
+    priceData: { id: string; price: number }[],
+    priceId?: string | undefined,
+    tokenSymbol?: string | undefined,
+  ): number => {
+    return getPriceFromPriceArray(priceData, priceId, tokenSymbol);
   };
 }

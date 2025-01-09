@@ -3,7 +3,7 @@ import { request } from 'graphql-request';
 import {
   checkExistingUser,
   fetchAccountByWalletAddress,
-  fetchintegratorFees,
+  fetchIntegratorFees,
   fetchLeaderboardUserData,
   fetchPortfolioData,
   fetchRealizedPnlData,
@@ -196,7 +196,7 @@ export const getAccountByAddress = async (subgraphEndpoint: string, userAddresse
 };
 
 export const getFeesByAddress = async (subgraphEndpoint: string, userAddresses: string[]) => {
-  const subgraphResponse: any = await request(subgraphEndpoint, fetchintegratorFees(userAddresses));
+  const subgraphResponse: any = await request(subgraphEndpoint, fetchIntegratorFees(userAddresses));
   if (!subgraphResponse) throw new Error('Error While Fechting Wallet for Address');
   return subgraphResponse?.wallets;
 };
