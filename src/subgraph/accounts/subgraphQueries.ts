@@ -134,8 +134,8 @@ export const fetchLeaderboardUserData = (userAddresses: string[]) => gql`
 }`;
 
 // New snx code
-
-export const fetchintegratorFees = (usersAddress: string[]) =>
+// @todo Update to use SNX Accounts for integrator fees
+export const fetchIntegratorFees = (usersAddress: string[]) =>
   gql`
    {
      wallets(
