@@ -226,10 +226,26 @@ export const getFeesByAddress = async (
   return feesByAddress;
 };
 
-export const checkisExistingUser = async (subgraphEndpoint: string, userAddress: string) => {
+export const checkIfExistingUser = async (subgraphEndpoint: string, userAddress: string) => {
+  interface SNXAccountResponse {
+    id: string;
+    accountId: string;
+    totalOrdersCount: string;
+  }
+
   const subgraphResponse: any = await request(subgraphEndpoint, checkExistingUser(userAddress));
   if (!subgraphResponse) throw new Error('Error while fetching account data');
-  if (!subgraphResponse?.wallet) return false;
-  if (Number(subgraphResponse?.wallet.totalOrdersCount)) return true;
-  return false;
+
+  // A wallet can have multiple SNX accounts
+  // The function returns true if it has any one snxAccount with past orders
+  const snxAccounts: SNXAccountResponse[] = subgraphResponse?.snxAccounts;
+  let isExisting = false;
+  for (let index = 0; index < snxAccounts.length; index++) {
+    if (Number(snxAccounts[index].totalOrdersCount) > 0) {
+      isExisting = true;
+      break;
+    }
+  }
+
+  return isExisting;
 };

@@ -133,8 +133,6 @@ export const fetchLeaderboardUserData = (userAddresses: string[]) => gql`
   }
 }`;
 
-// New snx code
-// @todo Update to use SNX Accounts for integrator fees
 export const fetchIntegratorFees = (userAddresses: string[]) => gql`
   {
     snxAccounts(where:
@@ -154,9 +152,15 @@ export const fetchIntegratorFees = (userAddresses: string[]) => gql`
 
 export const checkExistingUser = (userAddress: string) => gql`
   {
-    wallet(id: "${userAddress.toLowerCase()}" ) {
-      id
-      totalOrdersCount
+  snxAccounts(
+    where: {
+      owner: "${userAddress}",
+      type: PERP,
     }
+  ) {
+    id
+    accountId
+		totalOrdersCount
   }
+}
 `;

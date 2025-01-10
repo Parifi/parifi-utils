@@ -8,7 +8,7 @@ import { getPublicSubgraphEndpoint } from './common';
 import { Pyth } from '../pyth';
 import Decimal from 'decimal.js';
 import {
-  checkisExistingUser,
+  checkIfExistingUser,
   getAccountByAddress,
   getFeesByAddress,
   getLeaderboardUserData,
@@ -111,9 +111,9 @@ export class Subgraph {
     return await getFeesByAddress(subgraphEndpoint, userAddresses);
   }
 
-  public async checkisExistingUser(userAddress: string) {
+  public async checkIfExistingUser(userAddress: string) {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await checkisExistingUser(subgraphEndpoint, userAddress);
+    return await checkIfExistingUser(subgraphEndpoint, userAddress);
   }
 
   public transformPriceArray(priceArray: PriceObject[]): { id: string; price: number }[] {

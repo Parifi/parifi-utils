@@ -13,4 +13,13 @@ describe('Account data fetching logic from subgraph', () => {
     const response = await parifiSdk.subgraph.getFeesByAddress(userAddresses);
     expect(response.size).toEqual(userAddresses.length);
   });
+
+  it('should check if a user address is an existing user', async () => {
+    const parifiSdk = await getParifiSdkInstanceForTesting();
+    const newUserAddress = '0x0809fd0036a173e3a0d50b95ee32e9bc20aa4ef9';
+    const existingUserAddress = '0x2f22928335ed7e472c18e1e487593c0ac40e9ca8';
+
+    expect(await parifiSdk.subgraph.checkIfExistingUser(newUserAddress)).toBe(false);
+    expect(await parifiSdk.subgraph.checkIfExistingUser(existingUserAddress)).toBe(true);
+  });
 });
