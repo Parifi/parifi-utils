@@ -8,7 +8,7 @@ import {
   fetchPortfolioData,
   fetchRealizedPnlData,
 } from './subgraphQueries';
-import { DECIMAL_ZERO } from '../../common';
+import { convertWeiToEther, DECIMAL_ZERO } from '../../common';
 import { LeaderboardUserData, UserPortfolioData } from '../../interfaces/sdkTypes';
 
 /// Returns the Realized PNL for positions and vaults for a user address
@@ -191,19 +191,44 @@ export const getLeaderboardUserData = async (
 
 export const getAccountByAddress = async (subgraphEndpoint: string, userAddresses: string) => {
   const subgraphResponse: any = await request(subgraphEndpoint, fetchAccountByWalletAddress(userAddresses));
-  if (!subgraphResponse) throw new Error('Error While Fechting Wallet for Address');
+  if (!subgraphResponse) throw new Error('Error while fetching account data');
   return subgraphResponse?.wallet;
 };
 
-export const getFeesByAddress = async (subgraphEndpoint: string, userAddresses: string[]) => {
+export const getFeesByAddress = async (
+  subgraphEndpoint: string,
+  userAddresses: string[],
+): Promise<Map<string, number>> => {
+  // Temp interface to map subgraph response
+  interface SNXAccountResponse {
+    id: string;
+    accountId: string;
+    owner: { id: string };
+    integratorFeesGenerated: string;
+  }
+
+  const feesByAddress = new Map<string, number>();
+
   const subgraphResponse: any = await request(subgraphEndpoint, fetchIntegratorFees(userAddresses));
-  if (!subgraphResponse) throw new Error('Error While Fechting Wallet for Address');
-  return subgraphResponse?.wallets;
+  if (!subgraphResponse) throw new Error('Error while fetching account data');
+
+  const snxAccounts: SNXAccountResponse[] = subgraphResponse?.snxAccounts;
+  snxAccounts.forEach((account) => {
+    const userFees = feesByAddress.get(account.owner.id);
+    if (userFees) {
+      // Multiple SNX accounts exist for the wallet address, add fees to previous values
+      const totalFees = userFees + convertWeiToEther(account.integratorFeesGenerated);
+      feesByAddress.set(account.owner.id, totalFees);
+    } else {
+      feesByAddress.set(account.owner.id, convertWeiToEther(account.integratorFeesGenerated));
+    }
+  });
+  return feesByAddress;
 };
 
 export const checkisExistingUser = async (subgraphEndpoint: string, userAddress: string) => {
   const subgraphResponse: any = await request(subgraphEndpoint, checkExistingUser(userAddress));
-  if (!subgraphResponse) throw new Error('Error While Fechting Wallet for Address');
+  if (!subgraphResponse) throw new Error('Error while fetching account data');
   if (!subgraphResponse?.wallet) return false;
   if (Number(subgraphResponse?.wallet.totalOrdersCount)) return true;
   return false;
