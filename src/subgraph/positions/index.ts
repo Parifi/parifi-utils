@@ -3,7 +3,9 @@ import {
   fetchPositionByIdQuery,
   fetchPositionsByUserQuery,
   fetchPositionsByUserQueryAndStatus,
+  fetchUserOpenPositionsWithTime,
   fetchUserPositionHistory,
+  fetchUserPositionHistoryWithTime,
 } from './subgraphQueries';
 
 import { NotFoundError } from '../../error/not-found.error';
@@ -111,6 +113,50 @@ export const getUserPositionsHistory = async (
 ): Promise<SnxAccount[]> => {
   try {
     const subgraphResponse: any = await request(subgraphEndpoint, fetchUserPositionHistory(userAddress, count, skip));
+    const snxAccounts = mapResponseToSnxAccountArray(subgraphResponse?.snxAccounts);
+    return snxAccounts ?? [];
+  } catch (error) {
+    console.error('Error fetching positions:', error);
+    return [];
+  }
+};
+
+// Get all positions by user address
+export const getUserPositionHistoryWithTime = async (
+  subgraphEndpoint: string,
+  userAddress: string,
+  startTime: number,
+  endTime: number,
+  count: number = 100,
+  skip: number = 0,
+): Promise<SnxAccount[]> => {
+  try {
+    const subgraphResponse: any = await request(
+      subgraphEndpoint,
+      fetchUserPositionHistoryWithTime(userAddress, startTime, endTime, count, skip),
+    );
+    const snxAccounts = mapResponseToSnxAccountArray(subgraphResponse?.snxAccounts);
+    return snxAccounts ?? [];
+  } catch (error) {
+    console.error('Error fetching positions:', error);
+    return [];
+  }
+};
+
+// Get open positions by user address
+export const getUserOpenPositionsWithTime = async (
+  subgraphEndpoint: string,
+  userAddress: string,
+  startTime: number,
+  endTime: number,
+  count: number = 10,
+  skip: number = 0,
+): Promise<SnxAccount[]> => {
+  try {
+    const subgraphResponse: any = await request(
+      subgraphEndpoint,
+      fetchUserOpenPositionsWithTime(userAddress, startTime, endTime, count, skip),
+    );
     const snxAccounts = mapResponseToSnxAccountArray(subgraphResponse?.snxAccounts);
     return snxAccounts ?? [];
   } catch (error) {

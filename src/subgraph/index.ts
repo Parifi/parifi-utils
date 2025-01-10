@@ -24,6 +24,8 @@ import {
   getLiquidatedPositionsByUserAddress,
   getOpenPositionsByUserAddress,
   getPositionById,
+  getUserOpenPositionsWithTime,
+  getUserPositionHistoryWithTime,
   getUserPositionsHistory,
 } from './positions';
 
@@ -109,6 +111,15 @@ export class Subgraph {
     return await getFeesByAddress(subgraphEndpoint, userAddresses);
   }
 
+  public async checkisExistingUser(userAddress: string) {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await checkisExistingUser(subgraphEndpoint, userAddress);
+  }
+
+  public transformPriceArray(priceArray: PriceObject[]): { id: string; price: number }[] {
+    return transformPriceArray(priceArray);
+  }
+
   ////////////////////////////////////////////////////////////////
   //////////////////////    ORDERS    ////////////////////////////
   ////////////////////////////////////////////////////////////////
@@ -180,13 +191,28 @@ export class Subgraph {
     return await getUserPositionsHistory(subgraphEndpoint, userAddress, count, skip);
   }
 
-  public async checkisExistingUser(userAddress: string) {
+  // Get all positions by user address
+  public async getUserPositionHistoryWithTime(
+    userAddress: string,
+    startTime: number,
+    endTime: number,
+    count: number = 100,
+    skip: number = 0,
+  ): Promise<SnxAccount[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
-    return await checkisExistingUser(subgraphEndpoint, userAddress);
+    return await getUserPositionHistoryWithTime(subgraphEndpoint, userAddress, startTime, endTime, count, skip);
   }
 
-  public transformPriceArray(priceArray: PriceObject[]): { id: string; price: number }[] {
-    return transformPriceArray(priceArray);
+  // Get open positions by user address
+  public async getUserOpenPositionsWithTime(
+    userAddress: string,
+    startTime: number,
+    endTime: number,
+    count: number = 10,
+    skip: number = 0,
+  ): Promise<SnxAccount[]> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getUserOpenPositionsWithTime(subgraphEndpoint, userAddress, startTime, endTime, count, skip);
   }
 
   ////////////////////////////////////////////////////////////////
