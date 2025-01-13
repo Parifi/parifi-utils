@@ -238,7 +238,7 @@ export const mapResponseToPosition = (response: any): Position | undefined => {
       closingPrice: response?.closingPrice,
       realizedPnl: response?.realizedPositionPnl,
       realizedFee: response?.realizedFee,
-      netRealizedPnl: response?.netRealizedPnl,
+      netRealizedPnl: response?.realizedPnlAfterFees,
       createdTimestamp: response?.createdTimestamp,
       lastRefresh: response?.lastRefresh,
       lastRefreshISO: response?.lastRefreshISO,
