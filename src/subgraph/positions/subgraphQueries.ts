@@ -42,7 +42,8 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 2
         txHash
         liquidationTxHash
         closingPrice
-        # realizedPnl
+        realizedPositionPnl
+        realizedPnlAfterFees
         # realizedFee
         # netRealizedPnl
         createdTimestamp
@@ -101,7 +102,8 @@ export const fetchPositionsByUserQueryAndStatus = (
         txHash
         liquidationTxHash
         closingPrice
-        # realizedPnl
+        realizedPositionPnl
+        realizedPnlAfterFees
         # realizedFee
         # netRealizedPnl
         createdTimestamp
@@ -155,7 +157,8 @@ export const fetchUserPositionHistory = (userAddress: string, count: number = 20
         txHash
         liquidationTxHash
         closingPrice
-        # realizedPnl
+        realizedPositionPnl
+        realizedPnlAfterFees
         # realizedFee
         # netRealizedPnl
         createdTimestamp
@@ -192,7 +195,8 @@ export const fetchPositionByIdQuery = (positionId: string) =>
             txHash
             liquidationTxHash
             closingPrice
-            # realizedPnl
+            realizedPositionPnl
+            realizedPnlAfterFees
             # realizedFee
             # netRealizedPnl
             createdTimestamp
