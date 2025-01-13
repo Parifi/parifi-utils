@@ -33,7 +33,7 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 2
           feedId
         }
         positionSize
-        positionCollateral
+        # positionCollateral
         avgPrice
         avgPriceDec
         isLong
@@ -42,9 +42,9 @@ export const fetchPositionsByUserQuery = (userAddress: string, count: number = 2
         txHash
         liquidationTxHash
         closingPrice
-        realizedPnl
-        realizedFee
-        netRealizedPnl
+        # realizedPnl
+        # realizedFee
+        # netRealizedPnl
         createdTimestamp
         lastRefresh
         lastRefreshISO
@@ -92,7 +92,7 @@ export const fetchPositionsByUserQueryAndStatus = (
           feedId
         }
         positionSize
-        positionCollateral
+        # positionCollateral
         avgPrice
         avgPriceDec
         isLong
@@ -101,9 +101,9 @@ export const fetchPositionsByUserQueryAndStatus = (
         txHash
         liquidationTxHash
         closingPrice
-        realizedPnl
-        realizedFee
-        netRealizedPnl
+        # realizedPnl
+        # realizedFee
+        # netRealizedPnl
         createdTimestamp
         lastRefresh
         lastRefreshISO
@@ -146,7 +146,7 @@ export const fetchUserPositionHistory = (userAddress: string, count: number = 20
           feedId
         }
         positionSize
-        positionCollateral
+        # positionCollateral
         avgPrice
         avgPriceDec
         isLong
@@ -155,9 +155,9 @@ export const fetchUserPositionHistory = (userAddress: string, count: number = 20
         txHash
         liquidationTxHash
         closingPrice
-        realizedPnl
-        realizedFee
-        netRealizedPnl
+        # realizedPnl
+        # realizedFee
+        # netRealizedPnl
         createdTimestamp
         lastRefresh
         lastRefreshISO
@@ -184,7 +184,7 @@ export const fetchPositionByIdQuery = (positionId: string) =>
               accountId
             }
             isLong
-            positionCollateral
+            # positionCollateral
             positionSize
             avgPrice
             avgPriceDec
@@ -192,9 +192,9 @@ export const fetchPositionByIdQuery = (positionId: string) =>
             txHash
             liquidationTxHash
             closingPrice
-            realizedPnl
-            realizedFee
-            netRealizedPnl
+            # realizedPnl
+            # realizedFee
+            # netRealizedPnl
             createdTimestamp
             lastRefresh
             lastRefreshISO
