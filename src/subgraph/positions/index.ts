@@ -1,6 +1,7 @@
 import { request } from 'graphql-request';
 import {
   fetchPositionByIdQuery,
+  fetchPositionsBySnxAccount,
   fetchPositionsByUserQuery,
   fetchPositionsByUserQueryAndStatus,
   fetchUserOpenPositionsWithTime,
@@ -10,7 +11,11 @@ import {
 
 import { NotFoundError } from '../../error/not-found.error';
 import { Position, SnxAccount } from '../../interfaces/sdkTypes';
-import { mapResponseToPosition, mapResponseToSnxAccountArray } from '../../common/subgraphMapper';
+import {
+  mapResponseToPosition,
+  mapResponseToSnxAccount,
+  mapResponseToSnxAccountArray,
+} from '../../common/subgraphMapper';
 
 // Get all positions by user address
 export const getAllPositionsByUserAddress = async (
@@ -162,5 +167,24 @@ export const getUserOpenPositionsWithTime = async (
   } catch (error) {
     console.error('Error fetching positions:', error);
     return [];
+  }
+};
+
+// Get positions by SNX Account id 
+export const getUserPositionsBySnxAccount = async (
+  subgraphEndpoint: string,
+  snxAccountId: string,
+): Promise<SnxAccount | undefined> => {
+  let formattedSnxAccountId = snxAccountId;
+  try {
+    if (!snxAccountId.includes('PERP')) {
+      formattedSnxAccountId = 'PERP-'.concat(snxAccountId);
+    }
+    const subgraphResponse: any = await request(subgraphEndpoint, fetchPositionsBySnxAccount(formattedSnxAccountId));
+    const snxAccount = mapResponseToSnxAccount(subgraphResponse?.snxAccount);
+    return snxAccount;
+  } catch (error) {
+    console.error('Error fetching positions:', error);
+    return undefined;
   }
 };

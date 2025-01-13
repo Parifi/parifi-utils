@@ -26,6 +26,7 @@ import {
   getPositionById,
   getUserOpenPositionsWithTime,
   getUserPositionHistoryWithTime,
+  getUserPositionsBySnxAccount,
   getUserPositionsHistory,
 } from './positions';
 
@@ -213,6 +214,12 @@ export class Subgraph {
   ): Promise<SnxAccount[]> {
     const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
     return await getUserOpenPositionsWithTime(subgraphEndpoint, userAddress, startTime, endTime, count, skip);
+  }
+
+  // Get open positions by user address
+  public async getUserPositionsBySnxAccount(snxAccountId: string): Promise<SnxAccount | undefined> {
+    const subgraphEndpoint = this.getSubgraphEndpoint(this.rpcConfig.chainId);
+    return await getUserPositionsBySnxAccount(subgraphEndpoint, snxAccountId);
   }
 
   ////////////////////////////////////////////////////////////////

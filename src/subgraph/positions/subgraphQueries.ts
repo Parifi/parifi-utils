@@ -345,3 +345,53 @@ export const fetchUserOpenPositionsWithTime = (
     }
     }
   }`;
+
+export const fetchPositionsBySnxAccount = (snxAccountId: string) =>
+  gql`
+    {
+    snxAccount(id: "${snxAccountId}"
+    ) {
+      id
+      accountId
+      owner {
+        id
+      }
+      collateralDeposits {
+        id
+        collateralName
+        collateralSymbol
+        collateralDecimals
+        collateralAddress
+        currentDepositedAmount
+        totalAmountDeposited
+        totalAmountWithdrawn
+        totalAmountLiquidated
+      }
+      positions {
+        id
+        market {
+          id
+          marketName
+          marketSymbol
+          feedId
+        }
+        positionSize
+        positionCollateral
+        avgPrice
+        avgPriceDec
+        isLong
+        createdTimestamp
+        status
+        txHash
+        liquidationTxHash
+        closingPrice
+        realizedPnl
+        realizedFee
+        netRealizedPnl
+        createdTimestamp
+        lastRefresh
+        lastRefreshISO
+        canBeLiquidated
+    }
+    }
+  }`;
