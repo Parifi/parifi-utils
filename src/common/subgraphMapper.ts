@@ -236,7 +236,7 @@ export const mapResponseToPosition = (response: any): Position | undefined => {
       txHash: response?.txHash,
       liquidationTxHash: response?.liquidationTxHash,
       closingPrice: response?.closingPrice,
-      realizedPnl: response?.realizedPnl,
+      realizedPnl: response?.realizedPositionPnl,
       realizedFee: response?.realizedFee,
       netRealizedPnl: response?.netRealizedPnl,
       createdTimestamp: response?.createdTimestamp,
