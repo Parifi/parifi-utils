@@ -55,6 +55,6 @@
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
     "permissionless": "0.1.16",
-    "viem": "^2.9.17"
+    "viem": "2.17.1"
   }
 }
