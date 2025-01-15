@@ -1,4 +1,5 @@
 import { Decimal } from 'decimal.js';
+import { formatEther, parseEther } from 'viem';
 
 export const getDiff = (a: Decimal, b: Decimal): Decimal => {
   return a.gt(b) ? a.minus(b) : b.minus(a);
@@ -27,3 +28,29 @@ export const getUniqueValuesFromArray = (originalArray: string[]): string[] => {
   });
   return uniqueArray;
 };
+
+export function convertWeiToEther(amountInWei: string | bigint | undefined): number {
+  if (amountInWei == undefined) {
+    throw new Error('Invalid amount received during conversion: undefined');
+  }
+  if (typeof amountInWei == 'bigint') {
+    return Number(formatEther(amountInWei));
+  } else if (typeof amountInWei == 'string') {
+    return Number(formatEther(BigInt(amountInWei)));
+  } else {
+    throw new Error('Expected string or bigint for conversion');
+  }
+}
+
+export function convertEtherToWei(amount: string | number | undefined): bigint {
+  if (amount == undefined) {
+    throw new Error('Invalid amount received during conversion: undefined');
+  }
+  if (typeof amount == 'number') {
+    return parseEther(amount.toString());
+  } else if (typeof amount == 'string') {
+    return parseEther(amount);
+  } else {
+    throw new Error('Expected string or bigint for conversion');
+  }
+}
