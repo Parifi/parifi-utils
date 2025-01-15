@@ -133,25 +133,34 @@ export const fetchLeaderboardUserData = (userAddresses: string[]) => gql`
   }
 }`;
 
-// New snx code
-
-export const fetchintegratorFees = (usersAddress: string[]) =>
-  gql`
-   {
-     wallets(
-      where: {id_in: [${usersAddress.map((id) => `"${id}"`).join(', ')}]}
-    ) {
-       id
-       integratorFeesGenerated
-     }
-   }
- `;
+export const fetchIntegratorFees = (userAddresses: string[]) => gql`
+  {
+    snxAccounts(where:
+    {
+      owner_in: [${userAddresses.map((id) => `"${id}"`).join(', ')}],
+      type: PERP
+    }) {
+      id
+      accountId
+      owner {
+        id
+      }
+      integratorFeesGenerated
+    }
+  }
+`;
 
 export const checkExistingUser = (userAddress: string) => gql`
   {
-    wallet(id: "${userAddress.toLowerCase()}" ) {
-      id
-      totalOrdersCount
+  snxAccounts(
+    where: {
+      owner: "${userAddress}",
+      type: PERP,
     }
+  ) {
+    id
+    accountId
+		totalOrdersCount
   }
+}
 `;
