@@ -33,7 +33,6 @@ export const fetchOrdersByUserQuery = (userAddress: string, count: number = 50, 
         }
         expirationTime
         deltaSize
-        deltaCollateral
         executionPrice
         isLimitOrder
         status
@@ -66,7 +65,6 @@ export const fetchOrdersByIdQuery = (orderId: string) =>
     }
     expirationTime
     deltaSize
-    deltaCollateral
     executionPrice
     isLimitOrder
     status
